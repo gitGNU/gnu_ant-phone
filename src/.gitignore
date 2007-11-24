@@ -1,0 +1,11 @@
+ant-phone
+calleridlexer.c
+calleridparser.c
+calleridparser.h
+gettext.h
+isdnlexer.c
+isdnparser.c
+isdnparser.h
+*.o
+.deps
+
