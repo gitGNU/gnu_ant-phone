@@ -4,4 +4,4 @@ SUBDIRS = intl doc src po
 
 EXTRA_DIST = config.rpath autogen.sh ABOUT-NLS
 
-AUTOMAKE_OPTIONS = dist-bzip2
+#AUTOMAKE_OPTIONS = dist-bzip2
