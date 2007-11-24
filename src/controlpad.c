@@ -252,34 +252,19 @@ static void controlpad_mute_cb(GtkWidget *button, gpointer data) {
  */
 static void controlpad_record_cb(GtkWidget *button, gpointer data) {
   session_t *session = (session_t *) data;
-  char *digits = NULL;
 
   if (button == session->record_checkbutton) {
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button))) { /* record! */
-      session->option_record = 1;
       if (session->state == STATE_CONVERSATION) {
-	if (recording_open(session->recorder,
-	      		   digits = util_digitstime(&session->vcon_time),
-			   session->option_recording_format))
-	{
-          fprintf(stderr, "Error opening audio file.\n");
-	  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
-				       session->record_checkbutton), FALSE);
-	  return;
-	}
-        free(digits);
-	cid_row_mark_record(session, session->cid_num - 1);
+        if (session_start_recording(session) == 0) {
+          session->option_record = 1;
+          cid_row_mark_record(session, session->cid_num - 1);
+        }
       }
     } else { /* don't record! */
       session->option_record = 0;
       if (session->state == STATE_CONVERSATION) {
-	recording_write(session->recorder, session->rec_buf_local,
-	                session->rec_buf_local_index, RECORDING_LOCAL);
-	recording_write(session->recorder, session->rec_buf_remote,
-	                session->rec_buf_remote_index, RECORDING_REMOTE);
         recording_close(session->recorder);
-        session->rec_buf_local_index = 0;
-        session->rec_buf_remote_index = 0;
       }
     }
     gtk_widget_set_sensitive(session->record_checkbutton_local,

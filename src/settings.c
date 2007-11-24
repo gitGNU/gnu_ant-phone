@@ -202,7 +202,7 @@ void settings_options_read(session_t *session) {
   /* read isdn4linux config */
   isdn_lexer_init(ISDN_CONFIG_FILENAME);
   if (!isdn_in) {
-    fprintf(stderr, "Warning: Couldn't read ISDN config file.\n");
+    errprintf("Warning: Couldn't read ISDN config file.\n");
   } else {
     isdn_tree_node_t* node;
     
@@ -238,7 +238,7 @@ void settings_options_read(session_t *session) {
   }
 
   if (!(homedir = get_homedir())) {
-    fprintf(stderr, "Warning: Couldn't get home dir.\n");
+    errprintf("Warning: Couldn't get home dir.\n");
     return;
   }
 
@@ -246,14 +246,14 @@ void settings_options_read(session_t *session) {
   if (asprintf(&filename, "%s/." PACKAGE "/%s",
 	       homedir, SETTINGS_OPTIONS_FILENAME) < 0)
   {
-    fprintf(stderr,
+    errprintf(
 	    "Warning: Couldn't allocate memory for options filename.\n");
     return;
   }
 
   isdn_lexer_init(filename);
   if (!isdn_in) {
-    fprintf(stderr, "Warning: No options file available.\n");
+    errprintf("Warning: No options file available.\n");
   } else {
     isdn_tree_node_t* node;
 
@@ -268,20 +268,18 @@ void settings_options_read(session_t *session) {
     while (node != NULL) {
       switch (node->type) {
         case ISDN_NODE_TYPE_ENTRY:
-	  if (debug)
-	    printf("Setting \"%s\" to \"%s\"...\n",
+	  dbgprintf(1, "Setting \"%s\" to \"%s\"...\n",
 		   node->name, node->content.value);
 	  settings_option_set(session, node->name, node->content.value);
 	  break;
         case ISDN_NODE_TYPE_SECTION:
-	  fprintf(stderr, "Warning: Unexpected section \"%s\".\n", node->name);
+	  errprintf("Warning: Unexpected section \"%s\".\n", node->name);
 	  break;
         case ISDN_NODE_TYPE_SUBSECTION:
-	  fprintf(stderr,
-	          "Warning: Unexpected subsection \"%s\".\n", node->name);
+	  errprintf("Warning: Unexpected subsection \"%s\".\n", node->name);
           break;
         default:
-	  fprintf(stderr, "Unknown ISDN_NODE_TYPE\n");
+	  errprintf("Unknown ISDN_NODE_TYPE\n");
       }
     
       node = node->next;
@@ -302,7 +300,7 @@ void settings_options_write(session_t *session) {
   FILE *f;
 
   if (!(homedir = get_homedir())) {
-    fprintf(stderr, "Warning: Couldn't get home dir.\n");
+    errprintf("Warning: Couldn't get home dir.\n");
     return;
   }
 
@@ -311,7 +309,7 @@ void settings_options_write(session_t *session) {
 
   if (asprintf(&filename, "%s/." PACKAGE "/%s",
 	       homedir, SETTINGS_OPTIONS_FILENAME) < 0) {
-    fprintf(stderr,
+    errprintf(
 	    "Warning: Couldn't allocate memory for options filename.\n");
     return;
   }
@@ -405,10 +403,10 @@ void settings_options_write(session_t *session) {
 	       session->option_calls_merge_max_days);
 
     if (fclose(f) == EOF) {
-      fprintf(stderr, "Warning: Couldn't close options file.\n");
+      errprintf("Warning: Couldn't close options file.\n");
     }
-  } else if (debug) {
-    fprintf(stderr, "Warning: Can't write to options file.\n");
+  } else {
+    dbgprintf(1, "Warning: Can't write to options file.\n");
   }
   free(filename);
 }
@@ -423,19 +421,18 @@ void settings_history_read(session_t *session) {
   ssize_t got;
 
   if (!(homedir = get_homedir())) {
-    fprintf(stderr, "Warning: Couldn't get home dir.\n");
+    errprintf("Warning: Couldn't get home dir.\n");
     return;
   }
 
   if (asprintf(&filename, "%s/." PACKAGE "/%s",
 	       homedir, SETTINGS_HISTORY_FILENAME) < 0) {
-    fprintf(stderr,
+    errprintf(
 	    "Warning: Couldn't allocate memory for history filename.\n");
     return;
   }
 
-  if (debug)
-    fprintf(stdout, "Info: History Filename: %s.\n", filename);
+  dbgprintf(1, "Info: History Filename: %s.\n", filename);
   if ((f = fopen(filename, "r"))) {
     do {
       got = getline(&lineptr, &linesize, f);
@@ -444,16 +441,15 @@ void settings_history_read(session_t *session) {
       }
       if (got > 0 && strlen(lineptr) > 0) {
 	session_history_append(session, lineptr);
-	if (debug)
-	  fprintf(stdout, "Info: History Number: %s.\n", lineptr);
+        dbgprintf(1, "Info: History Number: %s.\n", lineptr);
       }
     } while (got > 0);
     
     if (fclose(f) == EOF) {
-      fprintf(stderr, "Warning: Couldn't close history file.\n");
+      errprintf("Warning: Couldn't close history file.\n");
     }
-  } else if (debug) {
-    fprintf(stderr, "Warning: No history file available.\n");
+  } else {
+    dbgprintf(1, "Warning: No history file available.\n");
   }
 
   free(filename);
@@ -480,7 +476,7 @@ void settings_history_write(session_t *session) {
   FILE *f;
 
   if (!(homedir = get_homedir())) {
-    fprintf(stderr, "Warning: Couldn't get home dir.\n");
+    errprintf("Warning: Couldn't get home dir.\n");
     return;
   }
   
@@ -489,7 +485,7 @@ void settings_history_write(session_t *session) {
 
   if (asprintf(&filename, "%s/." PACKAGE "/%s",
 	       homedir, SETTINGS_HISTORY_FILENAME) < 0) {
-    fprintf(stderr,
+    errprintf(
 	    "Warning: Couldn't allocate memory for history filename.\n");
     return;
   }
@@ -499,10 +495,10 @@ void settings_history_write(session_t *session) {
 		   settings_history_write_line, f);
 
     if (fclose(f) == EOF) {
-      fprintf(stderr, "Warning: Couldn't close history file.\n");
+      errprintf("Warning: Couldn't close history file.\n");
     }
-  } else if (debug) {
-    fprintf(stderr, "Warning: Can't write to history file.\n");
+  } else {
+    dbgprintf(1, "Warning: Can't write to history file.\n");
   }
 
   free(filename);
@@ -514,13 +510,13 @@ void settings_callerid_read(session_t *session) {
   char *filename;
 
   if (!(homedir = get_homedir())) {
-    fprintf(stderr, "Warning: Couldn't get home dir.\n");
+    errprintf("Warning: Couldn't get home dir.\n");
     return;
   }
 
   if (asprintf(&filename, "%s/." PACKAGE "/%s",
 	       homedir, SETTINGS_CALLERID_HISTORY_FILENAME) < 0) {
-    fprintf(stderr, "Warning: "
+    errprintf("Warning: "
 	    "Couldn't allocate memory for caller id history filename.\n");
     return;
   }
@@ -528,10 +524,10 @@ void settings_callerid_read(session_t *session) {
   if ((callerid_in = fopen(filename, "r"))) {
     callerid_parse(session);
     if (fclose(callerid_in) == EOF) {
-      fprintf(stderr, "Warning: Couldn't close callerid history file.\n");
+      errprintf("Warning: Couldn't close callerid history file.\n");
     }
-  } else if (debug) {
-    fprintf(stderr, "Warning: No caller id history file available.\n");
+  } else {
+    dbgprintf(1, "Warning: No caller id history file available.\n");
   }
 
   free(filename);
@@ -552,7 +548,7 @@ void settings_callerid_write(session_t *session) {
   gchar *duration;
 
   if (!(homedir = get_homedir())) {
-    fprintf(stderr, "Warning: Couldn't get home dir.\n");
+    errprintf("Warning: Couldn't get home dir.\n");
     return;
   }
 
@@ -561,7 +557,7 @@ void settings_callerid_write(session_t *session) {
 
   if (asprintf(&filename, "%s/." PACKAGE "/%s",
 	       homedir, SETTINGS_CALLERID_HISTORY_FILENAME) < 0) {
-    fprintf(stderr, "Warning: "
+    errprintf("Warning: "
 	    "Couldn't allocate memory for callerid history filename.\n");
     return;
   }
@@ -583,16 +579,16 @@ void settings_callerid_write(session_t *session) {
       fprintf (f, "%-19s|%-3s|%-20s|%-20s|%-10s\n",
 	       date, type, from, to, duration);
       if (debug > 1)
-      fprintf(stderr, "%-19s|%-3s|%-20s|%-20s|%-10s\n",
+      errprintf("%-19s|%-3s|%-20s|%-20s|%-10s\n",
 		date, type, from, to, duration);
       
     }
 
     if (fclose(f) == EOF) {
-      fprintf(stderr, "Warning: Couldn't close callerid history file.\n");
+      errprintf("Warning: Couldn't close callerid history file.\n");
     }
-  } else if (debug) {
-    fprintf(stderr, "Warning: Can't write to callerid history file.\n");
+  } else {
+    dbgprintf(1, "Warning: Can't write to callerid history file.\n");
   }
 
   free(filename);

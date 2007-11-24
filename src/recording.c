@@ -4,6 +4,7 @@
  * This file is part of ANT (Ant is Not a Telephone)
  *
  * Copyright 2003 Roland Stigge
+ * Copyright 2007 Ivan Schreter
  *
  * ANT is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +28,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 /* sndfile audio file reading/writing library */
 #include <sndfile.h>
@@ -37,25 +39,19 @@
 #include "recording.h"
 #include "util.h"
 
-/* recorder internal buffer size (number of items, 1 item = 2 shorts): */
-#define RECORDING_BUFSIZE 16384
+/*--------------------------------------------------------------------------*/
 
-/*
- * Carefully opens a file and prepares recorder
- * * when the file exists, new data will be appended
- *
- * File format: 
- *
- * input:
- *   recorder: struct to be filled with recorder state for recording session
- *             until recording_close()
- *   filename: the base file name. It will be expanded
- *             with full path and extension
- *
- * returns: 0 on success, -1 otherwise
- */
+int recording_init(struct recorder_t *recorder)
+{
+  memset(recorder, 0, sizeof(struct recorder_t));
+  return 0;
+}
+
+/*--------------------------------------------------------------------------*/
+
 int recording_open(struct recorder_t *recorder, char *filename,
-                   enum recording_format_t format) {
+                   enum recording_format_t format)
+{
   SF_INFO sfinfo;
   char *homedir;
   char *fn;
@@ -64,26 +60,24 @@ int recording_open(struct recorder_t *recorder, char *filename,
   touch_dotdir();
   
   if (!(homedir = get_homedir())) {
-    fprintf(stderr, "Warning: Couldn't get home dir.\n");
+    errprintf("RECORD: Couldn't get home dir.\n");
     return -1;
   }
   if (asprintf(&fn, "%s/." PACKAGE "/recordings", homedir) < 0) {
-    fprintf(stderr, "Warning: "
+    errprintf("RECORD: "
 	    "recording_open: Couldn't allocate memory for directory name.\n");
     return -1;
   }
   if (touch_dir(fn) < 0) {
-    if (debug)
-      fprintf(stderr,
-	      "Warning: recording_open: Can't reach directory %s.\n", fn);
+    errprintf("RECORD: recording_open: Can't reach directory %s.\n", fn);
     return -1;
   }
   free(fn);
 
   if (asprintf(&fn, "%s/." PACKAGE "/recordings/%s.%s", homedir, filename, format & RECORDING_FORMAT_WAV ? "wav" : "aiff")
       < 0) {
-    fprintf(stderr, "Warning: "
-	    "recording_open: Couldn't allocate memory for directory name.\n");
+    errprintf("RECORD: "
+	    "recording_open: Couldn't allocate memory for file name.\n");
     return -1;
   }
  
@@ -94,146 +88,187 @@ int recording_open(struct recorder_t *recorder, char *filename,
     sfinfo.channels = 2;
     sfinfo.samplerate = ISDN_SPEED;
     if (!(recorder->sf = sf_open(fn, SFM_WRITE, &sfinfo))) {
-      fprintf(stderr, "recording_open: sf_open (file creation) error.\n");
+      errprintf("RECORD: recording_open: sf_open (file creation) error.\n");
       return -1;
     }
   } else { /* file already exists */
     sfinfo.format = 0;
     if (!(recorder->sf = sf_open(fn, SFM_RDWR, &sfinfo))) {
-      fprintf(stderr, "recording_open: sf_open (reopen) error.\n");
+      errprintf("RECORD: recording_open: sf_open (reopen) error.\n");
       return -1;
     }
     if (sf_seek(recorder->sf, 0, SEEK_END) == -1) {
-      fprintf(stderr, "recording_open: sf_seek error.\n");
+      errprintf("RECORD: recording_open: sf_seek error.\n");
       return -1;
     }
   }
   recorder->filename = fn;
-  if (!(recorder->queue =
-	(struct recqueue_t *) malloc (sizeof(struct recqueue_t)))) {
-    fprintf(stderr, "recording_open: recorder->queue malloc error.\n");
-    return -1;
-  }
-  if (!(recorder->queue->buf =
-	(short *) malloc (RECORDING_BUFSIZE * sizeof(short) * 2))) {
-    fprintf(stderr, "recording_open: recorder->queue->buf malloc error.\n");
-    return -1;
-  }
-  recorder->queue->next = NULL;
-  recorder->current_local = recorder->current_remote = recorder->queue;
-  recorder->localindex = 0;
-  recorder->remoteindex = 0;
+
+  /* initialize streaming buffers */
+  recorder->last_write = 0;
+  memset(&recorder->channel_local, 0, sizeof(rec_channel_t));
+  memset(&recorder->channel_remote, 0, sizeof(rec_channel_t));
+
+  /* NOTE: this has to be the last assignment, as it starts recording */
+  recorder->start_time = microsec_time();
   return 0;
 }
 
-/*
- * writes specified number of shorts to file
- *
- * input:
- *   recorder: struct with sound file state
- *   buf, size: the buffer of shorts with its size (number of shorts)
- *   channel: RECORDING_LOCAL or RECORDING_REMOTE
- *
- * returns: 0 on success, -1 otherwise
- */
+/*--------------------------------------------------------------------------*/
+
 int recording_write(struct recorder_t *recorder, short *buf, int size,
-		    enum recording_channel_t channel) {
-  int i;
-  struct recqueue_t **link_this; /* alias for current_local or current_remote */
-  int *buf_index_this; /* alias for localindex or remoteindex */
-  struct recqueue_t *temp;
-  
-  if (channel == RECORDING_LOCAL) {
-    link_this = &recorder->current_local;
-    buf_index_this = &recorder->localindex;
+		    enum recording_channel_t channel)
+{
+  int64_t start = recorder->start_time;
+  int64_t current, startpos, position;
+  int bufpos, split, delta;
+  rec_channel_t *buffer;
+
+  if (start == 0)
+    return 0; /* not enabled */
+  if (size < 1) {
+    errprintf("RECORD: recording_write: Trying to record with wrong size %d\n",
+              size);
+    return -1;
+  }
+
+  /* determine channel */
+  switch (channel)
+  {
+    case RECORDING_LOCAL:
+      buffer = &recorder->channel_local;
+      break;
+    case RECORDING_REMOTE:
+      buffer = &recorder->channel_remote;
+      break;
+    default:
+      errprintf("RECORD: recording_write: Recording to unknown channel %d requested\n",
+                (int) channel);
+      return -1;
+  }
+
+  /* compute position where to start write */
+  current = microsec_time() - start;
+  if (current < 0)
+    return 0; /* should never happen! */
+  int64_t endpos = current * ISDN_SPEED / 1000000LL;
+  startpos = endpos - size;
+  position = buffer->position;
+  if (startpos >= position - RECORDING_JITTER && startpos <= position + RECORDING_JITTER) {
+    /* position falls within recording jitter, adjust it to prevent cracks in recording */
+    startpos = position;
+    endpos = position + size;
+  }
+  if (startpos < position) {
+    /* should not happen, but to be sure, skip samples at the beginning */
+    delta = (int) position - startpos;
+    startpos = position;
+    buf += delta;
+    size -= delta;
+    if (size <= 0)
+      return 0; /* skipping too much, no data left */
+  }
+  bufpos = startpos % RECORDING_BUFSIZE;
+
+  dbgprintf(3, "RECORD: recording_write: data 0x%lx+%d to channel %d, pos %lld(%d)\n",
+            (long) buf, size, (int) channel, (long long) startpos, bufpos);
+
+  /* copy data into buffer */
+  if (bufpos + size <= RECORDING_BUFSIZE) {
+    /* all data can be copied at once */
+    memcpy(buffer->buf + bufpos, buf,
+           size * sizeof(short));
   } else {
-    link_this = &recorder->current_remote;
-    buf_index_this = &recorder->remoteindex;
+    /* must split to two copies */
+    split = RECORDING_BUFSIZE - bufpos;
+    memcpy(buffer->buf + bufpos, buf,
+           split * sizeof(short));
+    buf += split;
+    size -= split;
+    memcpy(buffer->buf, buf, size * sizeof(short));
   }
 
-  for (i = 0; i < size; i++) {
-    (*link_this)->buf[(*buf_index_this)++ * 2 + channel] = buf[i];
-    if (*buf_index_this >= RECORDING_BUFSIZE) { /* one buffer full */
-      if ((*link_this)->next == NULL) { /* expand list */
-	if (!((*link_this)->next =
-	      (struct recqueue_t *) malloc (sizeof(struct recqueue_t)))) {
-	  fprintf(stderr, "recording_write: buffer allocation error.\n");
-	  return -1;
-	}
-	if (!((*link_this)->next->buf =
-	      (short *) malloc (RECORDING_BUFSIZE * sizeof(short) * 2))) {
-	  fprintf(stderr, "recording_write: buffer allocation error.\n");
-	  return -1;
-	}
-	(*link_this)->next->next = NULL;
-      }
-      
-      *link_this = (*link_this)->next; /* go further in list */
-      *buf_index_this = 0;
-
-      if (recorder->queue != recorder->current_local &&
-	  recorder->queue != recorder->current_remote) {
-	/* write out buffer */
-	sf_writef_short(recorder->sf, recorder->queue->buf, RECORDING_BUFSIZE);
-	
-	temp = recorder->queue;
-	recorder->queue = recorder->queue->next;
-	free(temp->buf);
-	free(temp);
-      }
-    }
-  }
+  /* mark buffer last position */
+  buffer->position = endpos;
   return 0;
 }
 
-/*
- * finishes recording to file, writes remaining data from queue to file
- * (eventually filling a dangling channeln with silence)
- *
- * input:
- *   recorder: struct with sound file state
- *
- * returns: 0 on success, -1 otherwise
- */
-int recording_close(struct recorder_t *recorder) {
-  struct recqueue_t **link_this; /* aliases for the links and their buffer - */
-  struct recqueue_t **link_other;
-  int *buf_index_this;           /*   indices to traverse */
-  int *buf_index_other;
-  enum recording_channel_t channel;
-  struct recqueue_t *temp;
-  
-  /* set last, unavailable samples to zero */
-  if (recorder->queue == recorder->current_local) { /* traverse local samples */
-    link_this = &recorder->current_local;
-    link_other = &recorder->current_remote;
-    buf_index_this = &recorder->localindex;
-    buf_index_other = &recorder->remoteindex;
-    channel = RECORDING_LOCAL;
-  } else { /* traverse remote samples */
-    link_this = &recorder->current_remote;
-    link_other = &recorder->current_local;
-    buf_index_this = &recorder->remoteindex;
-    buf_index_other = &recorder->localindex;
-    channel = RECORDING_REMOTE;
+/*--------------------------------------------------------------------------*/
+
+int recording_flush(struct recorder_t *recorder, unsigned int last)
+{
+  /* compute position to write up to */
+  int64_t maxposition = recorder->channel_local.position;
+  int64_t tmp = recorder->channel_remote.position;
+  int64_t startposition = recorder->last_write;
+  short recbuf[RECORDING_BUFSIZE * 2];  /* sample buffer */
+  int srcptr, dstptr, size;
+
+  if (recorder->start_time == 0)
+    return 0; /* recording not active */
+
+  if (tmp > maxposition)
+    maxposition = tmp;
+
+  if (startposition + (RECORDING_BUFSIZE * 7 / 8) < maxposition) {
+    /* underflow, skip samples */
+    dbgprintf(2, "RECORD: recording_flush: underflow detected, start %lld, current %lld\n",
+              (long long) startposition, (long long) maxposition);
+    startposition = maxposition - (RECORDING_BUFSIZE * 7 / 8);
   }
 
-  while (*link_this != NULL) { /* traverse all chain links */
-    while ((*link_this != *link_other && *buf_index_this < RECORDING_BUFSIZE)
-	   || *buf_index_this < *buf_index_other) { /* all remaining samples */
-      (*link_this)->buf[(*buf_index_this)++ * 2 + channel] = 0;
-    }
-    sf_writef_short(recorder->sf, (*link_this)->buf, *buf_index_this);
-    
-    *buf_index_this = 0;
-    temp = *link_this;
-    *link_this = (*link_this)->next;
-    free(temp->buf);
-    free(temp);
+  if (!last) {
+    /* skip last 1/8th of the buffer as jitter buffer */
+    maxposition -= RECORDING_BUFSIZE / 8;
   }
-  
-  if (!sf_close(recorder->sf)) return -1;
-  free(recorder->filename);
+
+  size = (int) (maxposition - startposition);
+  if (maxposition <= 0 || startposition >= maxposition ||
+      (!last && size < RECORDING_BUFSIZE / 8))
+    return 0;   /* not enough data yet */
+
+  /* write samples between startposition and maxposition */
+  dstptr = 0;
+  srcptr = startposition % RECORDING_BUFSIZE;
+  while (--size) {
+    recbuf[dstptr++] = recorder->channel_local.buf[srcptr];
+    recorder->channel_local.buf[srcptr] = 0;
+    recbuf[dstptr++] = recorder->channel_remote.buf[srcptr];
+    recorder->channel_remote.buf[srcptr] = 0;
+
+    if (++srcptr >= RECORDING_BUFSIZE)
+      srcptr = 0;
+  }
+  sf_writef_short(recorder->sf, recbuf, dstptr / 2);
+
+  /* update last sample pointer */
+  recorder->last_write = maxposition;
   return 0;
 }
 
+/*--------------------------------------------------------------------------*/
+
+int recording_close(struct recorder_t *recorder)
+{
+  int result = 0;
+
+  if (recorder->start_time) {
+    /* flush outstanding data and disable recording */
+    if (recording_flush(recorder, 1) < 0)
+      result = -1;
+    recorder->start_time = 0;
+
+    if (recorder->filename) {
+      free(recorder->filename);
+      recorder->filename = 0;
+    }
+
+    /* close the recorder */
+    if (sf_close(recorder->sf) != 0)
+      result = -1;
+  }
+
+  return result;
+}
+
+/*--------------------------------------------------------------------------*/

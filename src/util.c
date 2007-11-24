@@ -171,10 +171,10 @@ void execute(char *command) {
   char *argv[] = {"sh", "-c", command, NULL};
 
   if (result == -1) { /* error */
-    fprintf(stderr, "Fork error.\n");
+    errprintf("Fork error.\n");
   } else if (result == 0) { /* we are the child */
     if (execvp("sh", argv)) {
-      fprintf(stderr, "Exec error.\n");
+      errprintf("Exec error.\n");
       exit(1);
     }
   }
@@ -225,18 +225,16 @@ int touch_dotdir(void) {
   char *filename;
 
   if (!(homedir = get_homedir())) {
-    fprintf(stderr, "Warning: Couldn't get home dir.\n");
+    errprintf("Warning: Couldn't get home dir.\n");
     return -1;
   }
 
   if (asprintf(&filename, "%s/." PACKAGE, homedir) < 0) {
-    fprintf(stderr,
-           "Warning: Couldn't allocate memory for configuration directory.\n");
+    errprintf("Warning: Couldn't allocate memory for configuration directory.\n");
     return -1;
   }
   if (touch_dir(filename) < 0) {
-    if (debug)
-      fprintf(stderr, "Warning: Can't reach configuration directory.\n");
+    dbgprintf(1, "Warning: Can't reach configuration directory.\n");
     return -1;
   }
   free(filename);
@@ -357,9 +355,20 @@ int output_codeset_set(char* codeset) {
   if (!codeset)
     codeset = output_codeset;
   if (!bind_textdomain_codeset(PACKAGE, codeset)) {
-    fprintf(stderr, "Error setting gettext output codeset to %s.\n", codeset);
+    errprintf("Error setting gettext output codeset to %s.\n", codeset);
     return -1;
   }
   return 0;
 }
 
+/*--------------------------------------------------------------------------*/
+
+uint64_t microsec_time()
+{
+  /* TODO: optimize this using HR timer, since gettimeofday is expensive */
+  struct timeval tv;
+  gettimeofday(&tv, 0);
+  return tv.tv_sec * ((uint64_t) 1000000) + tv.tv_usec;
+}
+
+/*--------------------------------------------------------------------------*/

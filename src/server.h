@@ -29,8 +29,13 @@
 #define SERVER_CONNECTIONS_MAX_PENDING 5
 #define SERVER_INBUF_SIZE 1024
 
+/*!
+ * @brief Messages passed from client to server.
+ */
 enum local_msg_t {
-  LOCAL_MSG_CALL
+  LOCAL_MSG_CALL,
+  LOCAL_MSG_SUSPEND,
+  LOCAL_MSG_WAKEUP
 };
 
 char *server_local_socket_name(void);

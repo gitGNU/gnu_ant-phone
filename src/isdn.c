@@ -4,6 +4,7 @@
  * This file is part of ANT (Ant is Not a Telephone)
  *
  * Copyright 2002, 2003 Roland Stigge
+ * Copyright 2007 Ivan Schreter
  *
  * ANT is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,23 +27,23 @@
 /* GNU headers */
 #include <stdio.h>
 #ifdef HAVE_STDLIB_H
-  #include <stdlib.h>
+#include <stdlib.h>
 #endif
 #ifdef HAVE_UNISTD_H
-  #include <unistd.h>
-#endif
-#ifdef HAVE_TERMIOS_H
-  #include <termios.h>
+#include <unistd.h>
 #endif
 #ifdef HAVE_FCNTL_H
-  #include <fcntl.h>
+#include <fcntl.h>
 #endif
-#ifdef HAVE_SYS_TIME_H
-  #include <sys/time.h>
-#endif
+
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include <string.h>
-#include <signal.h>
 #include <errno.h>
+
+/* ISDN CAPI header */
+#include <capi20.h>
 
 /* own header files */
 #include "globals.h"
@@ -52,503 +53,1171 @@ static char* calls_filenames[] =
 { "/var/lib/isdn/calls", "/var/log/isdn/calls", "/var/log/isdn.log" };
 char* isdn_calls_filename_from_config = NULL;
 
-/*
- * locks (via lock file) and opens a (free) ttyI device
- *
- * output:
- *   isdn_device_name, isdn_lockfile_name
- *
- * returns isdn file descriptor on success, -1 otherwise
- */
-int open_isdn_device(char **isdn_device_name, char **isdn_lockfile_name) {
-  int i = 0; /* try from 0 */
-  int found = 0; /* free file name found */
-  char buf[64];
-  int fd;
-  int n;
-  int pid;
-
-  while (i < 64 && !found) {
-    snprintf(buf, sizeof(buf), "%s/LCK..ttyI%d", LOCK_PATH, i);
-    *isdn_lockfile_name = strdup(buf);
-    if ((fd = open(*isdn_lockfile_name, O_RDONLY)) >= 0) { /* exists */
-      /* stale? -> remove (for re-use) */
-      n = read(fd, buf, sizeof(buf) - 1);
-      close(fd);
-      if (n > 0) {
-	if (n == 4) {
-	  if (sizeof(int) == 4)
-	    pid = *(int*) buf;
-	  else
-	    pid = 0;
-	} else {
-	  buf[n] = 0;
-	  sscanf(buf, "%d", &pid);
-	}
-	if (pid > 0) {
-	  if (kill((pid_t) pid, 0) < 0 && errno == ESRCH) { /* stale */
-	    if (!unlink(*isdn_lockfile_name))
-	      found = 1;    /* file removed */
-	  }
-	}
-      }
-    } else {
-      if (errno == ENOENT)
-	found = 1;          /* file doesn't exist */
-    }
-    if (!found) i++;
-  }
-
-  if (found && i < 64) { /* got a valid lock file name */
-    /* lock device */
-    if ((fd = open(*isdn_lockfile_name, O_WRONLY | O_CREAT, 0666)) < 0) {
-      return -1;
-    }
-    snprintf(buf, sizeof(buf), "%10ld\n", (long)getpid());
-    write(fd, buf, strlen(buf));
-    close(fd);
-
-    /* finally name and open the device itself */
-    snprintf(buf, sizeof(buf), "/dev/ttyI%d", i);
-    *isdn_device_name = strdup(buf);
-
-    /* tty device would possibly block on open -> O_NONBLOCK */
-    return open(*isdn_device_name, O_RDWR | O_NONBLOCK);
-  } else
-    return -1;
-}
+/*--------------------------------------------------------------------------*/
 
 /*
- * tries to read the given string from the specified tty (e.g. a ttyI)
- * (waits for the string if not read immediately)
+ * initiate listen on ISDN device
  *
- * input:
- *   fd       tty file descriptor
- *   s        (0-terminated) string to compare with
- *   timeout  give up after this number of seconds
- *               0: return immediately if no data available
- *              -1: no timeout
- *   got      if got != NULL, store reference to result there
- * 
- * output:
- *   got      pointer to string containing buffer actually read if called
- *              with got != NULL
- *              -> will be NULL on error
- *            NOTE: caller is responsible to free the referenced buffer
- *
- * returns 0 on success, -1 otherwise
- *
- * NOTE: currently uses a fixed size buffer, implying a maximum number
- *       of bytes read
+ * isdn ISDN device structure
+ * controller controller number
  */
-int tty_read(int fd, char *s, int timeout, char **got) {
-  int failed = 0;   /* 0 or 1*/
-  int buf_last = 0; /* index of end of string ('\0') */
-  char buf[256] = "";
-  struct timeval tv, *tvp;
-  fd_set fds;
-  
-  if (timeout >= 0) {
-    tv.tv_sec = timeout;
-    tv.tv_usec = 0;
-    tvp = &tv;
-  } else
-    tvp = NULL;
-  
-  while (!strstr(buf, s) && !failed) {
-    FD_ZERO(&fds);
-    FD_SET(fd, &fds);
+static int isdn_listen(isdn_t *isdn, unsigned int controller)
+{
+  _cmsg CMSG;  /* structure for the message */
+  unsigned int info;
 
-    if (buf_last == sizeof(buf) - 1) /* buffer full */
-      failed = 1;
-    else {
-      if (select(FD_SETSIZE, &fds, 0, 0, tvp) == 1) { /* input ready */
-	read(fd, &buf[buf_last], 1); /* read 1 more byte */
-	buf[++buf_last] = 0;
-      } else { /* timeout or signal */
-	failed = 1;
-      }
-    }
-  }
-  /* printf("%s\n", buf); */
-  if (got != NULL) {
-    *got = strdup(buf);
-  }
-  return -failed;
-}
+  dbgprintf(2, "CAPI 2.0: LISTEN_REQ ApplID %d msg %d ctrl %d infomsk 0x%x CIPmsk 0x%x\n",
+          isdn->appl_id, isdn->msg_no, controller,
+          isdn->info_mask, isdn->cip_mask);
 
-/*
- * writes specified 0-terminated string to the specified tty
- *
- * returns 0 on success, -1 otherwise
- */
-int tty_write(int fd, char *s) {
-  if (write(fd, s, strlen(s)) != (int)strlen(s)) {
+  g_mutex_lock(isdn->data_lock);
+  info = LISTEN_REQ(&CMSG, isdn->appl_id, isdn->msg_no++, controller,
+                     isdn->info_mask, isdn->cip_mask, 0, NULL, NULL);
+  g_mutex_unlock(isdn->data_lock);
+
+  if (info != 0) {
+    errprintf("CAPI 2.0: LISTEN_REQ failed, RC=0x%x\n", info);
     return -1;
   }
   return 0;
 }
 
-/*
- * clears input and output queue of specified tty
- *
- * returns 0 on success, -1 otherwise
- */
-int tty_clear(int fd) {
-  return tcflush(fd, TCIOFLUSH);
-}
+/*--------------------------------------------------------------------------*/
 
-/*
- * ISDN initialization
- *
- * returns 0 on success, -1 otherwise
+/*!
+ * @brief Set remote number on ISDN connection object.
  */
-int init_isdn_device(int isdn_fd, struct termios *backup) {
-  int failed = 0;
-  int flags;
-  char *(init_commands[]) = {
-    "AT&F\n",        "OK\r\n",   /* restore factory settings                 */
-    "ATE0\n",        "OK\r\n",   /* echo off                                 */
-    /*"AT&B128\n",     "OK\r\n",*/   /* set outgoing packet size */
-    "ATI\n",         "Linux ISDN\r\nOK\r\n", /* check for real isdn device   */
-    "AT+FCLASS=8\n", "OK\r\n",   /* enable audio mode                        */
-    "AT+VSM=6\n",    "OK\r\n",   /* set uLaw format                          */
-    "ATS18=1\n",     "OK\r\n",   /* set audio mode (dial out)                */
-    "ATS14=4\n",     "OK\r\n",   /* layer-2 protocol = transparent           */
-    "ATS13.4=1\n",   "OK\r\n",   /* CALLER NUMBER after first RING           */
-    "ATS13.6=1\n",   "OK\r\n",   /* enable RUNG messages */
-    "ATS23=1\n",     "OK\r\n"    /* Calling Party Number (CPN) extended RING */
-  };
-  struct termios settings;
-  unsigned int i;
+static void isdn_set_remote_number(isdn_t *isdn, char *number)
+{
+  char *tmp, *tofree = isdn->remote_number;
 
-  /* assume:
-   *   ttyI speed is 64000 by default
-   */
-  
-  /* switch O_NONBLOCK off (turned on while opening) */
-  flags = fcntl(isdn_fd, F_GETFL, 0);
-  if (flags != -1) {
-    if (fcntl(isdn_fd, F_SETFL, flags & ~O_NONBLOCK) == -1) {
-      perror("G_GETFL");
-      return -1;
+  if (number) {
+    /* NOTE: number format:
+     * Byte 0: length of structure
+     * Byte 1: numbering plan
+     * Byte 2: presentation indicator (0x80 standard, 0xA0 for CLIR)
+     * Byte 3..n: number digits
+     */
+    int len = number[0] - 2;
+    if (len <= 0) {
+      isdn->remote_number = 0;
+    } else {
+      tmp = (char*) malloc(len + 1);
+      memcpy(tmp, number + 3, len);
+      tmp[len] = 0;
+      isdn->remote_number = tmp;
     }
   } else {
-    perror("F_GETFL");
-    return -1;
+    isdn->remote_number = 0;
   }
 
-  if (tcgetattr(isdn_fd, &settings))
-    return -1;
+  if (tofree)
+    free(tofree);
+}
 
-  memcpy(backup, &settings, sizeof(struct termios));
+/*--------------------------------------------------------------------------*/
 
-  settings.c_lflag &= ~(ICANON | ECHO | ECHONL | ECHOCTL | ISIG);
-  settings.c_iflag &= ~(IXON | IXOFF | IXANY | IGNCR | ICRNL | INLCR );
-  settings.c_iflag |= IGNPAR;
-  settings.c_cflag |= HUPCL;
-  settings.c_oflag &= ~ONLCR;
+/*!
+ * @brief Set local number on ISDN connection object.
+ */
+static void isdn_set_local_number(isdn_t *isdn, char *number)
+{
+  char *tmp, *tofree = isdn->local_number;
 
-  settings.c_cc[VMIN] = 1;
-  settings.c_cc[VTIME] = 0;
-  
-  if (tcsetattr(isdn_fd, TCSANOW, &settings))
-    return -1;
-
-  i = 0;
-  
-  while (!failed && i < sizeof(init_commands) / sizeof(char*)) {
-    tty_clear(isdn_fd);
-    if (tty_write(isdn_fd, init_commands[i++]))
-      failed = 1;
-    else
-      if (tty_read(isdn_fd, init_commands[i++], ISDN_COMMAND_TIMEOUT, NULL))
-	failed = 1;
+  if (number) {
+    /* NOTE: number format:
+    * Byte 0: length of structure
+    * Byte 1: numbering plan
+    * Byte 2: presentation indicator (0x80 standard, 0xA0 for CLIR)
+    * Byte 3..n: number digits
+    */
+    int len = number[0] - 2;
+    if (len <= 0) {
+      isdn->local_number = 0;
+    } else {
+      tmp = (char*) malloc(len + 1);
+      memcpy(tmp, number + 3, len);
+      tmp[len] = 0;
+      isdn->local_number = tmp;
+    }
+  } else {
+    isdn->local_number = 0;
   }
 
-  return -failed;
+  if (tofree)
+    free(tofree);
 }
 
-/*
- * ISDN de-initialization, restores termios settings
- *
- * returns 0 on success, -1 otherwise
- */
-int deinit_isdn_device(int isdn_fd, struct termios *backup) {
-  return tcsetattr(isdn_fd, TCSANOW, backup);
-}
+/*--------------------------------------------------------------------------*/
 
-/*
- * sets an MSN for the specified ttyI (originating MSN)
- * fd is assumed to be in command mode
- *
- * returns 0 on success, -1 otherwise
- */
-int isdn_setMSN(int isdn_fd, char *msn) {
-  char buf[256];
-
-  if (snprintf(buf, sizeof(buf), "AT&E%s\n", msn) >= (int)sizeof(buf)) {
-    fprintf(stderr, "Error: Specified MSN too long.\n");
-    return -1;
-  }
-  tty_clear(isdn_fd);
-  if (tty_write(isdn_fd, buf))
-    return -1;
-  else
-    if (tty_read(isdn_fd, "OK\r\n", ISDN_COMMAND_TIMEOUT, NULL))
-      return -1;
-  return 0;
-}
-
-/*
- * sets MSNs for the specified ttyI (MSNs to listen on)
- * fd is assumed to be in command mode
- * msns: semicolon-separated list of msns
- *
- * returns 0 on success, -1 otherwise
- */
-int isdn_setMSNs(int isdn_fd, char *msns) {
-  char buf[256];
-
-  if (snprintf(buf, sizeof(buf), "AT&L%s\n", msns) >= (int)sizeof(buf)) {
-    fprintf(stderr, "Error: Specified MSNs string too long.\n");
-    return -1;
-  }
-  tty_clear(isdn_fd);
-  if (tty_write(isdn_fd, buf))
-    return -1;
-  else
-    if (tty_read(isdn_fd, "OK\r\n", ISDN_COMMAND_TIMEOUT, NULL))
-      return -1;
-  return 0;
-}
-
-/*
- * stops audio mode (enter command mode)
- *
- * input: self_hangup: we want to hang up ourselves
- *
- * returns 0 on success, -1 otherwise
- */
-int isdn_stop_audio(int isdn_fd, int self_hangup) {
+static int isdn_trigger_disconnect(isdn_t *isdn)
+{
+  unsigned int info;
   int result = 0;
-  unsigned char abort_sending[] = {DLE, DC4, 0};
-  unsigned char end_of_audio[] = {DLE, ETX, 0};
+  _cmsg CMSG;  /* structure for the message */
 
-  char *got;
+  switch (isdn->state) {
+    case ISDN_CONNECT_WAIT:
+    case ISDN_CONNECT_ACTIVE:
+    case ISDN_DISCONNECT_B3_REQ:
+    case ISDN_DISCONNECT_B3_WAIT:
+    case ISDN_INCOMING_WAIT:
+      /* no data channel yet or no reply to data disconnect, do physical disconnect */
+      {
+        dbgprintf(1, "CAPI 2.0: DISCONNECT_REQ ApplID %d plci 0x%x\n",
+                  isdn->appl_id, isdn->active_plci);
 
-  tty_clear(isdn_fd);
+        g_mutex_lock(isdn->data_lock);
+        info = DISCONNECT_REQ(&CMSG, isdn->appl_id, isdn->msg_no++,
+                              isdn->active_plci,  /* physical connection ID */
+                              0, 0, 0, 0 /* additional info */);
+        g_mutex_unlock(isdn->data_lock);
 
-  if (self_hangup) { /* we want to hang up ourselves */
-    if (tty_write(isdn_fd, end_of_audio)) {   /* ETX - end of audio */
-      fprintf(stderr, "Error sending ETX (End of audio).\n");
-      return -1;
-    }
-    if (tty_write(isdn_fd, abort_sending)) {/* abort sending (request) (DC4) */
-      fprintf(stderr, "Error sending DC4 (abort sending).\n");
-      return -1;
-    }
-    if (tty_read(isdn_fd, end_of_audio, ISDN_COMMAND_TIMEOUT, NULL)) {
-      fprintf(stderr, "Error waiting for ETX (End of audio).\n");
-      return -1;
-    }
-    if (tty_read(isdn_fd, "\r\n", ISDN_COMMAND_TIMEOUT, NULL)) {
-      fprintf(stderr, "Error getting line break.\n");
-      return -1;
-    }
-    if (tty_read(isdn_fd, "\r\n", ISDN_COMMAND_TIMEOUT, &got)) {
-      fprintf(stderr, "Error getting new line.\n");
-    }
-    if (!strstr(got, "VCON")) {
-      fprintf(stderr, "Error getting status.\n");
+        if (info != 0) {
+          errprintf("CAPI 2.0: DISCONNECT_REQ failed, RC=0x%x\n", info);
+          isdn->state = ISDN_IDLE;
+          isdn->callback->info_error(isdn->cb_context, info);
+          result = -1;
+        } else {
+          isdn->state = ISDN_DISCONNECT_ACTIVE;
+        }
+      }
+      break;
+
+    case ISDN_CONNECT_B3_WAIT:
+    case ISDN_CONNECTED:
+      /* both data and physical connection active, tear down data channel */
+      {
+        dbgprintf(1, "CAPI 2.0: DISCONNECT_B3_REQ ApplID %d ncci 0x%x\n",
+                  isdn->appl_id, isdn->active_ncci);
+
+        g_mutex_lock(isdn->data_lock);
+        info = DISCONNECT_B3_REQ(&CMSG, isdn->appl_id, isdn->msg_no++,
+                                 isdn->active_ncci,  /* logical connection ID */
+                                 NULL /* NCPI */);
+        g_mutex_unlock(isdn->data_lock);
+
+        if (info != 0) {
+          errprintf("CAPI 2.0: DISCONNECT_B3_REQ failed, RC=0x%x\n", info);
+
+          /* retry with disconnect on whole connection */
+          dbgprintf(1, "CAPI 2.0: DISCONNECT_REQ ApplID %d plci 0x%x\n",
+                    isdn->appl_id, isdn->active_plci);
+
+          g_mutex_lock(isdn->data_lock);
+          info = DISCONNECT_REQ(&CMSG, isdn->appl_id, isdn->msg_no++,
+                                 isdn->active_plci,  /* physical connection ID */
+                                 0, 0, 0, 0 /* additional info */);
+          g_mutex_unlock(isdn->data_lock);
+
+          if (info != 0) {
+            errprintf("CAPI 2.0: DISCONNECT_REQ failed, RC=0x%x\n", info);
+            isdn->state = ISDN_IDLE;
+            isdn->callback->info_error(isdn->cb_context, info);
+            result = -1;
+          } else {
+            isdn->state = ISDN_DISCONNECT_ACTIVE;
+          }
+        } else {
+          isdn->state = ISDN_DISCONNECT_B3_REQ;
+        }
+      }
+      break;
+
+    case ISDN_RINGING:
+      /* reject the call */
+      {
+        dbgprintf(2, "CAPI 2.0: CONNECT_RESP ApplID %d msgno %d plci 0x%x reject %d\n",
+                  isdn->appl_id, isdn->msg_no, isdn->active_plci, 3);
+
+        g_mutex_lock(isdn->data_lock);
+        info = CONNECT_RESP(&CMSG, isdn->appl_id, isdn->msg_no++,
+                            isdn->active_plci, 3 /* reject */,
+                            0 /* B1protocol: default */,
+                            0 /* B2protocol: default */,
+                            0 /* default B3protocol */,
+                            0 /* default B1configuration */,
+                            0 /* default B2configuration */,
+                            0 /* default B3configuration */,
+                            NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL /* additional info */);
+        g_mutex_unlock(isdn->data_lock);
+
+        isdn->state = ISDN_IDLE;
+        if (info != 0) {
+          errprintf("CAPI 2.0: CONNECT_RESP failed, RC=0x%x\n", info);
+          isdn->callback->info_error(isdn->cb_context, info);
+        } else {
+          isdn->callback->info_disconnected(isdn->cb_context);
+        }
+      }
+      break;
+
+    default:
+      errprintf("ISDN in unexpected state %d on disconnect\n", isdn->state);
       result = -1;
-    }
-    free(got);
-  } else { /* remote side hangup */
-    if (tty_write(isdn_fd, end_of_audio)) {   /* ETX - end of audio */
-      fprintf(stderr, "Error sending ETX (End of audio).\n");
-      return -1;
-    }
-    /* there doesn't seem to come anything after remote hangup ... (?) */
+      break;
   }
-  tty_clear(isdn_fd);
+
   return result;
 }
 
-/*
- * hang up isdn device
- *
- * NOTE: assumes command mode
- *
- * returns 0 on success, -1 otherwise
- */
-int isdn_hangup(int isdn_fd) {
-  tty_clear(isdn_fd);
-  if (tty_write(isdn_fd, "ATH\n"))
-    return -1;
-  if (tty_read(isdn_fd, "OK\r\n", ISDN_COMMAND_TIMEOUT, NULL))
-    return -1;
-  tty_clear(isdn_fd);
+/*--------------------------------------------------------------------------*/
+
+static void isdn_handle_confirmation(isdn_t *isdn, _cmsg *msg)
+{
+  unsigned int info, plci, ncci, controller;
+
+  switch (msg->Command) {
+
+    case CAPI_ALERT:
+      /* ALERT message */
+      {
+        plci = ALERT_CONF_PLCI(msg);
+        info = ALERT_CONF_INFO(msg);
+
+        dbgprintf(2, "CAPI 2.0: ALERT_CONF ApplID %d plci 0x%x info 0x%x\n",
+                  isdn->appl_id, plci, info);
+
+        if (info != 0) {
+          /* connection error */
+          isdn->state = ISDN_IDLE;
+        } else {
+          /* may ring now */
+          isdn->callback->info_ring(isdn->cb_context, isdn->remote_number, isdn->local_number);
+        }
+      }
+      break;
+
+    case CAPI_CONNECT:
+      /* physical channel connection is being established */
+      {
+        plci = CONNECT_CONF_PLCI(msg);
+        info = CONNECT_CONF_INFO(msg);
+
+        dbgprintf(2, "CAPI 2.0: CONNECT_CONF ApplID %d plci 0x%x info 0x%x\n",
+                  isdn->appl_id, plci, info);
+
+        if (info != 0) {
+          /* connection error */
+          isdn->state = ISDN_IDLE;
+          isdn->callback->info_error(isdn->cb_context, info);
+        } else {
+          /* CONNECT_ACTIVE_IND comes later, when connection actually established */
+          isdn->state = ISDN_CONNECT_WAIT;
+          isdn->active_plci = plci;
+        }
+      }
+      break;
+
+    case CAPI_CONNECT_B3:
+      /* logical connection is being established */
+      {
+        ncci = CONNECT_B3_CONF_NCCI(msg);
+        info = CONNECT_B3_CONF_INFO(msg);
+
+        dbgprintf(2, "CAPI 2.0: CONNECT_B3_CONF ApplID %d ncci 0x%x info 0x%x\n",
+                  isdn->appl_id, ncci, info);
+
+        if (isdn->state == ISDN_CONNECT_ACTIVE) {
+          if (info != 0) {
+            /* connection error */
+            isdn->callback->info_error(isdn->cb_context, info);
+            isdn_trigger_disconnect(isdn);
+          } else {
+            /* CONNECT_B3_ACTIVE_IND comes later, when connection actually established */
+            isdn->active_ncci = ncci;
+            isdn->state = ISDN_CONNECT_B3_WAIT;
+          }
+        } else {
+          /* wrong connection state for B3 connect, trigger disconnect */
+          isdn_trigger_disconnect(isdn);
+        }
+      }
+      break;
+
+    case CAPI_SELECT_B_PROTOCOL:
+      /* currently unused, response to SELECT_B_PROTOCOL_REQ while connection established */
+      break;
+
+    case CAPI_LISTEN:
+      /* LISTEN confirmation */
+      {
+        info = LISTEN_CONF_INFO(msg);
+        controller = LISTEN_CONF_CONTROLLER(msg);
+
+        dbgprintf(2, "CAPI 2.0: LISTEN_CONF ApplID %d controller %d info 0x%x\n",
+                  isdn->appl_id, controller, info);
+      }
+      break;
+
+    case CAPI_DISCONNECT_B3:
+      /* data channel disconnect initiated */
+      {
+        ncci = DISCONNECT_B3_CONF_NCCI(msg);
+        info = DISCONNECT_B3_CONF_INFO(msg);
+
+        dbgprintf(2, "CAPI 2.0: DISCONNECT_B3_CONF ApplID %d ncci 0x%x info 0x%x\n",
+                  isdn->appl_id, ncci, info);
+
+        if (info != 0) {
+          /* error, most probably NCCI not known */
+          isdn->callback->info_error(isdn->cb_context, info);
+          isdn->state = ISDN_DISCONNECT_B3_WAIT;
+          isdn_trigger_disconnect(isdn);
+        } else {
+          /* DISCONNECT_B3_ACTIVE_IND comes later, when connection actually closed */
+          isdn->state = ISDN_DISCONNECT_B3_WAIT;
+        }
+      }
+      break;
+
+    case CAPI_DISCONNECT:
+      /* physical channel disconnect initiated */
+      {
+        plci = DISCONNECT_CONF_PLCI(msg);
+        info = DISCONNECT_CONF_INFO(msg);
+
+        dbgprintf(2, "CAPI 2.0: DISCONNECT_CONF ApplID %d plci 0x%x info 0x%x\n",
+                  isdn->appl_id, plci, info);
+
+        if (info != 0) {
+          /* connection error */
+          isdn->state = ISDN_IDLE;
+          isdn->callback->info_error(isdn->cb_context, info);
+        } else {
+          /* DISCONNECT_ACTIVE_IND comes later, when connection actually closed */
+          isdn->state = ISDN_DISCONNECT_WAIT;
+        }
+      }
+      break;
+
+    case CAPI_DATA_B3:
+      /* sent data acknowledged, NOP */
+      break;
+
+    case CAPI_FACILITY:
+      /* TODO */
+      break;
+  }
+}
+
+/*--------------------------------------------------------------------------*/
+
+static void isdn_handle_indication(isdn_t *isdn, _cmsg *msg)
+{
+  unsigned int info, plci, ncci, flags, datalen, datahandle, cip, reject;
+  char *number, *called;
+  _cstruct ncpi;
+  void *data;
+
+  switch (msg->Command) {
+    case CAPI_CONNECT:
+      /* connect indication when called from remote phone */
+      {
+        plci = CONNECT_IND_PLCI(msg);
+        cip = CONNECT_IND_CIPVALUE(msg);
+
+        number = (char*) CONNECT_IND_CALLINGPARTYNUMBER(msg);
+        called = (char*) CONNECT_IND_CALLEDPARTYNUMBER(msg);
+
+        dbgprintf(2, "CAPI 2.0: CONNECT_IND ApplID %d plci 0x%x cip %d\n",
+                  isdn->appl_id, plci, cip);
+
+        reject = 0;
+        if (cip != 16 && cip != 1 && cip != 4) {
+          /* not telephony */
+          reject = 1; /* ignore */
+        } else if (isdn->state != ISDN_IDLE) {
+          reject = 3; /* user busy */
+        }
+        /* TODO: check called number, if in listening MSN set, set reject=1 (ignore), if not */
+
+        if (!reject) {
+          /* may ring now */
+          isdn->active_plci = plci;
+
+          isdn_set_remote_number(isdn, number);
+          isdn_set_local_number(isdn, called);
+
+#if 0
+          isdn->state = ISDN_RINGING;
+          isdn->callback->info_ring(isdn->cb_context, isdn->remote_number, isdn->local_number);
+#else
+          /* tell the network, we are interested in the call and ring */
+          dbgprintf(2, "CAPI 2.0: ALERT_REQ ApplID %d msgno %d plci 0x%x\n",
+                    isdn->appl_id, isdn->msg_no, plci);
+
+          g_mutex_lock(isdn->data_lock);
+          info = ALERT_REQ(msg, isdn->appl_id, isdn->msg_no++, plci,
+                           NULL, NULL, NULL, NULL, NULL);
+          g_mutex_unlock(isdn->data_lock);
+
+          if (info == 0) {
+            isdn->state = ISDN_RINGING;
+            isdn->active_plci = plci;
+          } else {
+            errprintf("CAPI 2.0: ALERT_REQ failed, RC=0x%x, rejecting call\n", info);
+            reject = 3;
+          }
+#endif
+        }
+
+        if (reject) {
+          /* answer the info message immediately */
+          dbgprintf(2, "CAPI 2.0: CONNECT_RESP ApplID %d msgno %d plci 0x%x reject %d\n",
+                    isdn->appl_id, isdn->msg_no, plci, reject);
+
+          g_mutex_lock(isdn->data_lock);
+          CONNECT_RESP(msg, isdn->appl_id, isdn->msg_no++,
+                      plci, reject,
+                      0 /* B1protocol: default */,
+                      0 /* B2protocol: default */,
+                      0 /* default B3protocol */,
+                      0 /* default B1configuration */,
+                      0 /* default B2configuration */,
+                      0 /* default B3configuration */,
+                      NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL /* additional info */);
+          g_mutex_unlock(isdn->data_lock);
+        }
+      }
+      break;
+
+    case CAPI_CONNECT_ACTIVE:
+      /* connection is now active */
+      {
+        plci = CONNECT_ACTIVE_IND_PLCI(msg);
+        number = (char*) CONNECT_ACTIVE_IND_CONNECTEDNUMBER(msg);
+
+        dbgprintf(2, "CAPI 2.0: CONNECT_ACTIVE_IND ApplID %d plci 0x%x\n",
+                  isdn->appl_id, plci);
+
+        if (plci != isdn->active_plci) {
+          /* connect on wrong PLCI??? */
+          errprintf("CAPI 2.0: CONNECT_ACTIVE_IND wrong plci 0x%x, expected 0x%x\n",
+                    plci, isdn->active_plci);
+
+          g_mutex_lock(isdn->data_lock);
+          CONNECT_ACTIVE_RESP(msg, isdn->appl_id, isdn->msg_no++, plci);
+          g_mutex_unlock(isdn->data_lock);
+        } else {
+          if (isdn->state != ISDN_INCOMING_WAIT) {
+            isdn_set_remote_number(isdn, number);
+          }
+
+          /* answer the info message */
+          g_mutex_lock(isdn->data_lock);
+          CONNECT_ACTIVE_RESP(msg, isdn->appl_id, isdn->msg_no++, plci);
+          g_mutex_unlock(isdn->data_lock);
+
+          if (isdn->state == ISDN_INCOMING_WAIT) {
+            /* B-channel will be established by remote side */
+            isdn->state = ISDN_CONNECT_ACTIVE;
+          } else {
+            /* request connection for B-channel */
+            dbgprintf(2, "CAPI 2.0: CONNECT_B3_REQ ApplID %d msgno %d plci 0x%x\n",
+                      isdn->appl_id, isdn->msg_no, isdn->active_plci);
+
+            g_mutex_lock(isdn->data_lock);
+            info = CONNECT_B3_REQ(msg, isdn->appl_id, isdn->msg_no++, isdn->active_plci, NULL);
+            g_mutex_unlock(isdn->data_lock);
+
+            if (info != 0) {
+              /* connection error */
+              errprintf("CAPI 2.0: CONNECT_B3_REQ failed, RC=0x%x\n", info);
+              isdn->callback->info_error(isdn->cb_context, info);
+              isdn_set_remote_number(isdn, 0);
+              /* initiate hangup on PLCI */
+              isdn_trigger_disconnect(isdn);
+            } else {
+              /* wait for CONNECT_B3, then announce result to application via callback */
+              isdn->state = ISDN_CONNECT_ACTIVE;
+            }
+          }
+        }
+      }
+      break;
+
+    case CAPI_CONNECT_B3_ACTIVE:
+      /* B-channel connection is now active, connection complete */
+      {
+        ncci = CONNECT_B3_ACTIVE_IND_NCCI(msg);
+
+        if (ncci != isdn->active_ncci) {
+          /* connect on wrong NCCI??? */
+          errprintf("CAPI 2.0: CONNECT_B3_ACTIVE_IND wrong ncci 0x%x, expected %d\n",
+                    ncci, isdn->active_ncci);
+        } else {
+          dbgprintf(2, "CAPI 2.0: CONNECT_B3_ACTIVE_IND ApplID %d msgno %d ncci 0x%x\n",
+                    isdn->appl_id, isdn->msg_no, ncci);
+
+          /* answer the info message */
+          g_mutex_lock(isdn->data_lock);
+          CONNECT_B3_ACTIVE_RESP(msg, isdn->appl_id, isdn->msg_no++, ncci);
+          g_mutex_unlock(isdn->data_lock);
+          isdn->state = ISDN_CONNECTED;
+
+          /* notify application about successful call establishment */
+          isdn_speed_init(&isdn->in_speed);
+          isdn->callback->info_connected(isdn->cb_context, isdn->remote_number);
+        }
+      }
+      break;
+
+    case CAPI_DISCONNECT:
+      /* connection completely released */
+      {
+        plci = DISCONNECT_IND_PLCI(msg);
+        info = DISCONNECT_IND_REASON(msg);
+
+        dbgprintf(2, "CAPI 2.0: DISCONNECT_IND ApplID %d msgno %d plci 0x%x reason 0x%x\n",
+                  isdn->appl_id, isdn->msg_no, plci, info);
+
+        /* answer the info message */
+        g_mutex_lock(isdn->data_lock);
+        DISCONNECT_RESP(msg, isdn->appl_id, isdn->msg_no++, plci);
+        g_mutex_unlock(isdn->data_lock);
+
+        if (plci != isdn->active_plci) {
+          /* disconnect on wrong PLCI??? */
+          errprintf("CAPI 2.0: DISCONNECT_IND wrong PLCI %d, expected %d\n",
+                    plci, isdn->active_plci);
+        } else {
+          isdn->state = ISDN_IDLE;
+          isdn->active_ncci = 0;
+          isdn->active_plci = 0;
+
+          if ((info & 0xff00) == 0x3400) {
+            /* network provides reason in lower byte */
+            switch (info) {
+              case 0x3400:
+              case 0x3480:
+              case 0x3490:
+              case 0x349f:
+                /* normal connection close */
+                info = 0;
+                break;
+            }
+          }
+
+          /* notify application */
+          if (info != 0) {
+            isdn->callback->info_error(isdn->cb_context, info);
+          } else {
+            isdn->callback->info_disconnected(isdn->cb_context);
+          }
+        }
+      }
+      break;
+
+    case CAPI_DISCONNECT_B3:
+      /* B-channel connection is now disconnected, connection terminating */
+      {
+        ncci = DISCONNECT_B3_IND_NCCI(msg);
+        info = DISCONNECT_B3_IND_REASON_B3(msg);
+
+        dbgprintf(2, "CAPI 2.0: DISCONNECT_B3_IND ApplID %d msgno %d ncci 0x%x reason 0x%x\n",
+                  isdn->appl_id, isdn->msg_no, ncci, info);
+
+        /* answer the info message */
+        g_mutex_lock(isdn->data_lock);
+        DISCONNECT_B3_RESP(msg, isdn->appl_id, isdn->msg_no++, ncci);
+        g_mutex_unlock(isdn->data_lock);
+
+        if (ncci != isdn->active_ncci) {
+          /* disconnect on wrong NCCI??? */
+          errprintf("CAPI 2.0: DISCONNECT_B3_IND wrong ncci 0x%x, expected 0x%x\n",
+                    ncci, isdn->active_ncci);
+        } else {
+          isdn->active_ncci = 0;
+          if (isdn->state == ISDN_CONNECTED || isdn->state == ISDN_CONNECT_B3_WAIT) {
+            /* passive disconnect, DISCONNECT_IND comes later */
+            isdn->state = ISDN_DISCONNECT_ACTIVE;
+          } else {
+            /* active disconnect, needs to send DISCONNECT_REQ */
+            isdn_trigger_disconnect(isdn);
+          }
+        }
+      }
+      break;
+
+    case CAPI_DATA_B3:
+      /* data arrived */
+      {
+        ncci = DATA_B3_IND_NCCI(msg);
+        data = DATA_B3_IND_DATA(msg);
+        datalen = DATA_B3_IND_DATALENGTH(msg);
+        datahandle = DATA_B3_IND_DATAHANDLE(msg);
+        flags = DATA_B3_IND_FLAGS(msg);
+
+        dbgprintf(flags ? 2 : 3, "CAPI 2.0: DATA_B3_IND ApplID %d msgno %d ncci 0x%x data 0x%lx+%d flags 0x%x\n",
+                  isdn->appl_id, isdn->msg_no, ncci, (long) data, datalen, flags);
+
+        isdn_speed_addsamples(&isdn->in_speed, datalen);
+
+        /* TODO: process flags */
+        isdn->callback->info_data(isdn->cb_context, data, datalen);
+
+        /* answer the info message */
+        g_mutex_lock(isdn->data_lock);
+        DATA_B3_RESP(msg, isdn->appl_id, isdn->msg_no++, ncci, datahandle);
+        g_mutex_unlock(isdn->data_lock);
+
+        if (debug > 1) {
+          isdn_speed_debug(&isdn->in_speed, 2, "CAPI 2.0: in");
+        }
+      }
+      break;
+
+    case CAPI_CONNECT_B3:
+      /* connect indication from remote side */
+      {
+        ncci = CONNECT_B3_IND_NCCI(msg);
+        ncpi = CONNECT_B3_IND_NCPI(msg);
+
+        dbgprintf(3, "CAPI 2.0: CONNECT_B3_IND ApplID %d msgno %d ncci 0x%x\n",
+                  isdn->appl_id, isdn->msg_no, ncci);
+
+        /* answer the info message */
+        g_mutex_lock(isdn->data_lock);
+        CONNECT_B3_RESP(msg, isdn->appl_id, isdn->msg_no++, ncci, 0, ncpi);
+        g_mutex_unlock(isdn->data_lock);
+
+        if (isdn->state == ISDN_CONNECT_ACTIVE) {
+          /* CONNECT_B3_ACTIVE_IND comes later, when connection actually established */
+          isdn->active_ncci = ncci;
+          isdn->state = ISDN_CONNECT_B3_WAIT;
+        } else {
+          /* wrong connection state for B3 connect, trigger disconnect */
+          isdn_trigger_disconnect(isdn);
+        }
+      }
+      break;
+
+    case CAPI_FACILITY:
+    case CAPI_INFO:
+      break;
+  }
+}
+
+/*--------------------------------------------------------------------------*/
+
+static gpointer isdn_reply_thread(gpointer param)
+{
+  isdn_t *isdn = (isdn_t*) param;
+  _cmsg msg;
+  unsigned int info;
+
+  /* timeout is needed, since CAPI release doesn't release waitformessage as it should */
+  struct timeval timeout;
+
+  while (!thread_is_stopping(&isdn->reply_thread)) {
+    /* process CAPI messages and call callbacks */
+    timeout.tv_sec = 1;
+    timeout.tv_usec = 0;
+    info = capi20_waitformessage(isdn->appl_id, &timeout);
+
+    if (info != CapiNoError) {
+      if (isdn->appl_id == 0) {
+        /* ISDN inactive, retry later */
+        sleep(1);
+      }
+      continue;
+    }
+
+    g_mutex_lock(isdn->data_lock);
+
+    info = CAPI_GET_CMSG(&msg, isdn->appl_id);
+
+    g_mutex_unlock(isdn->data_lock);
+
+    g_mutex_lock(isdn->lock);
+
+    switch (info) {
+      case CapiNoError:
+        /* process the message */
+        switch (msg.Subcommand) {
+          case CAPI_CONF:
+            /* confirmation message */
+            isdn_handle_confirmation(isdn, &msg);
+            break;
+
+          case CAPI_IND:
+            /* indication message */
+            isdn_handle_indication(isdn, &msg);
+            break;
+        }
+        break;
+
+      case CapiReceiveQueueEmpty:
+        errprintf("CAPI 2.0: Empty queue, even if message pending\n");
+        break;
+
+      default:
+        /* error */
+        errprintf("CAPI 2.0: Error while receiving next message, stopping ISDN, RC=0x%x\n", info);
+        isdn->reply_thread.stop_flag = 1;
+        break;
+    }
+
+    g_mutex_unlock(isdn->lock);
+  }
+
   return 0;
 }
 
-/*
- * Set isdn device to block mode, assuming in audio mode
- *
- * in blockmode, the minimum number of bytes possible to read from specified
- *   ttyI will be set to DEFAULT_ISDNBUF_SIZE and non blocking reads and writes
- *   will be enabled
- *
- * input:
- *   isdn_fd         file descriptor
- *   flag            0 == off, 1 == on
- *
- * returns 0 on success, -1 otherwise
- */
-int isdn_blockmode(int isdn_fd, int flag) {
-  struct termios settings;
-  int min, time;
-  int flags;
+/*--------------------------------------------------------------------------*/
 
-  flags = fcntl(isdn_fd, F_GETFL, 0);
-  if (flags == -1) {
-    perror("F_GETFL");
+int open_isdn_device(isdn_t *isdn, isdn_callback_t *callbacks, void *context)
+{
+  unsigned int info;
+
+  unsigned char buf[64];
+  unsigned int numControllers, i, appl_id;
+  unsigned int bChannels, dtmf, fax, faxExt, suppServ, transp;
+  _cdword buf2[4];
+
+  memset(isdn, 0, sizeof(isdn_t));
+
+  info = CAPI20_ISINSTALLED();
+  if (info != 0) {
+    errprintf("CAPI 2.0: not installed, RC=0x%x\n", info);
     return -1;
   }
 
-  if (flag) {
-    min = DEFAULT_ISDNBUF_SIZE;
-    time = 0;                    /* 10 == 1sec */
-    flags |= O_NONBLOCK; /* select consumes much cpu time with this */
-  } else {
-    min = 1;
-    time = 0;
-    flags &= ~O_NONBLOCK;
+  isdn->lock = g_mutex_new();
+  if (!isdn->lock) {
+    errprintf("Cannot allocate ISDN mutex\n");
+    return -1;
   }
-
-  if (fcntl(isdn_fd, F_SETFL, flags) == -1) {
-    perror("G_GETFL");
+  isdn->data_lock = g_mutex_new();
+  if (!isdn->data_lock) {
+    g_mutex_free(isdn->lock);
+    isdn->lock = 0;
+    errprintf("Cannot allocate data mutex\n");
     return -1;
   }
 
-  if (tcgetattr(isdn_fd, &settings)) {
-    perror("isdn_blockmode, tcgetattr");
+  info = CAPI20_GET_PROFILE (0, buf);
+  if (info != 0) {
+    errprintf("CAPI 2.0: error getting profile, RC=0x%x\n", info);
+    return -1;
+  }
+  numControllers = buf[0] + (buf[1] << 8);
+
+  if (numControllers == 0) {
+    errprintf("CAPI 2.0: No ISDN controllers installed\n");
     return -1;
   }
 
-  settings.c_cc[VMIN] = min;
-  settings.c_cc[VTIME] = time;
-  
-  if (tcsetattr(isdn_fd, TCSANOW, &settings)) {
-    perror("isdn_blockmode, tcsetattr");
-    return -1;
+  if (debug) {
+    dbgprintf(1, "CAPI 2.0: Controllers found: %d\n", numControllers);
+    if (capi20_get_manufacturer(0,buf)) {
+      dbgprintf(1, "CAPI 2.0: Manufacturer: %s\n", buf);
+    }
+    if (capi20_get_version(0, (unsigned char *) buf2)) {
+      dbgprintf(1, "CAPI 2.0: Version: %d.%d/%d.%d\n",
+              buf2[0], buf2[1], buf2[2], buf2[3]);
+    }
   }
 
-  /* verify */
-  if (tcgetattr(isdn_fd, &settings))
-    return -1;
-  if (settings.c_cc[VMIN] != min) {
-    fprintf(stderr,"Error setting block size. New block size: %d.\n",
-	    settings.c_cc[VMIN]);
-    return -1;
+
+  for (i = 1; i <= numControllers; ++i)
+  {
+    if (debug) {
+      if (capi20_get_manufacturer(i, buf)) {
+        dbgprintf(1, "CAPI 2.0: Controller %d: Manufacturer: %s\n", i, buf);
+      }
+      if (capi20_get_version(i, (unsigned char *) buf2)) {
+        dbgprintf(1, "CAPI 2.0: Controller %d: Version: %d.%d/%d.%d\n",
+                i, buf2[0], buf2[1], buf2[2], buf2[3]);
+      }
+    }
+
+    info = CAPI20_GET_PROFILE(i, buf);
+    if (info != 0) {
+      errprintf("CAPI 2.0: error getting controller %d profile, RC=0x%x\n",
+              i, info);
+      return -1;
+    }
+
+    bChannels = buf[2] + (buf[3]<<8);
+
+    if (buf[4] & 0x08)
+      dtmf = 1;
+    else
+      dtmf = 0;
+
+    if (buf[4] & 0x10)
+      suppServ = 1;
+    else
+      suppServ = 0;
+
+    if (buf[8] & 0x02 && buf[12] & 0x02 && buf[16] & 0x01)
+      transp = 1;
+    else
+      transp = 0;
+
+    if (buf[8] & 0x10 && buf[12] & 0x10 && buf[16] & 0x10)
+      fax = 1;
+    else
+      fax = 0;
+
+    if (buf[8] & 0x10 && buf[12] & 0x10 && buf[16] & 0x20)
+      faxExt = 1;
+    else
+      faxExt = 0;
+
+    dbgprintf(1, "CAPI 2.0: Bchan %d, DTMF %d, FAX %d/%d, transp %d, suppServ %d\n",
+            bChannels, dtmf, fax, faxExt, transp, suppServ);
   }
 
-  return 0;
-}
+  info = capi20_register(2 /*maxLogicalConnection*/,
+                         7 /*maxBDataBlocks*/,
+                         2 * ISDN_FRAGMENT_SIZE /*maxBDataLen*/,
+                         &appl_id);
 
-/*
- * closes ttyI device and removes lock file
- *
- * returns 0 on success, -1 otherwise
- */
-int close_isdn_device(int isdn_fd, char *isdn_device_name,
-		      char *isdn_lockfile_name) {
-  if (close(isdn_fd)) {
+  if (appl_id == 0 || info != 0) {
+    errprintf("CAPI 2.0: Error registering application, RC=0x%x\n", info);
     return -1;
   }
-  if (unlink(isdn_lockfile_name)) {
-    fprintf(stderr, "Removing isdn device lock file: unlink error.\n");
-    return -1;
-  }
-  free(isdn_lockfile_name);
-  free(isdn_device_name);
-  return 0;
-}
+  dbgprintf(1, "CAPI 2.0: Received application ID %d\n", appl_id);
 
-/*
- * dials specified number (voice call)
- * (proper ttyI init is assumed)
- *
- * returns:
- *   0 on success (VCON)
- *   1 on busy
- *  -1 otherwise (error / timeout)
- */
-int isdn_dial(int isdn_fd, char *number, int timeout) {
-  char *s;
-  int result;
-  char *got;
+  isdn->appl_id = appl_id;
+  isdn->ctrl_count = numControllers;
+  isdn->callback = callbacks;
+  isdn->cb_context = context;
+  isdn->msg_no = 0;
+  thread_init(&isdn->reply_thread);
 
-  if ((s = (char*) malloc(strlen(number) + 5))) {
-  
-    snprintf(s, strlen(number) + 5, "ATD%s\n", number);
-    tty_clear(isdn_fd);
-    result = tty_write(isdn_fd, s);
-    free(s);
-    if (result) {
-      fprintf(stderr, "Error dialing.\n");
+  /* INFO and CIP masks as defined in Chapter 5.37 of CAPI 2.0 specs */
+
+  /* call progression */
+  isdn->info_mask = 0x10;
+  /* speech, 3,1kHz audio, telephony */
+  isdn->cip_mask = 0x00010012;
+  /* telephony only */
+  /*isdn->cip_mask = 0x00010000;*/
+  /* all services would be: 0x1FFF03FF */
+
+  /* activate listening on all controllers */
+  for (i = 1; i <= numControllers; ++i) {
+    /* TODO: listen only if the controller has voice capability */
+    if (isdn_listen(isdn, i) < 0) {
+      errprintf("CAPI 2.0: Error listening on controller %d\n", i);
       return -1;
     }
   }
 
-  if (tty_read(isdn_fd, "\r\n", timeout, NULL)) /* error / timeout */
-    return -1;
+  thread_start(&isdn->reply_thread, isdn_reply_thread, isdn);
 
-  if (tty_read(isdn_fd, "\r\n", ISDN_COMMAND_TIMEOUT, &got))
-    return -1;
-
-  if (strstr(got, "BUSY\r\n")) {
-    free(got);
-    return 1;
-  }
-
-  if (strstr(got, "VCON\r\n")) {
-    free(got);
-    return 0;
-  }
-
-  free(got);
-  return -1; /* failed somehow */
-}
-
-/*
- * sets ttyI to full duplex mode
- * (should be called directly after VCON)
- *
- * returns 0 on success, -1 otherwise
- */
-int isdn_set_full_duplex(int isdn_fd) {
-  tty_clear(isdn_fd);
-  if (tty_write(isdn_fd, "AT+VRX+VTX\n"))
-    return -1;
   return 0;
 }
 
-/*
- * returns the name of the calls file (originally just /var/lib/isdn/calls)
- * on error, returns NULL
- */
+/*--------------------------------------------------------------------------*/
+
+int close_isdn_device(isdn_t *isdn)
+{
+  unsigned int info;
+  int result = 0;
+
+  if (isdn->appl_id != 0) {
+    info = capi20_release(isdn->appl_id);
+    if (info != 0) {
+      errprintf("CAPI 2.0: Error releasing ISDN controller, RC=0x%x\n", info);
+      result = -1;
+    }
+  }
+
+  thread_stop(&isdn->reply_thread);
+
+  isdn->appl_id = 0;
+  if (isdn->own_msn) {
+    free(isdn->own_msn);
+    isdn->own_msn = 0;
+  }
+  if (isdn->lock) {
+    g_mutex_free(isdn->lock);
+    isdn->lock = 0;
+  }
+
+  return result;
+}
+
+/*--------------------------------------------------------------------------*/
+
+int activate_isdn_device(isdn_t *isdn, unsigned int active)
+{
+  unsigned int info, appl_id, numControllers, i;
+  unsigned char buf[64];
+  int result = 0;
+
+  dbgprintf(1, "CAPI 2.0: activate %d\n", active);
+  if (active) {
+    /* activate */
+    if (isdn->appl_id == 0) {
+      info = CAPI20_GET_PROFILE (0, buf);
+      if (info != 0) {
+        errprintf("CAPI 2.0: error getting profile, RC=0x%x\n", info);
+        result = -1;
+      } else {
+        numControllers = buf[0] + (buf[1] << 8);
+
+        info = capi20_register(2 /*maxLogicalConnection*/,
+                              7 /*maxBDataBlocks*/,
+                              2 * ISDN_FRAGMENT_SIZE /*maxBDataLen*/,
+                              &appl_id);
+
+        if (appl_id == 0 || info != 0) {
+          errprintf("CAPI 2.0: Error registering application, RC=0x%x\n", info);
+          return -1;
+        }
+        dbgprintf(1, "CAPI 2.0: Received application ID %d\n", appl_id);
+        isdn->appl_id = appl_id;
+
+        /* activate listening on all controllers */
+        for (i = 1; i <= numControllers; ++i) {
+          /* TODO: listen only if the controller has voice capability */
+          if (isdn_listen(isdn, i) < 0) {
+            errprintf("CAPI 2.0: Error listening on controller %d\n", i);
+            return -1;
+          }
+        }
+      }
+    }
+  } else {
+    /* deactivate */
+    if (isdn->appl_id) {
+      info = capi20_release(isdn->appl_id);
+      if (info != 0) {
+        errprintf("CAPI 2.0: Error releasing ISDN controller, RC=0x%x\n", info);
+        result = -1;
+      }
+      isdn->appl_id = 0;
+    }
+  }
+
+  return result;
+}
+
+/*--------------------------------------------------------------------------*/
+
+int isdn_dial(isdn_t *isdn, unsigned int controller, char *number)
+{
+  _cmsg CMSG;  /* structure for the message */
+  unsigned int info, msgno;
+  int result = 0;
+  char *called_nr, *calling_nr;
+
+  g_mutex_lock(isdn->lock);
+
+  if (isdn->state != ISDN_IDLE) {
+    errprintf("ISDN connection or disconnect in progress, cannot dial (state %d)\n", isdn->state);
+    result = -1;
+  } else {
+    msgno = isdn->msg_no++;
+
+    if (controller == 0) {
+      // TODO: pick proper controller which has voice capability
+      controller = 1;
+    }
+
+    dbgprintf(1, "CAPI 2.0: CONNECT_REQ ApplID %d ctrl %d CIP %d Called %s\n",
+            isdn->appl_id, controller, 16, number);
+
+    called_nr = (char*) malloc(strlen(number) + 3);
+    if (!called_nr) {
+      errprintf("Cannot allocate memory for called number\n");
+      return -1;
+    }
+    called_nr[0] = strlen(number) + 1;
+    called_nr[1] = 0x80;
+    strcpy(called_nr + 2, number);
+
+    if (isdn->own_msn) {
+      calling_nr = (char*) malloc(strlen(isdn->own_msn) + 4);
+      if (calling_nr) {
+        calling_nr[0] = strlen(isdn->own_msn) + 2;
+        calling_nr[1] = 0x00;
+        calling_nr[2] = 0x80; /* NOTE 0xA0 to disable displaying on remote side */
+        strcpy(calling_nr + 3, isdn->own_msn);
+      }
+    } else {
+      calling_nr = 0;
+    }
+
+    g_mutex_lock(isdn->data_lock);
+    info = CONNECT_REQ(&CMSG, isdn->appl_id, msgno, controller,
+                        (unsigned short) 16 /* CIP: telephony */,
+                        (unsigned char*) called_nr /* called party number */,
+                        (unsigned char*) calling_nr /* calling party number */,
+                        0 /* called party subaddress */,
+                        0 /* calling party subaddress */,
+                        1 /* B1protocol: DTE (originate) */,
+                        1 /* B2protocol: transparent */,
+                        0 /* default B3protocol */,
+                        0 /* default B1configuration */,
+                        0 /* default B2configuration */,
+                        0 /* default B3configuration */,
+                        NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL /* additional info */);
+    g_mutex_unlock(isdn->data_lock);
+
+    free(called_nr);
+    if (calling_nr)
+      free(calling_nr);
+
+    if (info == 0) {
+      isdn->state = ISDN_CONNECT_REQ;
+    } else {
+      errprintf("CAPI 2.0: CONNECT_REQ failed, RC=0x%x\n", info);
+      result = -1;
+    }
+  }
+
+  g_mutex_unlock(isdn->lock);
+
+  return result;
+}
+
+/*--------------------------------------------------------------------------*/
+
+int isdn_send_data(isdn_t *isdn, unsigned char *data, unsigned int datalen)
+{
+  int result = 0;
+  _cmsg CMSG;  /* structure for the message */
+  unsigned int info, msgno = isdn->msg_no++;
+
+  if (isdn->state != ISDN_CONNECTED) {
+    dbgprintf(3, "ISDN data send while not connected (state %d)\n", isdn->state);
+    return -1;
+  }
+
+  dbgprintf(3, "CAPI 2.0: DATA_B3_REQ ApplID %d ncci 0x%x data 0x%lx+%d\n",
+            isdn->appl_id, isdn->active_ncci, (long) data, datalen);
+
+  g_mutex_lock(isdn->data_lock);
+  info = DATA_B3_REQ(&CMSG, isdn->appl_id, msgno,
+                      isdn->active_ncci, data, datalen,
+                      msgno, /* as data handle */
+                      0x0);  /* flags */
+  g_mutex_unlock(isdn->data_lock);
+
+  if (info != 0) {
+    if (isdn->state == ISDN_CONNECTED) {
+      dbgprintf(1, "CAPI 2.0: DATA_B3_REQ failed (too fast audio?), RC=0x%x\n", info);
+    } else {
+      dbgprintf(3, "CAPI 2.0: DATA_B3_REQ failed (ISDN disconnected, OK), RC=0x%x\n", info);
+    }
+    result = -1;
+  }
+
+  return result;
+}
+
+/*--------------------------------------------------------------------------*/
+
+int isdn_hangup(isdn_t *isdn)
+{
+  int result = 0;
+
+  g_mutex_lock(isdn->lock);
+
+  if (isdn->state == ISDN_IDLE) {
+    errprintf("ISDN hangup called, even if connection idle\n");
+    result = -1;
+  } else {
+    result = isdn_trigger_disconnect(isdn);
+  }
+
+  g_mutex_unlock(isdn->lock);
+
+  return result;
+}
+
+/*--------------------------------------------------------------------------*/
+
+int isdn_pickup(isdn_t *isdn _U_)
+{
+  _cmsg CMSG;  /* structure for the message */
+  int result = 0;
+  unsigned int info;
+  unsigned char localnum[4];
+
+  g_mutex_lock(isdn->lock);
+
+  if (isdn->state != ISDN_RINGING) {
+    errprintf("ISDN pickup called, even if not ringing\n");
+    result = -1;
+  } else {
+    /* answer the call via CONNECT_RESP */
+    dbgprintf(2, "CAPI 2.0: CONNECT_RESP ApplID %d msgno %d plci 0x%x reject %d\n",
+              isdn->appl_id, isdn->msg_no, isdn->active_plci, 0);
+
+    localnum[0] = 0x00;
+    localnum[1] = 0x00;
+    localnum[2] = 0x80;
+    localnum[3] = 0x00;
+
+    g_mutex_lock(isdn->data_lock);
+    info = CONNECT_RESP(&CMSG, isdn->appl_id, isdn->msg_no++,
+                        isdn->active_plci, 0,
+                        1 /* B1protocol: originate */,
+                        1 /* B2protocol: transparent */,
+                        0 /* default B3protocol */,
+                        0 /* default B1configuration */,
+                        0 /* default B2configuration */,
+                        0 /* default B3configuration */,
+                        &localnum[0] /* TODO: local number */,
+                        NULL, NULL, NULL, NULL, NULL, NULL, NULL /* additional info */);
+    g_mutex_unlock(isdn->data_lock);
+
+    if (info != 0) {
+      errprintf("CAPI 2.0: CONNECT_RESP failed, RC=0x%x\n", info);
+      isdn->state = ISDN_IDLE;
+      result = -1;
+    } else {
+      /* connection initiated, wait for CONNECT_ACTIVE_IND */
+      isdn->state = ISDN_INCOMING_WAIT;
+    }
+  }
+
+  g_mutex_unlock(isdn->lock);
+
+  return result;
+}
+
+/*--------------------------------------------------------------------------*/
+
+int isdn_setMSN(isdn_t *isdn, char *msn) {
+  char *to_free = isdn->own_msn;
+
+  if (msn && strcmp(msn, "0") != 0)
+    isdn->own_msn = strdup(msn);
+  else
+    isdn->own_msn = 0;
+
+  if (to_free)
+    free(to_free);
+  return 0;
+}
+
+/*--------------------------------------------------------------------------*/
+
+int isdn_setMSNs(isdn_t *isdn _U_, char *msns _U_) {
+  // TODO
+  return 0;
+}
+
+/*--------------------------------------------------------------------------*/
+
 char* isdn_get_calls_filename(void) {
   unsigned int i;
   int fd;
 
   if (isdn_calls_filename_from_config &&
-      (fd = open(isdn_calls_filename_from_config, O_RDONLY)) != -1)
+      (fd = open(isdn_calls_filename_from_config, O_RDONLY, 0644)) != -1)
   {
     close(fd);
-    if (debug)
-      fprintf(stderr,
-	      "Using calls file listed in I4L config.\n");
+    dbgprintf(1, "Using calls file listed in I4L config.\n");
     return isdn_calls_filename_from_config;
   }
   for (i = 0; i < sizeof(calls_filenames) / sizeof(char*); i++) {
@@ -560,3 +1229,43 @@ char* isdn_get_calls_filename(void) {
   return NULL;
 }
 
+/*--------------------------------------------------------------------------*/
+
+void isdn_speed_init(isdn_speed_t *speed)
+{
+  speed->samples = 0;
+  speed->delta = 0;
+  speed->start = 0;
+  speed->debug = 0;
+}
+
+/*--------------------------------------------------------------------------*/
+
+void isdn_speed_addsamples(isdn_speed_t *speed, unsigned int samples)
+{
+  uint64_t time = microsec_time();
+  if (speed->start) {
+    speed->samples += samples;
+    speed->delta = time - speed->start;
+  } else {
+    speed->start = time;
+    speed->samples = 0;
+    speed->delta = 0;
+    speed->debug = 0;
+  }
+}
+
+/*--------------------------------------------------------------------------*/
+
+void isdn_speed_debug(isdn_speed_t *speed, int level, char *prefix)
+{
+  uint64_t curtime = speed->start + speed->delta;
+
+  if (curtime >= speed->debug + 1000000 && speed->delta) {
+    speed->debug = curtime;
+    dbgprintf(level, "%s speed: %.3f samples/sec\n", prefix,
+              speed->samples * 1000000.0 / speed->delta);
+  }
+}
+
+/*--------------------------------------------------------------------------*/

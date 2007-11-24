@@ -107,10 +107,10 @@ INCLUDE([ \t]|"\\\n")*"("    {
 			         /* ignoring non-existent included file */
 			         if (debug) {
 				   if (loop_detected)
-				     fprintf(stderr, "Loop detected ");
+				     errprintf("Loop detected ");
 				   else
-				     fprintf(stderr, "Error ");
-				   fprintf(stderr,
+				     errprintf("Error ");
+				   errprintf(
 				     "reading ISDN options file %s "
 				     "from %s. Ignoring.\n",
 				     isdn_filename, temp->filename);
@@ -124,7 +124,7 @@ INCLUDE([ \t]|"\\\n")*"("    {
 			         /* include file OK */
 				 isdn_in = temp_in;
                                  if (debug)
-                                   fprintf(stderr,
+                                   errprintf(
 				     "Reading options file %s "
 				     "from %s ...\n",
 				     isdn_filename, temp->filename);
@@ -144,7 +144,7 @@ INCLUDE([ \t]|"\\\n")*"("    {
 			         isdn_include_t* temp = isdn_include_list;
 				 
 				 if (debug)
-				   fprintf(stderr, "Returning to %s ...\n",
+				   errprintf("Returning to %s ...\n",
 				           temp->filename);
 			         yy_delete_buffer(YY_CURRENT_BUFFER);
 				 yy_switch_to_buffer(temp->state);
@@ -216,7 +216,7 @@ INCLUDE([ \t]|"\\\n")*"("    {
 .                            { /* eat up rest */
                                isdn_locate();
 			       if (debug) {
-			         fprintf(stderr,
+			         errprintf(
 				   "isdnlexer: Unrecognized character: %c "
 				   "at %d:%d\n",
 				   *isdn_text,
@@ -261,9 +261,9 @@ void isdn_lexer_init(char* filename) {
   isdn_lloc.last_column = 1;
   isdn_include_list = NULL;
   if (debug)
-    fprintf(stderr, "Reading options file: %s ...\n", filename);
+    errprintf("Reading options file: %s ...\n", filename);
   if (!(isdn_in = fopen(filename, "r"))) {
-    fprintf(stderr, "Error opening options file %s.\n", filename);
+    errprintf("Error opening options file %s.\n", filename);
   } else {
     isdn_filename = strdup(filename);
   }
@@ -274,7 +274,7 @@ void isdn_lexer_init(char* filename) {
  */
 void isdn_lexer_deinit() {
   if (fclose(isdn_in) == EOF) {
-    fprintf(stderr, "Warning: Couldn't close options file.\n");
+    errprintf("Warning: Couldn't close options file.\n");
   }
   free(isdn_filename);
 }

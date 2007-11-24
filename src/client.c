@@ -42,7 +42,7 @@
  *
  * returns 0 on success, -1 otherwise
  */
-int client_make_call(char *number) {
+int client_make_call(char message, char *number) {
   int sock;
   struct sockaddr_un local_name;
   size_t size;
@@ -67,8 +67,8 @@ int client_make_call(char *number) {
     return -1;
   }
   
-  if (asprintf(&msg, "%c%s", LOCAL_MSG_CALL, number) < 0) {
-    fprintf(stderr, "asprintf error");
+  if (asprintf(&msg, "%c%s", message, number) < 0) {
+    errprintf("asprintf error");
     return -1;
   }
   bytes = write(sock, msg, 1 + strlen(number) + 1);

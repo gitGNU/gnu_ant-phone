@@ -64,7 +64,7 @@ line       : '\n'
 	         free($1); free($3); free($5); free($7); free($9); }
            | error '\n'
              { if (debug)
-	         fprintf(stderr,
+	         errprintf(
 		         "Warning: Parsing callerid history file:%d, "
 			 "recovering after error.\n", @1.last_line);
 	     }
@@ -79,7 +79,7 @@ line       : '\n'
  */
 void callerid_error(const char *message) {
   if (debug)
-    fprintf(stderr,
+    errprintf(
 	    "Warning: Parsing callerid history file line %d: %s.\n",
 	    callerid_lloc.first_line, message);
 }

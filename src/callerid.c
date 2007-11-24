@@ -69,7 +69,7 @@ static gpointer cid_row_new(void) {
  */
 static void cid_row_destroy(gpointer rowdata) {
   if (debug > 1)
-    fprintf(stderr, "debug: destroying rowdata at %p.\n", rowdata);
+    errprintf("debug: destroying rowdata at %p.\n", rowdata);
   free(rowdata);
 }
 
@@ -193,6 +193,25 @@ static void cid_playback(GtkWidget *widget _U_, gpointer data, guint row) {
 }
 
 /*
+ * Callback: called on call request
+ */
+static void cid_call(GtkWidget *widget _U_, gpointer data, guint row) {
+  session_t *session = (session_t *) data;
+
+  char *typestr;
+  char *numberstr;
+
+  gtk_clist_get_pixtext(GTK_CLIST(session->cid_list), row,
+                        CID_COL_TYPE, &typestr, NULL, NULL, NULL);
+
+  gtk_clist_get_text(GTK_CLIST(session->cid_list), row,
+                     strcmp(typestr, "IN") == 0 ?
+                     CID_COL_FROM : CID_COL_TO, &numberstr);
+
+  gtk_entry_set_text(GTK_ENTRY(GTK_COMBO(session->dial_number_box)->entry), numberstr);
+}
+
+/*
  * Callback: called on "OK" click in "Save as..." file selection
  */
 static void cid_save_as_filename_cb(GtkWidget *fs) {
@@ -225,26 +244,24 @@ static void cid_save_as_filename_cb(GtkWidget *fs) {
 	      }
 	    } while (just_read);
 	    if (close(fd_out)) {
-	      fprintf(stderr, "Error on closing destination file.\n");
+	      errprintf("Error on closing destination file.\n");
 	    }
 	  } else {
-	    fprintf(stderr,
-		    "Error on destination file (%s) open().\n", destination);
+	    errprintf("Error on destination file (%s) open().\n", destination);
 	  }
 	  if (close(fd_in)) {
-	    fprintf(stderr, "Error on source file.\n");
+	    errprintf("Error on source file.\n");
 	  }
 	} else {
-	  fprintf(stderr,
-	          "Error on source file (%s) open().\n", sourcename);
+	  errprintf("Error on source file (%s) open().\n", sourcename);
 	}
 	free(buffer);
       } else {
-	fprintf(stderr, "Error on malloc().\n");
+	errprintf("Error on malloc().\n");
       }
       free(destination);
     } else {
-      fprintf(stderr, "Error on asprintf().\n");
+      errprintf("Error on asprintf().\n");
     }
   }
   free(sourcename);
@@ -266,7 +283,7 @@ static void cid_save_as(GtkWidget *widget _U_, gpointer data, guint row) {
     if (0 > asprintf(&title, _("Enter the base filename for %s file"),
 	             extension))
     {
-      fprintf(stderr, "Error on asprintf().\n");
+      errprintf("Error on asprintf().\n");
       return;
     }
     fs = gtk_file_selection_new(title);
@@ -279,7 +296,7 @@ static void cid_save_as(GtkWidget *widget _U_, gpointer data, guint row) {
                            "clicked", G_CALLBACK(cid_save_as_filename_cb), fs);
     gtk_widget_show(fs);
   } else {
-    fprintf(stderr, "Error: no filename extension found.\n");
+    errprintf("Error: no filename extension found.\n");
   }
 }
 
@@ -333,6 +350,7 @@ static gint cid_mouse_cb(GtkWidget *widget _U_,
 
       GtkItemFactoryEntry menu_items[] = {
 /*path                   accel. callb.         cb param. kind           extra */
+{_("/_Call"),            NULL,  cid_call,      row,      "",            NULL},
 {_("/_Playback"),        NULL,  cid_playback,  row,      "",            NULL},
 {_("/_Save as..."),      NULL,  cid_save_as,   row,      "",            NULL},
 {_("/Delete _Recording"),NULL,  cid_delete_rec,row,      "",            NULL},
@@ -345,6 +363,7 @@ static gint cid_mouse_cb(GtkWidget *widget _U_,
 
       gint nmenu_items = sizeof(menu_items) / sizeof(menu_items[0]);
 
+      GtkWidget *call_item;
       GtkWidget *playback_item;
       GtkWidget *save_as_item;
       GtkWidget *delete_record_item;
@@ -358,21 +377,25 @@ static gint cid_mouse_cb(GtkWidget *widget _U_,
       gtk_item_factory_create_items_ac(item_factory, nmenu_items, menu_items,
 				   session, 2);
       
+      if (!(call_item = gtk_item_factory_get_item(item_factory,
+          temp = stripchr(_("/_Call"), '_'))))
+        errprintf("Error getting call_item.\n");
+      free(temp);
       if (!(playback_item = gtk_item_factory_get_item(item_factory,
 	  temp = stripchr(_("/_Playback"), '_'))))
-        fprintf(stderr, "Error getting playback_item.\n");
+        errprintf("Error getting playback_item.\n");
       free(temp);
       if (!(save_as_item = gtk_item_factory_get_item(item_factory,
 	  temp = stripchr(_("/_Save as..."), '_'))))
-        fprintf(stderr, "Error getting save_as_item.\n");
+        errprintf("Error getting save_as_item.\n");
       free(temp);
       if (!(delete_record_item = gtk_item_factory_get_item(item_factory,
 	    temp = stripchr(_("/Delete _Recording"), '_'))))
-        fprintf(stderr, "Error getting delete_record_item_item.\n");
+        errprintf("Error getting delete_record_item_item.\n");
       free(temp);
       if (!(delete_item = gtk_item_factory_get_item(item_factory,
 	  temp = stripchr(_("/_Delete Row"), '_'))))
-        fprintf(stderr, "Error getting delete_item.\n");
+        errprintf("Error getting delete_item.\n");
       free(temp);
 
       if (!(session->state == STATE_READY &&
@@ -382,6 +405,9 @@ static gint cid_mouse_cb(GtkWidget *widget _U_,
         gtk_widget_set_sensitive(delete_record_item, FALSE);
       } else {
 	free(fn);
+      }
+      if (session->state != STATE_READY) {
+        gtk_widget_set_sensitive(call_item, FALSE);
       }
   
       menu = GTK_MENU(gtk_item_factory_get_widget(item_factory, "<popup>"));
@@ -528,7 +554,7 @@ static char *cid_timestring(time_t t) {
   date[0] = '\1';
   len = strftime(date, 20, "%Y-%m-%d %H:%M:%S", localtime(&t));
   if (len == 0 && date[0] != '\0') {
-    fprintf(stderr, "cid: Error calculating time with strftime.\n");
+    errprintf("cid: Error calculating time with strftime.\n");
     return NULL;
   }
 
@@ -635,7 +661,7 @@ void cid_set_duration(session_t *session, gchar *message) {
 void cid_add_saved_line(session_t *session, char *date, char *type,
 			char *from, char *to, char *duration) {
   if (debug > 1)
-    fprintf(stderr, "Caller ID add:\n"
+    errprintf("Caller ID add:\n"
 	    "Date: |%s|, Type: |%s|, From: |%s|, To: |%s|, Dur: |%s|\n",
             date, type, from, to, duration);
   
@@ -683,13 +709,11 @@ void cid_calls_merge(session_t *session) {
   /* try to find isdnlog data file */
   calls_filename = isdn_get_calls_filename();
   if (calls_filename && (f = fopen(calls_filename, "r"))) {
-    if (debug) {
-      fprintf(stderr, "Using %s as source for isdnlog data.\n", calls_filename);
-    }
+    dbgprintf(1, "Using %s as source for isdnlog data.\n", calls_filename);
     if (session->option_calls_merge_max_days) {
       /* binary search on the file for the desired starting time if needed */
       if (debug >= 3) {
-	fprintf(stderr, "Binary search in calls file...\n");
+	errprintf("Binary search in calls file...\n");
       }
       low = 0;
       fseek(f, 0, SEEK_END);
@@ -697,7 +721,7 @@ void cid_calls_merge(session_t *session) {
       
       while (high - low > 200) {
 	if (debug >= 3) {
-	  fprintf(stderr, "low = %d, high = %d\n", low, high);
+	  errprintf("low = %d, high = %d\n", low, high);
 	}
         mid = (low + high) / 2;
         fseek(f, mid, SEEK_SET);
@@ -726,7 +750,7 @@ void cid_calls_merge(session_t *session) {
       if (sscanf(line,
 	         "%*40[^|]|%40[^|]|%40[^|]|%d|%*40[^|]|%d|%*40[^|]|%1c",
 	         from, to, &duration, &date, type) != 5) {
-	fprintf(stderr, "Warning: Incomplete data input from calls file.\n");
+	errprintf("Warning: Incomplete data input from calls file.\n");
 	break;
       }
       if ((temp = strchr(from, ' '))) *temp = '\0';
@@ -791,9 +815,9 @@ void cid_calls_merge(session_t *session) {
     cid_normalize(session);
   
     if (fclose(f))
-      fprintf(stderr, "Error closing %s.\n", calls_filename);
+      errprintf("Error closing %s.\n", calls_filename);
   } else { /* error on fopen() */
-    fprintf(stderr,
+    errprintf(
       "Warning: Couldn't open isdnlog calls logfile. Proceeding without it.\n");
   }
   free(line);
@@ -876,13 +900,13 @@ char* cid_get_record_filename(session_t* session, int row) {
   timestr = cid_purify_timestring(timestr);
 
   if (!(homedir = get_homedir())) {
-    fprintf(stderr, "Warning: Couldn't get home dir.\n");
+    errprintf("Warning: Couldn't get home dir.\n");
     return NULL;
   }
   
   if (asprintf(&pattern, "%s/." PACKAGE "/recordings/%s.*",
 	homedir, timestr) < 0) {
-    fprintf(stderr, "Warning: "
+    errprintf("Warning: "
 	    "Couldn't allocate memory for filename globbing pattern.\n");
     return NULL;
   }
@@ -895,7 +919,7 @@ char* cid_get_record_filename(session_t* session, int row) {
       result = NULL;
       break;
     default:
-      fprintf(stderr, "Warning: "
+      errprintf("Warning: "
 	  "globbing error while looking up recorded conversation.\n");
       return NULL;
   }

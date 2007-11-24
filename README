@@ -6,20 +6,20 @@ Copyright 2002, 2003, 2004, 2005 Roland Stigge
 WHAT IT IS
 ==========
 
-ANT is a telephone application written for GNU/Linux, I4L (ISDN4Linux,
-integrated in the kernel), GTK+ (GIMP Toolkit) and OSS (Open Sound System).
+ANT is a telephone application written for GNU/Linux, CAPI 2.0 (ISDN
+interface), GTK+ (GIMP Toolkit) and ALSA (sound system).
 
 
 ABOUT ANT
 =========
 
-It directly interfaces OSS and ISDN devices, so there is no need to install
+It directly interfaces ALSA and CAPI devices, so there is no need to install
 extra software or hardware like PBX (Private Branch Exchange) or telephony
-cards, if you've got direct access to an audio capable ISDN Card and full
+cards, if you've got direct access to an audio capable ISDN card and full
 duplex (or multiple) soundcard.
 
 For the soundcard interface you can use headphones (or speakers) and a
-microphone, or a headset instead of all this.
+microphone, or a headset.
 
 Currently, there is no direct mixer integration planned for ANT for several
 reasons. For GNU/Linux, there are quite a lot of good mixer programs available
@@ -36,16 +36,16 @@ WHAT YOU WILL NEED
 to run:
 
 * a computer
-* an ISDN card with audio support for Linux (ISDN4Linux driver)
-  (teles or HiSax drivers are known to work)
+* an ISDN card with CAPI 2.0 telephony support for Linux
 * GNU/Linux (as far as nobody has tried it on another platform yet)
-* OSS support
 * a full duplex sound card or two sound devices
   (one for input, another for output)
 * a microphone (or your sound source of choice)
 * speakers, or better: headphones
 * instead of the last two points, you could also use a headset
 * GTK+ 2.x
+* libcapi20 (CAPI 2.0 support)
+* libasound (ALSA support)
 * libsndfile
 
 to compile:
@@ -53,8 +53,9 @@ to compile:
 * GNU make
 * GCC
 * GTK+ 2.x development files
-* OSS development files (actually, it's mostly just one header file)
-* libsndfile development files
+* libcapi20 development files (CAPI 2.0 support)
+* libasound development files (ALSA support)
+* libsndfile development files (for recording)
 
 
 WHAT YOU MIGHT NEED
@@ -76,7 +77,7 @@ FEATURES
 * Setting outgoing (identifying) MSN (Multiple Subscriber Number) and
   MSNs to listen on
 * Line Level Checker
-* Works with ALSA (OSS emulation)
+* Works with ALSA
 * Saved config file
 * Saved Caller ID history
 * Option to run an external command on incoming call (useful for external

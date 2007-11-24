@@ -46,363 +46,300 @@
 #include "globals.h"
 #include "sound.h"
 
-int default_audio_priorities[] = {AFMT_S16_LE,/* try formats in this order */ \
-			          AFMT_S16_BE,\
-			          AFMT_U16_LE,\
-			          AFMT_U16_BE,\
-                                  AFMT_U8,\
-                                  AFMT_S8,\
-            /* ulaw at last because no native soundcard support assumed */ \
-			          AFMT_MU_LAW,\
-				  0}; /* end of list */
-/*
- * common initialization for a specific audio device
+/* try formats in this order */
+int default_audio_priorities[] = {SND_PCM_FORMAT_S16_LE,
+                                  SND_PCM_FORMAT_S16_BE,
+                                  SND_PCM_FORMAT_U16_LE,
+                                  SND_PCM_FORMAT_U16_BE,
+                                  SND_PCM_FORMAT_U8,
+                                  SND_PCM_FORMAT_S8,
+            /* alaw/ulaw at last because no native soundcard support assumed */
+                                  SND_PCM_FORMAT_A_LAW,
+                                  SND_PCM_FORMAT_MU_LAW,
+                                  0}; /* end of list */
+
+/*--------------------------------------------------------------------------*/
+
+/*!
+ * @brief Common initialization for a specific audio device
  *
- * NOTE: Assumes opened device, but leaves it in a state not able for further
- *       use when not successful. The device has to be closed and opened again.
+ * @param audio PCM descriptor of an audio device.
+ * @param format PCM format.
+ * @param channels number of PCM channels.
+ * @param speed requested/actual sampling rate (in/out).
+ * @param fragment_size requested/actual fragment size (in/out).
  *
- * input: audio_fd: valid file descriptor of an audio device,
- *        format, number of channels, requested sampling rate
- *        requested fragment sizes
- *
- * returns: 0 if successful, non-zero otherwise
- *
- * output:  speed: actually sampling rate
- *          fragment_size: actually fragment size for this device
- * 
+ * @return 0 if successful, non-zero otherwise.
  */
-int init_audio_device(int audio_fd, int format, int channels, int *speed,
-		      int *fragment_size) {
-  int temp_format;
-  int temp_channels;
-  int temp_speed;
-  int formats_mask;
-  int fragment_arg;
+static int init_audio_device(snd_pcm_t *audio,
+                             int format,
+                             int channels,
+                             unsigned int *speed,
+		             int *fragment_size)
+{
+  int err;
+  unsigned int rspeed;
+  int dir;
+  unsigned int buffer_time, period_time;
+  snd_pcm_uframes_t period_size;
 
-  /* set fragment size */
-  fragment_arg = 0x7FFF0000 + logb(*fragment_size);
-  
-  if (ioctl(audio_fd, SNDCTL_DSP_SETFRAGMENT, &fragment_arg)) {
-    perror("SNDCTL_DSP_SETFRAGMENT");
-    return(-1);
-  }
+  snd_pcm_hw_params_t *hwparams;
+  snd_pcm_sw_params_t *swparams;
+  snd_pcm_hw_params_alloca(&hwparams);
+  snd_pcm_sw_params_alloca(&swparams);
 
-  /* query supported audio formats */
-  if (ioctl(audio_fd, SNDCTL_DSP_GETFMTS, &formats_mask) == -1) {
-    perror("SNDCTL_DSP_GETFMTS");
-    return(-1);
-  }
-  if (!(formats_mask & format)) { /* requested format not supported */
-    return(-1);                   /* caller should try another one  */
+  if ((err = snd_pcm_hw_params_any(audio, hwparams)) < 0) {
+    errprintf("AUDIO: AUDIO: No audio configurations available: %s\n",
+              snd_strerror(err));
+    return err;
   }
 
-  /* audio format */
-  temp_format = format;
-  if (ioctl(audio_fd, SNDCTL_DSP_SETFMT, &temp_format) == -1) {
-    perror("SNDCTL_DSP_SETFMT");
-    return(-1);
+  if ((err = snd_pcm_hw_params_set_format(audio, hwparams, format)) < 0) {
+    errprintf("AUDIO: Audio sample format (%d) not available: %s\n",
+              format, snd_strerror(err));
+    return err;
   }
 
-  /* number of channels */
-  temp_channels = channels;
-  if (ioctl(audio_fd, SNDCTL_DSP_CHANNELS, &temp_channels) == -1) {
-    perror("SNDCTL_DSP_CHANNELS");
-    return(-1);
-  }
-  if (temp_channels != channels) {
-    fprintf(stderr, "Error: %d not supported as number of channels", channels);
-    return(-1);
+  if ((err = snd_pcm_hw_params_set_channels(audio, hwparams, channels)) < 0) {
+    errprintf("AUDIO: Audio channels count (%d) not available: %s\n",
+              channels, snd_strerror(err));
+    return err;
   }
 
-  /* sampling rate */
-  temp_speed = *speed;
-  if (ioctl(audio_fd, SNDCTL_DSP_SPEED, &temp_speed) == -1) {
-    perror("SNDCTL_DSP_SPEED");
-    /* rarely returned because of oss' liberal use of other possible speeds */
-    return(-1);
+  rspeed = *speed;
+  if ((err = snd_pcm_hw_params_set_rate_near(audio, hwparams, &rspeed, 0)) < 0) {
+    errprintf("AUDIO: Audio speed %dHz not available: %s\n",
+              *speed, snd_strerror(err));
+    return err;
   }
-  *speed = temp_speed; /* actually used speed  */
+  if (rspeed != *speed) {
+    errprintf("AUDIO: Audio speed doesn't match (requested %dHz, got %dHz)\n",
+              *speed, rspeed);
+    return -EINVAL;
+  }
 
-  /* "verify" fragment size:
-   *  let the driver actually calculate the fragment size
-   */
-  if (ioctl(audio_fd, SNDCTL_DSP_GETBLKSIZE, &fragment_arg)) {
-    perror("SNDCTL_DSP_GETBLKSIZE");
-    return(-1);
+  buffer_time = 150000;
+  if ((err = snd_pcm_hw_params_set_buffer_time_near(audio, hwparams, &buffer_time, &dir)) < 0) {
+    errprintf("AUDIO: Unable to set audio buffer time %d: %s\n",
+              buffer_time, snd_strerror(err));
+    return err;
   }
-  if (fragment_arg != *fragment_size)
-    fprintf(stderr, "Note: Using non-default fragment size %d.\n",
-	    fragment_arg);
-  *fragment_size = fragment_arg;
+
+  period_time = 25000;
+  if ((err = snd_pcm_hw_params_set_period_time_near(audio, hwparams, &period_time, &dir)) < 0) {
+    errprintf("AUDIO: Unable to set audio period time %d: %s\n",
+              period_time, snd_strerror(err));
+    return err;
+  }
+
+  if ((err = snd_pcm_hw_params_get_period_size_min(hwparams, &period_size, &dir)) < 0) {
+    errprintf("AUDIO: Unable to get audio period time: %s\n",
+              snd_strerror(err));
+    return err;
+  }
+  *fragment_size = period_size;
+
+  if ((err = snd_pcm_hw_params_set_access(audio, hwparams, SND_PCM_ACCESS_RW_INTERLEAVED)) < 0) {
+    errprintf("AUDIO: Unable to set audio access mode: %s\n",
+              snd_strerror(err));
+    return err;
+  }
+
+  if ((err = snd_pcm_hw_params(audio, hwparams)) < 0) {
+    errprintf("AUDIO: Unable to set hw params for audio: %s\n",
+              snd_strerror(err));
+    return err;
+  }
+
+  if ((err = snd_pcm_sw_params_current(audio, swparams)) < 0) {
+    errprintf("AUDIO: Unable to determine current swparams for audio: %s\n",
+              snd_strerror(err));
+    return err;
+  }
+
+  if ((err = snd_pcm_sw_params_set_start_threshold(audio, swparams, period_size)) < 0) {
+    errprintf("AUDIO: Unable to set start threshold: %s\n",
+              snd_strerror(err));
+    return err;
+  }
+
+  /*
+  if ((err = snd_pcm_sw_params_set_sleep_min(audio, swparams, 0)) < 0) {
+    errprintf("AUDIO: Unable to set minimum sleep time: %s\n",
+              snd_strerror(err));
+    return err;
+  }
+  */
+
+  if ((err = snd_pcm_sw_params_set_xfer_align(audio, swparams, 1)) < 0) {
+    errprintf("AUDIO: Unable to set transfer alignment: %s\n",
+              snd_strerror(err));
+    return err;
+  }
+
+  if ((err = snd_pcm_sw_params_set_silence_size(audio, swparams, period_size * 2)) < 0) {
+    errprintf("AUDIO: Unable to set silence threshold: %s\n",
+              snd_strerror(err));
+    return err;
+  }
+
+  /*
+  if ((err = snd_pcm_sw_params_set_stop_threshold(audio, swparams, 0)) < 0) {
+    errprintf("AUDIO: Unable to set stop threshold: %s\n",
+              snd_strerror(err));
+    return err;
+  }
+  */
+
+  //snd_pcm_sw_params_set_avail_min(Handle,swparams,Frames);
+
+
+  if ((err = snd_pcm_sw_params(audio, swparams)) < 0) {
+    printf("Unable to set sw params for audio: %s\n", snd_strerror(err));
+    return err;
+  }
+
+#if 0
+  if ((err = snd_pcm_prepare(audio)) < 0) {
+    errprintf("AUDIO: Cannot prepare audio: %s\n", snd_strerror(err));
+    return -1;
+  }
+#endif
 
   return 0;
 }
 
-/*
- * opens the audio device(s). if in_audio_device_name and out_audio_device_name
- * are equal, full duplex mode is assumed
- *
- * input: in_audio_device_name, out_audio_device_name: strings
- *        channels: requestes number of channels (1 / 2)
- *        format_priorities: list of sorted integers with valid sound formats
- *                           (e.g. AFMT_U8). the first working one will be used
- *        speed_in, speed_out: requested speeds (equal for full duplex)
- *
- * returns:  0 if successful
- *          -1 if not successful
- *
- * output:
- *    audio_fd_in, audio_fd_out: file descriptors
- *    fragment_size_in, fragment_size_out: device buffer fragment sizes
- *    format_in, format_out: actually used formats
- *    speed_in, speed_out: actually used speeds
- */
+/*--------------------------------------------------------------------------*/
+
 int open_audio_devices(char *in_audio_device_name,
 		       char *out_audio_device_name,
 		       int channels, int *format_priorities,
-		       int *audio_fd_in, int *audio_fd_out,
+		       snd_pcm_t **audio_in, snd_pcm_t **audio_out,
 		       int *fragment_size_in, int *fragment_size_out,
 		       int *format_in, int *format_out,
-		       int *speed_in, int *speed_out) {
-  int audio_fd;
+                       unsigned int *speed_in, unsigned int *speed_out)
+{
+  int err;
   int initresult;
-  int capabilities;
   int *priority;
   
   /* try to open the sound device */
-  if (strcmp(in_audio_device_name, out_audio_device_name) == 0) {
-    /* same device for input and output: full duplex */
-
-    for (initresult = -1, priority = format_priorities;
-	 priority  && initresult; priority++) { /* try different formats */
-      if ((audio_fd = open(in_audio_device_name, O_RDWR | O_NONBLOCK, 0))
-	  == -1) {
-	perror(in_audio_device_name);
-	return(-1);
-      }
-      /* device is in non-blocking mode now */
-
-      *audio_fd_in = audio_fd;
-      *audio_fd_out = audio_fd;
-      
-      /* set device to full duplex mode */
-      if (ioctl(audio_fd, SNDCTL_DSP_SETDUPLEX, 0)) {
-	perror("SNDCTL_DSP_SETDUPLEX");
-	return(-1);
-      }
-      if (ioctl(audio_fd, SNDCTL_DSP_GETCAPS, &capabilities)) {
-	perror("SNDCTL_DSP_GETCAPS");
-	return(-1);
-      }
-      if (!(capabilities & DSP_CAP_DUPLEX)) {
-	fprintf(stderr, "Error: device doesn't support full duplex mode\n");
-	return(-1);
-      }
-      
-      /* *speed_in assumed to be equal to *speed_out */
-      *format_in = *priority; /* get new format to try */
-      initresult = init_audio_device(audio_fd, *format_in, channels, speed_in,
-				     fragment_size_in);
-      if (initresult) /* let's retry (and re-open) */
-	close_audio_devices(*audio_fd_in, *audio_fd_out);
-    }
-    *format_out = *format_in;
-    *speed_out = *speed_in;
-    *fragment_size_out = *fragment_size_in;
-    return initresult;
-  } else {
-    /* different devices for input and output */
-
-    for (initresult = -1, priority = format_priorities;
-	 initresult && priority; priority++) {
-      if ((audio_fd = open(in_audio_device_name, O_RDONLY | O_NONBLOCK, 0)) ==
-	  -1) {
-	perror(in_audio_device_name);
-	return(-1);
-      }
-      /* device is in non-blocking mode now */
-
-      *audio_fd_in = audio_fd;
-      *format_in = *priority;
-      initresult = init_audio_device(audio_fd, *format_in, channels, speed_in,
-				     fragment_size_in);
-      if (initresult) /* let's retry (and re-open) */
-	if (close(audio_fd)) {
-	  perror("close audio in device");
-	  return -1;
-	}
-    }
-
-    if (initresult) return initresult; /* no chance */
-
-    for (initresult = -1, priority = format_priorities;
-	 initresult && priority; priority++) {
-      if ((audio_fd = open(out_audio_device_name, O_WRONLY | O_NONBLOCK, 0))
-	  == -1) {
-	perror(out_audio_device_name);
-	if (close(*audio_fd_in)) { /* error -> close audio_in device */
-	  perror("close audio in device");
-	}
-	return(-1);
-      }
-      /* device is in non-blocking mode now */
-
-      *audio_fd_out = audio_fd;
-      *format_out = *priority;
-
-      initresult = init_audio_device(audio_fd, *format_out, channels,
-				     speed_out, fragment_size_out);
-      if (initresult) /* let's retry (and re-open) */
-	if (close(audio_fd)) {
-	  perror("close audio out device");
-	  return -1;
-	}
-    }
-    return initresult;
-  }
-}
-
-/*
- * stops audio playback and recording on specified file descriptors
- */
-int audio_stop(int audio_fd_in, int audio_fd_out) {
-  /* Instead of ioctl SNDCTL_DSP_RESET, OSS Programmer's Guide recommends
-   * closing and reopening the devices (-> close/open_audio_devices).
-   * Here, we flush the input buffer and use SNDCTL_DSP_RESET
-   * to clean up for further recording, but on restart, old input comes again.
-   */
-  int result;
-  int frag_size;
-  char *buf; /* temporary allocated buffer */
-
-  struct timeval tv;
-  fd_set fds;
-  int num; /* number of file descriptors with data (0/1) */
-
-  /* flush input buffer */
-  if (ioctl(audio_fd_in, SNDCTL_DSP_GETBLKSIZE, &frag_size))
-    fprintf(stderr, "Error obtaining audio input fragment size "
-	    "with SNDCTL_DSP_GETBLKSIZE in audio_stop().\n");
-  else {
-    buf = (char *) malloc(frag_size);
-    
-    tv.tv_sec = 0; /* return immediately */
-    tv.tv_usec = 0;
-    
-    do {
-      FD_ZERO(&fds);
-      FD_SET(audio_fd_in, &fds);
-      
-      num = select(FD_SETSIZE, &fds, 0, 0, &tv); /* return immediately */
-      if (num > 0)
-	read(audio_fd_in, buf, frag_size);
-    } while (num > 0);
-    if (num == -1)
-      perror("select at audio_stop");
-    free(buf);
-  }
-  
-  /* stop device */
-  if (audio_fd_in == audio_fd_out)
-    result = ioctl(audio_fd_in, SNDCTL_DSP_RESET, 0);
-  else
-    result = ioctl(audio_fd_in, SNDCTL_DSP_RESET, 0) |
-      ioctl(audio_fd_out, SNDCTL_DSP_RESET, 0);
-
-  return result;
-}
-
-/*
- * Closes specified input/output file descriptors
- * returns 0 on success, -1 on error
- */
-int close_audio_devices(int audio_fd_in, int audio_fd_out) {
-  audio_stop(audio_fd_in, audio_fd_out);
-
-  if (close(audio_fd_in) == -1) {
-    perror("close audio device");
-    return -1;
-  }
-  if (audio_fd_in != audio_fd_out)
-    if (close(audio_fd_out) == -1) {
-      perror("close audio device");
+  if ((err = snd_pcm_open(audio_in, in_audio_device_name, SND_PCM_STREAM_CAPTURE, 0/*SND_PCM_NONBLOCK*/)) < 0) {
+    errprintf("AUDIO: Audio recording device '%s' open error: %s, trying default\n",
+            in_audio_device_name, snd_strerror(err));
+    if ((err = snd_pcm_open(audio_in, "default", SND_PCM_STREAM_CAPTURE, 0/*SND_PCM_NONBLOCK*/)) < 0) {
+      errprintf("AUDIO: Audio recording device 'default' open error: %s\n",
+                snd_strerror(err));
       return -1;
     }
-  return 0;
+  }
+  if ((err = snd_pcm_open(audio_out, out_audio_device_name, SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK)) < 0) {
+    errprintf("AUDIO: Audio playback device '%s' open error: %s, trying default\n",
+            out_audio_device_name, snd_strerror(err));
+    if ((err = snd_pcm_open(audio_out, "default", SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK)) < 0) {
+      errprintf("AUDIO: Audio playback device 'default' open error: %s\n",
+                snd_strerror(err));
+      return -1;
+    }
+  }
+
+  /* set format and sampling rate */
+  for (initresult = -1, priority = format_priorities;
+       initresult && priority; priority++) {
+
+    *format_in = *priority;
+    initresult = init_audio_device(*audio_in, *format_in, channels, speed_in, fragment_size_in);
+  }
+
+  if (initresult)
+    return initresult; /* no chance */
+
+  for (initresult = -1, priority = format_priorities;
+       initresult && priority; priority++) {
+
+    *format_out = *priority;
+    initresult = init_audio_device(*audio_out, *format_out, channels, speed_out, fragment_size_out);
+  }
+
+#if 0
+  /* not implemented in ALSA */
+  if ((err = snd_pcm_link(*audio_out, *audio_in)) < 0) {
+    errprintf("AUDIO: Error linking in/out devices: %s\n",
+              snd_strerror(err));
+    return -1;
+  }
+#endif
+
+  if (debug > 2) {
+    /* TODO: redirect output to dbgprintf */
+    snd_output_t *output;
+    snd_output_stdio_attach(&output, stderr, 0);
+    dbgprintf(2, "AUDIO: Dump of IN PCM:");
+    snd_pcm_dump(*audio_in, output);
+    dbgprintf(2, "AUDIO: Dump of OUT PCM:");
+    snd_pcm_dump(*audio_out, output);
+  }
+
+  return initresult;
 }
 
-/*
- * returns number of bytes per sample for the specified
- * OSS format (e.g. AFMT_U8)
- *
- * returns >= 1 on success, 0 otherwise (when format not supported)
- */
-int sample_size_from_format(int format) {
+int audio_stop(snd_pcm_t *audio_in, snd_pcm_t *audio_out) {
+
+  int err, err0;
+
+  err = 0;
+  if ((err0 = snd_pcm_drop(audio_in)) < 0) {
+    errprintf("AUDIO: Unable to reset audio capture: %s\n", snd_strerror(err0));
+    err = -1;
+  }
+  if ((err0 = snd_pcm_drop(audio_out)) < 0) {
+    errprintf("AUDIO: Unable to reset audio playback: %s\n", snd_strerror(err0));
+    err = -1;
+  }
+  return err;
+}
+
+/*--------------------------------------------------------------------------*/
+
+int close_audio_devices(snd_pcm_t *audio_in, snd_pcm_t *audio_out)
+{
+
+  int err, err0;
+
+  audio_stop(audio_in, audio_out);
+
+  err = 0;
+  if ((err0 = snd_pcm_close(audio_in)) < 0) {
+    errprintf("AUDIO: Unable to close audio capture: %s\n", snd_strerror(err0));
+    err = -1;
+  }
+  if ((err0 = snd_pcm_close(audio_out)) < 0) {
+    errprintf("AUDIO: Unable to close audio playback: %s\n", snd_strerror(err0));
+    err = -1;
+  }
+  return err;
+}
+
+/*--------------------------------------------------------------------------*/
+
+int sample_size_from_format(int format)
+{
   switch(format) {
-  case AFMT_U8:
-  case AFMT_S8:
-  case AFMT_MU_LAW:
-    return 1;
-    
-  case AFMT_S16_LE:
-  case AFMT_S16_BE:
-  case AFMT_U16_LE:
-  case AFMT_U16_BE:
+  case SND_PCM_FORMAT_S16_LE:
+  case SND_PCM_FORMAT_S16_BE:
+  case SND_PCM_FORMAT_U16_LE:
+  case SND_PCM_FORMAT_U16_BE:
     return 2;
-   
+
+  case SND_PCM_FORMAT_U8:
+  case SND_PCM_FORMAT_S8:
+  case SND_PCM_FORMAT_MU_LAW:
+  case SND_PCM_FORMAT_A_LAW:
+    return 1;
+
   default:
     return 0;
   }
 }
 
-/*
- * returns the number of available fragents that can be read immediately
- * from specified sound device file descriptor fd
- */
-int audio_get_read_fragments_number(int fd) {
-  audio_buf_info info;
-  
-  if (ioctl(fd, SNDCTL_DSP_GETISPACE, &info) == -1) {
-    perror("SNDCTL_DSP_GETISPACE");
-  }
-  return info.fragments;
-}
-
-/*
- * returns the total number of fragents available for OSS at
- * specified sound device file descriptor fd for reading
- */
-int audio_get_read_fragments_total(int fd) {
-  audio_buf_info info;
-  
-  if (ioctl(fd, SNDCTL_DSP_GETISPACE, &info) == -1) {
-    perror("SNDCTL_DSP_GETISPACE");
-  }
-  return info.fragstotal;
-}
-
-/*
- * returns the number of fragents that can be written (non-blocking) to
- * specified sound device file descriptor fd
- */
-int audio_get_write_fragments_number(int fd) {
-  audio_buf_info info;
-  
-  if (ioctl(fd, SNDCTL_DSP_GETOSPACE, &info) == -1) {
-    perror("SNDCTL_DSP_GETOSPACE");
-  }
-  return info.fragments;
-}
-
-/*
- * returns the total number of fragents available for OSS at
- * specified sound device file descriptor fd for writing
- */
-int audio_get_write_fragments_total(int fd) {
-  audio_buf_info info;
-  
-  if (ioctl(fd, SNDCTL_DSP_GETOSPACE, &info) == -1) {
-    perror("SNDCTL_DSP_GETOSPACE");
-  }
-  return info.fragstotal;
-}
+/*--------------------------------------------------------------------------*/

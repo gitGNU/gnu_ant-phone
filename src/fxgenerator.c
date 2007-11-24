@@ -136,8 +136,11 @@ unsigned char fxgenerate(session_t *session, enum effect_t effect,
 	  (int)((sin(seconds * 2 * M_PI * f1) + sin(seconds * 2 * M_PI * f2))
 	  / 2 * 127.5 * 0.7 + 127.5)];
     break;
+  case EFFECT_EMPTY:
+    x = session->audio_LUT_generate[128];
+    break;
   default:
-    fprintf(stderr, "fxgenerate: Unknown effect.\n");
+    errprintf("fxgenerate: Unknown effect %d.\n", effect);
     x = 0;
   }
   

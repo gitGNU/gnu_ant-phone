@@ -27,6 +27,7 @@
 
 /* own headers */
 #include "isdntree.h"
+#include "globals.h"
 
 isdn_tree_node_t* isdn_tree;
 
@@ -51,7 +52,7 @@ static void isdn_tree_dump_list(isdn_tree_node_t* list, int indent) {
 	isdn_tree_dump_list(list->content.subsection, indent + 2);
         break;
       default:
-	fprintf(stderr, "Unknown ISDN_NODE_TYPE\n");
+	errprintf("Unknown ISDN_NODE_TYPE\n");
     }
     
     list = list->next;
@@ -87,7 +88,7 @@ static void isdn_tree_free_list(isdn_tree_node_t* list) {
 	isdn_tree_free_list(list->content.subsection);
         break;
       default:
-	fprintf(stderr, "Unknown ISDN_NODE_TYPE\n");
+	errprintf("Unknown ISDN_NODE_TYPE\n");
     }
     
     temp = list->next;

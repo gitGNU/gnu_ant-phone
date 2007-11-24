@@ -102,9 +102,11 @@ int main(int argc, char *argv[]) {
     {"msn",      required_argument, 0, 'm'},
     {"msns",     required_argument, 0, 'l'},
     {"call",     required_argument, 0, 'c'},
+    {"sleep",    no_argument,       0, 's'},
+    {"wakeup",   no_argument,       0, 'w'},
     {0, 0, 0, 0}
   };
-  char *short_options = "hvrd::i:o:m:l:c:";
+  char *short_options = "hvrswd::i:o:m:l:c:";
   int option_index = 0;
   int c;
 
@@ -126,11 +128,11 @@ int main(int argc, char *argv[]) {
 #ifdef ENABLE_NLS
   setlocale(LC_ALL, "");
   if (!bindtextdomain(PACKAGE, LOCALEDIR)) {
-    fprintf(stderr, "Error setting directory for textdomain (i18n).\n");
+    errprintf("Error setting directory for textdomain (i18n).\n");
   }
   output_codeset_save();
   if (!textdomain(PACKAGE)) {
-    fprintf(stderr, "Error setting domainname for gettext() "
+    errprintf("Error setting domainname for gettext() "
                     "(internationalization).\n");
   }
 #endif
@@ -186,6 +188,9 @@ Options:\n\
   -l, --msns=MSNS         MSNs to listen on, semicolon-separated list or '*'\n\
                             default: *\n\
   -c, --call=NUMBER       Call specified number\n\
+  -s, --sleep             Put ISDN thread to sleep (to be able to remove CAPI\n\
+                            modules before suspending the computer).\n\
+  -w, --wakeup            Restart ISDN thread after sleep.\n\
 \n\
 Note: If arguments of --soundin and --soundout are equal, a full duplex\n\
       sound device is needed.\n"), argv[0]);
@@ -219,7 +224,25 @@ Note: If arguments of --soundin and --soundout are equal, a full duplex\n\
       break;
     case 'c':
       printf(_("Calling %s... "), optarg);
-      if (client_make_call(optarg)) {
+      if (client_make_call(LOCAL_MSG_CALL, optarg)) {
+	printf("\nAn error occured while calling a running " PACKAGE ".\n");
+      } else {
+	printf(_("successful.\n"));
+      }
+      exit(0);
+      break;
+    case 's':
+      printf(_("Suspending ISDN thread... "));
+      if (client_make_call(LOCAL_MSG_SUSPEND, "")) {
+	printf("\nAn error occured while calling a running " PACKAGE ".\n");
+      } else {
+	printf(_("successful.\n"));
+      }
+      exit(0);
+      break;
+    case 'w':
+      printf(_("Waking up ISDN thread... "));
+      if (client_make_call(LOCAL_MSG_WAKEUP, "")) {
 	printf("\nAn error occured while calling a running " PACKAGE ".\n");
       } else {
 	printf(_("successful.\n"));
@@ -237,22 +260,20 @@ Note: If arguments of --soundin and --soundout are equal, a full duplex\n\
   if (session_init(&session, audio_device_name_in, audio_device_name_out,
 		   msn, msns))
   {
-    fprintf(stderr, "Error at session init.\n");
+    errprintf("Error at session init.\n");
     exit(1);
   } else {
-    if (debug)
-      fprintf(stderr, "Init OK.\n");
+    dbgprintf(1, "Init OK.\n");
   }
-      
+
   /* gtk stuff, main loop */
   gtk_result = main_gtk(&session);
 
   if (session_deinit(&session)) {
-    fprintf(stderr, "Error at session exit\n");
+    errprintf("Error at session exit\n");
     exit(1);
   } else {
-    if (debug)
-      fprintf(stderr, "Quit OK.\n");
+    dbgprintf(1, "Quit OK.\n");
   }
   output_codeset_set(NULL); /* restore saved codeset */
 

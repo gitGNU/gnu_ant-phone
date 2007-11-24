@@ -54,7 +54,7 @@ static int gtksettings_try(GtkWidget *widget) {
     free(session->exec_on_incoming);
     session->exec_on_incoming = strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
   } else
-    fprintf(stderr, "gtksettings_cb_ok: Error getting exec_on_incoming.\n");
+    errprintf("gtksettings_cb_ok: Error getting exec_on_incoming.\n");
 
   /* popup checkbutton */
   button = (GtkWidget *) gtk_object_get_data(GTK_OBJECT(widget),
@@ -63,7 +63,7 @@ static int gtksettings_try(GtkWidget *widget) {
     session->option_popup =
       gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
   else
-    fprintf(stderr, "gtksettings_cb_ok: Error getting popup state.\n");
+    errprintf("gtksettings_cb_ok: Error getting popup state.\n");
   
   /* recording_format */
   list = (GSList *) gtk_object_get_data(GTK_OBJECT(widget), "recording_format");
@@ -76,21 +76,21 @@ static int gtksettings_try(GtkWidget *widget) {
       list = list->next;
     }
   } else
-    fprintf(stderr, "gtksettings_cb_ok: Error getting recording_format.\n");
+    errprintf("gtksettings_cb_ok: Error getting recording_format.\n");
 
   /* msn */
   entry = (GtkWidget *) gtk_object_get_data(GTK_OBJECT(widget), "msn_entry");
   if (entry)
     session->msn = strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
   else
-    fprintf(stderr, "gtksettings_cb_ok: Error getting msn.\n");
+    errprintf("gtksettings_cb_ok: Error getting msn.\n");
 
   /* msns */
   entry = (GtkWidget *) gtk_object_get_data(GTK_OBJECT(widget), "msns_entry");
   if (entry)
     session->msns = strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
   else
-    fprintf(stderr, "gtksettings_cb_ok: Error getting msns.\n");
+    errprintf("gtksettings_cb_ok: Error getting msns.\n");
        
   /* history_entry */
   entry = (GtkWidget *) gtk_object_get_data(GTK_OBJECT(widget),
@@ -99,7 +99,7 @@ static int gtksettings_try(GtkWidget *widget) {
     session->dial_number_history_maxlen =
       strtol(gtk_entry_get_text(GTK_ENTRY(entry)), NULL, 0);
   else
-    fprintf(stderr, "gtksettings_cb_ok: Error getting history.\n");
+    errprintf("gtksettings_cb_ok: Error getting history.\n");
   session->dial_number_history_pointer = 0;
 
   /* cid_max_entry */
@@ -109,7 +109,7 @@ static int gtksettings_try(GtkWidget *widget) {
     session->cid_num_max =
       strtol(gtk_entry_get_text(GTK_ENTRY(entry)), NULL, 0);
   else
-    fprintf(stderr, "gtksettings_cb_ok: "
+    errprintf("gtksettings_cb_ok: "
 	    "Error getting caller id maximum rows.\n");
 
   /* cid_calls_merge_checkbutton */
@@ -119,7 +119,7 @@ static int gtksettings_try(GtkWidget *widget) {
     session->option_calls_merge =
       gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
   else
-    fprintf(stderr,
+    errprintf(
 	    "gtksettings_cb_ok: Error getting isdnlog calls_merge state.\n");
   /* cid_calls_merge_max_entry */
   entry = (GtkWidget *) gtk_object_get_data(GTK_OBJECT(widget),
@@ -128,7 +128,7 @@ static int gtksettings_try(GtkWidget *widget) {
     session->option_calls_merge_max_days =
       strtol(gtk_entry_get_text(GTK_ENTRY(entry)), NULL, 0);
   else
-    fprintf(stderr, "gtksettings_cb_ok: "
+    errprintf("gtksettings_cb_ok: "
 	    "Error getting maximum number of days for isdnlog retrieval.\n");
 
   /* save checkbutton */
@@ -138,7 +138,7 @@ static int gtksettings_try(GtkWidget *widget) {
     session->option_save_options =
       gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
   else
-    fprintf(stderr,
+    errprintf(
 	    "gtksettings_cb_ok: Error getting save_options state.\n");
 
   /*
@@ -147,8 +147,7 @@ static int gtksettings_try(GtkWidget *widget) {
 
   if (session->audio_device_name_in) { /* shut down if defined */
     session_io_handlers_stop(session);
-    if (!session->option_release_devices) /* audio_close if normal mode */
-      session_audio_deinit(session);
+    session_set_audio_state(session, AUDIO_DISCONNECTED);
     free(session->audio_device_name_in);
     free(session->audio_device_name_out);
   }
@@ -160,7 +159,7 @@ static int gtksettings_try(GtkWidget *widget) {
     session->audio_device_name_in =
       strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
   else
-    fprintf(stderr,"gtksettings_cb_ok: Error getting audio_device_name_in.\n");
+    errprintf("gtksettings_cb_ok: Error getting audio_device_name_in.\n");
 
   /* audio_device_name_out */
   entry = (GtkWidget *) gtk_object_get_data(GTK_OBJECT(widget),
@@ -169,7 +168,7 @@ static int gtksettings_try(GtkWidget *widget) {
     session->audio_device_name_out =
       strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
   else
-    fprintf(stderr,
+    errprintf(
 	    "gtksettings_cb_ok: Error getting audio_device_name_out.\n");
 
   /* release checkbutton */
@@ -179,11 +178,11 @@ static int gtksettings_try(GtkWidget *widget) {
     session->option_release_devices =
       gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
   else
-    fprintf(stderr,
+    errprintf(
 	    "gtksettings_cb_ok: Error getting release_devices state.\n");
 
   if (!session->option_release_devices) {
-    if (session_audio_init(session)) {
+    if (session_set_audio_state(session, AUDIO_IDLE) < 0) {
       successful = 0;
       free(session->audio_device_name_in);
       free(session->audio_device_name_out);
@@ -196,21 +195,23 @@ static int gtksettings_try(GtkWidget *widget) {
     session_set_state(session, STATE_READY); /* update everything */
   }
 
-  /* try to apply msn settings */
-  if (isdn_setMSN(session->isdn_fd, session->msn) ||
-      isdn_setMSNs(session->isdn_fd, session->msns)) {
-    /* got some problem */
-    free(session->msn);
-    free(session->msns);
-    session->msn = old_msn;
-    session->msns = old_msns;
-    isdn_setMSN(session->isdn_fd, session->msn);
-    isdn_setMSNs(session->isdn_fd, session->msns);
-    successful = 0;
-  } else {
-    /* everything's fine */
-    free(old_msn);
-    free(old_msns);
+  if (session->state == STATE_READY) {
+    /* try to apply msn settings */
+    if (isdn_setMSN(&session->isdn, session->msn) ||
+        isdn_setMSNs(&session->isdn, session->msns)) {
+      /* got some problem */
+      free(session->msn);
+      free(session->msns);
+      session->msn = old_msn;
+      session->msns = old_msns;
+      isdn_setMSN(&session->isdn, session->msn);
+      isdn_setMSNs(&session->isdn, session->msns);
+      successful = 0;
+    } else {
+      /* everything's fine */
+      free(old_msn);
+      free(old_msns);
+    }
   }
 
   return !!successful - 1;

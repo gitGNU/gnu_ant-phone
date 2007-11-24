@@ -4,6 +4,7 @@
  * This file is part of ANT (Ant is Not a Telephone)
  *
  * Copyright 2002, 2003 Roland Stigge
+ * Copyright 2007 Ivan Schreter
  *
  * ANT is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

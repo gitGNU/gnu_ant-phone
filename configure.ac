@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_INIT(ant-phone)
-AM_INIT_AUTOMAKE(ant-phone, "0.1.13", ant-phone-devel@nongnu.org)
+AM_INIT_AUTOMAKE(ant-phone, "0.2.0", ant-phone-devel@nongnu.org)
 AC_PREREQ(2.53)
 AC_CONFIG_SRCDIR([config.h.in])
 AM_CONFIG_HEADER([config.h])
@@ -53,7 +53,7 @@ AC_SUBST(DEPS_LIBS)
 #
 AC_MSG_CHECKING(to see if we can add '-Wall -W' to CFLAGS)
 if test x$GCC != x ; then
-  CFLAGS="$CFLAGS -D_U_=\"__attribute__((unused))\" -Wall -W -D_GNU_SOURCE -O3"
+  CFLAGS="$CFLAGS -D_U_=\"__attribute__((unused))\" -Wall -W -D_GNU_SOURCE"
   AC_MSG_RESULT(yes)
 else
   CFLAGS="-D_U_=\"\" $CFLAGS"

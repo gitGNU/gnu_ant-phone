@@ -27,7 +27,9 @@ ant_phone_SOURCES = \
 	server.c \
 	client.c \
 	recording.c \
-	isdntree.c
+	isdntree.c \
+	thread.c \
+	globals.c
 
 noinst_HEADERS = \
 	callerid.h \
@@ -49,7 +51,8 @@ noinst_HEADERS = \
 	globals.h \
 	gettext.h \
 	isdnlexer.h \
-	isdntree.h
+	isdntree.h \
+	thread.h
 
 EXTRA_DIST = \
 	pickup.xpm \
@@ -73,7 +76,7 @@ datadir = @datadir@
 localedir = $(datadir)/locale
 DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
 
-LIBS = @LIBINTL@ @LIBS@
+LIBS = @LIBINTL@ @LIBS@ -lgthread-2.0 -lasound -lcapi20
 
 INCLUDES = -I../intl -I$(top_srcdir)/intl @DEPS_CFLAGS@
 AM_CFLAGS = -DVERSION='"@VERSION@"' -DPACKAGE='"@PACKAGE@"' @CFLAGS@

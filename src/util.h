@@ -32,6 +32,8 @@
 #endif
 #include <time.h>
 
+#include <stdint.h>
+
 #define SHORT_INTERVAL 10000
 /* 10 milliseconds */
 
@@ -52,5 +54,12 @@ char* stripchr(char* s, char c);
 char* filename_extension(char* fn);
 int output_codeset_save(void);
 int output_codeset_set(char* codeset);
+
+/*!
+ * @brief Get time in microsecond.
+ *
+ * @return time in microseconds since arbitrary start point.
+ */
+uint64_t microsec_time();
 
 #endif /* util.h */

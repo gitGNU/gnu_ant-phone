@@ -82,6 +82,7 @@ static void quit(GtkWidget *widget _U_, gpointer data, guint action _U_) {
   settings_callerid_write(session); /* write callerid history */
   
   gtk_handle_hang_up_button(NULL, data); /* simulate hang_up_button */
+  session_io_handlers_stop(session); /* make sure GTK handlers are stopped */
 
   /* some (GUI) de-initialization, not directly session related */
   llcheck_bar_deinit(session->llcheck_in);
@@ -117,15 +118,13 @@ gint timeout_callback(gpointer data) {
   if (interrupted) {
     switch(interrupted) {
     case SIGINT:
-      if (debug)
-	fprintf(stderr, "Ctrl-C caught.\n");
+      dbgprintf(1, "Ctrl-C caught.\n");
       break;
     case SIGTERM:
-      if (debug)
-	fprintf(stderr, "SIGTERM caught.\n");
+      dbgprintf(1, "SIGTERM caught.\n");
       break;
     default:
-      fprintf(stderr, "Warning: Unknown signal caught.\n");
+      errprintf("Warning: Unknown signal caught.\n");
     }
     quit(NULL, data, 0);
   }
@@ -136,7 +135,7 @@ gint timeout_callback(gpointer data) {
 
     if (0 > asprintf(&buf, "%s %s",
 		     state_data[session->state].status_bar, timediff))
-      fprintf(stderr, "Warning: timeout_callback: asprintf error.\n");
+      errprintf("Warning: timeout_callback: asprintf error.\n");
     
     gtk_statusbar_pop(GTK_STATUSBAR(session->status_bar),
 		      session->phone_context_id);
@@ -154,7 +153,7 @@ gint timeout_callback(gpointer data) {
 
     if (0 > asprintf(&buf, "%s %s",
 		     state_data[session->state].status_bar, timediff))
-      fprintf(stderr, "Warning: timeout_callback: asprintf error.\n");
+      errprintf("Warning: timeout_callback: asprintf error.\n");
     
     gtk_statusbar_pop(GTK_STATUSBAR(session->status_bar),
 		      session->phone_context_id);
@@ -277,10 +276,10 @@ static void cb_info_window(GtkWidget *widget _U_, gpointer data,
     { N_("Output channels:"), inactive ? strdup(_("[inactive]")) : ltostr(1) },
     { "", strdup("") },
 
-    { N_("ISDN device:"), strdup(session->isdn_device_name) },
+/*    { N_("ISDN device:"), strdup(session->isdn_device_name) }, */
     { N_("ISDN speed (samples):"), ltostr(8000) },
     { N_("ISDN sample size (bits):"), ltostr(8) },
-    { N_("ISDN fragment size (bytes):"), ltostr(255) }
+/*    { N_("ISDN fragment size (bytes):"), ltostr(255) } */
   };
   unsigned int i;
 

@@ -1,17 +1,22 @@
 Bugs:
 =====
-* Recording chopped up (only recorded file)
-* Incoming delay
-* Kernel cpu consumption in conversation mode. This is a kernel-internal
-  problem. While reading blocks from kernel OSS devices and ttyI, select(s)
-  seems to consume lot's of cpu time in kernel space while NOT BLOCKING!
-  -> not a big problem for now, just less idle tasks ;)
-  -> The problem doesn't seem to appear with ALSA
+* Due to unsynchronized ISDN and ALSA clocks, there are still some issues with
+  audio overruns/unterruns, which may cause slight distortions in the sound
+  quality. This can only by addressed by stretching/contracting sound segments.
+  Currently it is handled by duplicating small frames (~20ms) on underruns or
+  skipping small frames (~20ms) on overruns. In some rare cases, however,
+  it happens frequently for up to a minute. Hanging up and redialing is one
+  option how to get rid of this problem.
+* Audio device choosing is still done via textbox. With ALSA now, it should be
+  done via combobox, as device names can be queried.
+* Surely some new ones after rewrite of large parts of the code...
 
 Feature requests:
 =================
 * Real time support
+   => not really necessary anymore, but can be easily implemented now
 * client/server architecture (ttyI network forward) (Sven Geggus <sven@gegg.us>, Arne Börs <Arne.Boers@gmx.de>, martin@stigge.org)
+   => can be now handled by remote CAPI, no need for special code
 * Makeln (Joerg Brueggemann <jb@neviges.net>)
 * database connection (caller id, times of incoming / outgoing, ...)
 
@@ -51,6 +56,7 @@ Daniel Nöthen <bipak@gmx.net>:
 
 Philipp Thomas <pthomas@suse.de>:
 * CAPI support, native ALSA support (both in Linux 2.6) (needed for SuSE 9.1 prepared for 02/2004)
+    => both done
 
 wolfgang@rohdewald.de:
 * "execute on recorded message" option

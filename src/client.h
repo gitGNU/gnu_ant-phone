@@ -22,4 +22,4 @@
  *
  */
 
-int client_make_call(char *number);
+int client_make_call(char message, char *number);

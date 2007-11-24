@@ -97,7 +97,7 @@ section    : '[' ISDN_TOKEN_NAME ']' entries
 	         if (!($$ =
 		       (isdn_tree_node_t*) malloc(sizeof(isdn_tree_node_t))))
 		 {
-		   fprintf(stderr, "Error: Out of memory.\n");
+		   errprintf("Error: Out of memory.\n");
 		   exit(1);
 		 }
 		 $$->type = ISDN_NODE_TYPE_SECTION;
@@ -122,7 +122,7 @@ entries    : { $$.list = NULL; $$.last = NULL; }
 	       }
 	   | entries error
 	       {
-	         fprintf(stderr, "Error region from %d:%d up to %d:%d.\n",
+	         errprintf("Error region from %d:%d up to %d:%d.\n",
 		         @2.first_line, @2.first_column,
 			 @2.last_line, @2.last_column);
 	         $$ = $1;
@@ -134,7 +134,7 @@ entry      : ISDN_TOKEN_NAME '=' value
 	         if (!($$ =
 		       (isdn_tree_node_t*) malloc(sizeof(isdn_tree_node_t))))
 		 {
-		   fprintf(stderr, "Error: Out of memory.\n");
+		   errprintf("Error: Out of memory.\n");
 		   exit(1);
 		 }
 		 $$->type = ISDN_NODE_TYPE_ENTRY;
@@ -147,7 +147,7 @@ entry      : ISDN_TOKEN_NAME '=' value
 	         if (!($$ =
 		       (isdn_tree_node_t*) malloc(sizeof(isdn_tree_node_t))))
 		 {
-		   fprintf(stderr, "Error: Out of memory.\n");
+		   errprintf("Error: Out of memory.\n");
 		   exit(1);
 		 }
 		 $$->type = ISDN_NODE_TYPE_SUBSECTION;
@@ -171,7 +171,7 @@ value      : ISDN_TOKEN_VALUE
  */
 void isdn_error(const char *message) {
   if (debug)
-    fprintf(stderr,
+    errprintf(
 	    "Warning: Parsing isdn options file: %d:%d: %s.\n",
 	    isdn_lloc.first_line, isdn_lloc.first_column, message);
 }

@@ -4,6 +4,7 @@
  * This file is part of ANT (Ant is Not a Telephone)
  *
  * Copyright 2002, 2003 Roland Stigge
+ * Copyright 2007 Ivan Schreter
  *
  * ANT is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -127,7 +128,9 @@ static void llcheck_quit(GtkObject *window) {
   GtkWidget *bar = gtk_object_get_data(window, "bar");
 
   /* remove own and restore old handlers */
+#ifdef USE_GTK_LOOP
   gtk_input_remove(session->gtk_audio_input_tag);
+#endif
   session_io_handlers_start(session);
 
   /* stop effect */
@@ -140,94 +143,15 @@ static void llcheck_quit(GtkObject *window) {
 }
 
 /*
- * gdk callback on audio input
- *
- * input: widget: the llcheck_bar
- */
-static void llcheck_handle_audio_input(gpointer widget, gint fd _U_,
-				       GdkInputCondition condition _U_) {
-  session_t *session = gtk_object_get_data(widget, "session");
-  int i, got;
-  int max = 0;
-  unsigned char sample;
-
-  got = read(session->audio_fd_in, session->audio_inbuf,
-	     session->fragment_size_in);
-
-  if (got != -1) {
-    for (i = 0; i < got;
-	 i += session->audio_sample_size_in) {
-      
-      if (session->audio_sample_size_in == 1) {
-	sample = session->audio_LUT_analyze[
-		   session->audio_LUT_out[(int)(session->audio_inbuf[i])]];
-      } else { /* audio_sample_size == 2 */
-	/* multiple byte samples are used "little endian" in int
-	   to look up in LUT (see mediation_makeLUT) */
-	sample = session->audio_LUT_analyze[
-	  session->audio_LUT_out[(int)(session->audio_inbuf[i]) |
-				 (int)(session->audio_inbuf[i+1]) << 8]];
-      }
-
-      if (abs((int)sample - 128) > max)
-	max = abs((int)sample - 128);
-    }
-    
-    llcheck_bar_set(widget, (double)max / 128);
-
-  } else {
-    switch (errno) {
-    case EAGAIN:
-      fprintf(stderr,
-	      "llcheck_handle_audio_input: "
-	      "EAGAIN - no data immediately available.\n");
-      break;
-    case EBADF:
-      fprintf(stderr,
-	      "llcheck_handle_audio_input: "
-	      "EBADF - invalid file descriptor.\n");
-      break;
-    case EINTR:
-      fprintf(stderr,
-	      "llcheck_handle_audio_input: EINTR - interrupted by signal.\n");
-      break;
-    case EIO:
-      fprintf(stderr,
-	      "llcheck_handle_audio_input: EIO - hardware error.\n");
-      break;
-    }
-  }
-}
-
-/*
  * called when sound is requested in level check window
  *
  * input: widget: (play) button
  *        data:   session pointer
  */
-static void llcheck_play(GtkWidget *widget, gpointer data) {
+static void llcheck_play(GtkWidget *widget _U_, gpointer data) {
   session_t *session = (session_t *)data;
-  GtkWidget *bar = gtk_object_get_data(GTK_OBJECT(widget), "bar");
 
-  if (session->effect != EFFECT_NONE) { /* already playing -> stop feeding */
-    gtk_input_remove(session->effect_tag);
-  }
-
-  /* carefully reset audio */
-  gtk_input_remove(session->gtk_audio_input_tag);
-  session_reset_audio(session);
-  session->gtk_audio_input_tag = gtk_input_add_full(session->audio_fd_in,
-					            GDK_INPUT_READ,
-					            llcheck_handle_audio_input,
-					            NULL,
-					            (gpointer) bar,
-					            NULL);
-
-  /* start recording (again) */
-  read(session->audio_fd_in, session->audio_inbuf,
-       session->fragment_size_in);
-
-  /* finally, start playing */
+  /* start playing effect */
   session_effect_start(session, EFFECT_TEST);
 }
 
@@ -313,7 +237,7 @@ void llcheck_bar_set(GtkWidget *bar, double max) {
     (GtkWidget *)gtk_object_get_data(GTK_OBJECT(bar), "pbar2");
   struct history_t *history =
     (struct history_t *)gtk_object_get_data(GTK_OBJECT(bar), "history");
-  double maxmax = history_append(&history, max);
+  double maxmax = history ? history_append(&history, max) : max;
   int width = GPOINTER_TO_INT(gtk_object_get_data(GTK_OBJECT(bar), "width"));
       /* saving additional width
 	 (bar->allocation.width is valid only with shown widgets) */
@@ -432,17 +356,8 @@ void llcheck(GtkWidget *widget _U_, gpointer data, guint action _U_) {
   
   gtk_window_set_modal(GTK_WINDOW(window), TRUE);
 
-  /* remove old and set up own audio input handler */
-  session_io_handlers_stop(session);
-  session->gtk_audio_input_tag = gtk_input_add_full(session->audio_fd_in,
-					            GDK_INPUT_READ,
-					            llcheck_handle_audio_input,
-						    NULL,
-					            (gpointer) bar,
-						    NULL);
-
-  read(session->audio_fd_in, session->audio_inbuf, /* start recording */
-       session->fragment_size_in);
+  /* start empty effect */
+  session_effect_start(session, EFFECT_EMPTY);
 
   /* show everything */
   gtk_widget_show(window);

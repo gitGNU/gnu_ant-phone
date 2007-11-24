@@ -4,6 +4,7 @@
  * This file is part of ANT (Ant is Not a Telephone)
  *
  * Copyright 2002, 2003 Roland Stigge
+ * Copyright 2007 Ivan Schreter
  *
  * ANT is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,5 +34,20 @@
 #define N_(String) gettext_noop (String)
 
 extern int debug;
+
+/*!
+ * @brief Output a message.
+ *
+ * @param level message level (0=error, 1..n=debug).
+ * @param format printf-like format for following arguments.
+ */
+void msgprintf(int level, const char *format, ...)
+    __attribute__ ((format (printf, 2, 3)));
+
+#define dbgprintf(level, ...) \
+  if (level <= debug) msgprintf(level, __VA_ARGS__)
+
+#define errprintf(...) \
+  msgprintf(0, __VA_ARGS__)
 
 #endif /* globals.h */

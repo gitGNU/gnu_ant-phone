@@ -47,7 +47,7 @@ char *server_local_socket_name(void) {
 
   if (asprintf(&filename, "%s/." PACKAGE "/%s",
 	       get_homedir(), SERVER_LOCAL_SOCKET_NAME) < 0) {
-    fprintf(stderr,
+    errprintf(
 	    "Warning: Couldn't allocate memory for history filename.\n");
     return NULL;
   }
@@ -83,7 +83,7 @@ int server_init(session_t *session) {
   /* bind (file) name to socket */
   if (bind(local_sock, (struct sockaddr *) &local_name, size)) {
     perror("local bind");
-    fprintf(stderr,
+    errprintf(
 	    "This program was possibly killed by accident on last run.\n"
 	    "In this case, try running it with option -r.\n");
     return -1;
@@ -118,15 +118,25 @@ void server_handle_local_input(gpointer data, gint fd _U_,
 
   bytes = read(sock, buffer, SERVER_INBUF_SIZE);
   if (bytes > 0) { /* got message */
-    if (buffer[0] == LOCAL_MSG_CALL) {
-      if (debug) fprintf(stderr, "Request (%d bytes): call %s.\n",
-			 bytes, &buffer[1]);
-      session_make_call(session, &buffer[1]);
+    switch (buffer[0]) {
+      case LOCAL_MSG_CALL:
+        dbgprintf(1, "Request (%d bytes): call %s.\n",
+                          bytes, &buffer[1]);
+        session_make_call(session, &buffer[1]);
+        break;
+      case LOCAL_MSG_SUSPEND:
+        dbgprintf(1, "Request (%d bytes): sleep ISDN.\n", bytes);
+        session_activate_isdn(session, 0);
+        break;
+      case LOCAL_MSG_WAKEUP:
+        dbgprintf(1, "Request (%d bytes): wake up ISDN.\n", bytes);
+        session_activate_isdn(session, 1);
+        break;
     }
   } else if (bytes < 0) { /* error */
     perror("local read");
   } else { /* EOF */
-    fprintf(stderr, "local read: EOF");
+    errprintf("local read: EOF");
   }
 
   close(sock);
