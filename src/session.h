@@ -153,6 +153,7 @@ typedef struct {
 
   /* GUI elements in this session (GTK specific) */
   GtkWidget *main_window;             /*!< the main window (with style ...) */
+  GtkStatusIcon *status_icon;         /*!< status icon in WM panel */
   GtkWidget *pick_up_button;          /*!< the pick up button to enable / disable */
   GtkWidget *pick_up_label;           /*!< the label on the pick up button */
   GtkWidget *hang_up_button;          /*!< the hang up button to enable / disable */

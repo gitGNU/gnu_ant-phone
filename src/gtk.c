@@ -4,6 +4,7 @@
  * This file is part of ANT (Ant is Not a Telephone)
  *
  * Copyright 2002, 2003 Roland Stigge
+ * Copyright 2007 Ivan Schreter
  *
  * ANT is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,17 +66,127 @@
 /* call timeout_callback each <this number> of milliseconds */
 #define TIMER_DELAY 300
 
-volatile int interrupted = 0; /* the caught signal will be stored here */
+static volatile int interrupted = 0; /*!< the caught signal will be stored here */
 
-/*
- * the quit (e.g. menu entry) callback
- * prototype is this way to standardize to GtkItemFactoryCallback2
+struct info_row_t {
+  gchar *tag;
+  gchar *value;
+};
+
+/*!
+ * @brief Quit callback (e.g., on menu entry).
  *
- * this function will always be called when gtk is to finish
+ * This function will always be called when gtk is to finish.
  *
- * input: data: session
+ * @param data session.
  */
-static void quit(GtkWidget *widget _U_, gpointer data, guint action _U_) {
+static void quit(GtkWidget *widget _U_, gpointer data, guint action _U_);
+
+/*!
+ * @brief Main window delete_event callback (close button).
+ *
+ * @param data session.
+ */
+static gint delete_event(GtkWidget *widget _U_,
+                         GdkEvent *event _U_,
+                         gpointer data);
+
+/*!
+ * @brief Main window state change callback (e.g., minimize).
+ *
+ * @param event window event (contains old and new states).
+ * @param data session.
+ */
+static gint window_state_event(GtkWidget *widget _U_,
+                               GdkEventWindowState *event,
+                               gpointer data);
+
+/*!
+ * @brief Activation of tray icon callback.
+ *
+ * @param data session.
+ */
+static gint icon_activate(GtkStatusIcon *status_icon _U_,
+                          gpointer       data);
+
+/*!
+ * @brief Popup menu callback on tray icon.
+ *
+ * @param data session.
+ */
+static gint icon_popup_menu(GtkStatusIcon *status_icon _U_,
+                            guint          button _U_,
+                            guint          activate_time _U_,
+                            gpointer       data);
+
+/*!
+ * @brief Handler for SIGTERM and SIGINT.
+ *
+ * @param sig caught signal.
+ */
+static void terminate_signal_callback(int sig);
+
+/*!
+ * @brief Create the basic dial box with entry and dial / hang up buttons.
+ *
+ * Also sets dial box members in session.
+ *
+ * @note caller has to gtk_widget_show it himself.
+ *
+ * @param session session.
+ * @return dial box.
+ */
+static GtkWidget *get_dial_box(session_t *session);
+
+/*!
+ * @brief Called on key pressed in combo box entry.
+ *
+ * @param entry combo box.
+ * @param event key press event.
+ * @param data session.
+ */
+static gint entry_key_cb(GtkWidget *entry, GdkEventKey *event, gpointer data);
+
+/*!
+ * @brief Create main menu widget.
+ *
+ * @note Assumes other parts to be initialized (maybe not shown already).
+ *
+ * @param window parent window to integrate accelerators.
+ * @param session session.
+ * @return the widget yet to pack.
+ */
+static GtkWidget *get_main_menu(GtkWidget *window, session_t *session);
+
+/*!
+ * @brief Callback for File/Info menu entry.
+ */
+static void cb_info_window(GtkWidget *widget _U_, gpointer data,
+                           guint action _U_);
+
+/*!
+ * @brief Callback for Help/About menu entry.
+ */
+static void cb_about(GtkWidget *widget _U_, gpointer data _U_, guint action _U_);
+
+/*!
+ * @brief Callback for Help/License menu entry.
+ */
+static void cb_license(GtkWidget *widget _U_, gpointer data _U_, guint action _U_);
+
+/*!
+ * @brief Timeout callback.
+ *
+ * Called periodically (e.g. each 300 milliseconds) from gtk main loop.
+ *
+ * @param data session.
+ */
+static gint timeout_callback(gpointer data);
+
+/*--------------------------------------------------------------------------*/
+
+static void quit(GtkWidget *widget _U_, gpointer data, guint action _U_)
+{
   session_t *session = (session_t *) data;
   
   settings_history_write(session); /* write history */
@@ -91,28 +202,100 @@ static void quit(GtkWidget *widget _U_, gpointer data, guint action _U_) {
   gtk_main_quit();
 }
 
-/*
- * main window delete_event callback
- *
- * input: data: session
- */
-gint delete_event(GtkWidget *widget,
-		  GdkEvent *event _U_,
-		  gpointer data)
+/*--------------------------------------------------------------------------*/
+
+static gint delete_event(GtkWidget *widget _U_,
+                          GdkEvent *event _U_,
+                          gpointer data)
 {
+  session_t *session = (session_t*) data;
+
+  /* just hide main window */
+  dbgprintf(1, "UI: Main window minimizing to tray\n");
+
+  gtk_status_icon_set_visible(session->status_icon, TRUE);
+  gtk_widget_hide(session->main_window);
+  return TRUE;
+#if 0
   quit(widget, data, 0);
-  return FALSE; /* continue event handling */
+  return FALSE;
+#endif
 }
 
-/* handler for SIGTERM and SIGINT */
-void terminate_signal_callback(int sig) {
+/*--------------------------------------------------------------------------*/
+
+static gint window_state_event(GtkWidget *widget _U_,
+                               GdkEventWindowState *event,
+                               gpointer data)
+{
+  session_t *session = (session_t*) data;
+
+  if ((event->new_window_state & GDK_WINDOW_STATE_ICONIFIED) &&
+      !(event->new_window_state & GDK_WINDOW_STATE_WITHDRAWN))
+  {
+    /* window has been iconified, hide it and show status icon */
+    dbgprintf(1, "UI: Main window minimizing to tray\n");
+
+    gtk_status_icon_set_visible(session->status_icon, TRUE);
+    gtk_widget_hide(session->main_window);
+    gtk_window_deiconify(GTK_WINDOW(session->main_window));
+  }
+  return TRUE;
+}
+
+/*--------------------------------------------------------------------------*/
+
+static gint icon_activate(GtkStatusIcon *status_icon _U_,
+                          gpointer       data)
+{
+  session_t *session = (session_t*) data;
+
+#if 0
+  if (GTK_WIDGET_VISIBLE(session->main_window)) {
+    dbgprintf(1, "UI: Icon activated, hiding main window\n");
+
+    gtk_widget_hide(session->main_window);
+  } else {
+#endif
+    dbgprintf(1, "UI: Icon activated, restoring main window\n");
+
+    gtk_window_present(GTK_WINDOW(session->main_window));
+    gtk_widget_grab_focus(session->dial_number_box);
+#if 0
+  }
+#endif
+  return TRUE;
+}
+
+/*--------------------------------------------------------------------------*/
+
+static gint icon_popup_menu(GtkStatusIcon *status_icon _U_,
+                            guint          button _U_,
+                            guint          activate_time _U_,
+                            gpointer       data)
+{
+  session_t *session = (session_t*) data;
+
+  dbgprintf(1, "UI: Icon popup\n");
+
+  /* TODO: display a popup menu with some sensible stuff instead */
+  gtk_window_present(GTK_WINDOW(session->main_window));
+  gtk_widget_grab_focus(session->dial_number_box);
+
+  return FALSE;
+}
+
+/*--------------------------------------------------------------------------*/
+
+static void terminate_signal_callback(int sig)
+{
   interrupted = sig;
 }
 
-/*
- * periodically (e.g. each 300 milliseconds) from gtk main loop called function
- */
-gint timeout_callback(gpointer data) {
+/*--------------------------------------------------------------------------*/
+
+static gint timeout_callback(gpointer data)
+{
   session_t *session = (session_t *) data;
 
   if (interrupted) {
@@ -168,20 +351,14 @@ gint timeout_callback(gpointer data) {
 }
 
 
+/*--------------------------------------------------------------------------*/
+
 /*
  * some GUI tools
  */
 
-/*
- * return a dialog window with a (big) label and an ok button to close
- * (good for displaying a note)
- *
- * justification: justification of label (e.g. GTK_JUSTIFY_LEFT)
- *
- * NOTE: caller has to show the window itself with gtk_widget_show()
- *       and maybe want to make it modal with
- *         gtk_window_set_modal(GTK_WINDOW(window), TRUE);
- */
+/*--------------------------------------------------------------------------*/
+
 GtkWidget *ok_dialog_get(char *title, char *contents,
 			 GtkJustification justification) {
   GtkWidget *window;
@@ -220,10 +397,10 @@ GtkWidget *ok_dialog_get(char *title, char *contents,
   return window;
 }
 
-/*
- * shortcut to display a note about audio devices not available
- */
-void show_audio_error_dialog(void) {
+/*--------------------------------------------------------------------------*/
+
+void show_audio_error_dialog(void)
+{
   GtkWidget *dialog;
 
   dialog = ok_dialog_get(_("ANT Note"),
@@ -236,22 +413,23 @@ void show_audio_error_dialog(void) {
   gtk_widget_show(dialog);
 }
 
+/*--------------------------------------------------------------------------*/
+
 /**********************
  * some GUI callbacks *
  **********************/
+
+/*--------------------------------------------------------------------------*/
 
 /*
  * File Menu entries
  */
 
-struct info_row_t {
-  gchar *tag;
-  gchar *value;
-};
+/*--------------------------------------------------------------------------*/
 
-/* Info window */
 static void cb_info_window(GtkWidget *widget _U_, gpointer data,
-			   guint action _U_) {
+			   guint action _U_)
+{
   session_t *session = (session_t *) data;
   int inactive = session->option_release_devices &&
     (session->state == STATE_READY || session->state == STATE_RINGING_QUIET);
@@ -340,15 +518,22 @@ static void cb_info_window(GtkWidget *widget _U_, gpointer data,
   gtk_widget_show(window);
 }
 
+/*--------------------------------------------------------------------------*/
+
 /*
  * Options menu entries
  */
+
+/*--------------------------------------------------------------------------*/
+
 /*
  * Help menu entries
  */
 
-/* the about menu entry callback */
-static void cb_about(GtkWidget *widget _U_, gpointer data _U_, guint action _U_) {
+/*--------------------------------------------------------------------------*/
+
+static void cb_about(GtkWidget *widget _U_, gpointer data _U_, guint action _U_)
+{
   GtkWidget *window;
   GtkWidget *button_box;
   GtkWidget *button;
@@ -414,8 +599,10 @@ static void cb_about(GtkWidget *widget _U_, gpointer data _U_, guint action _U_)
   gtk_widget_show(window);
 }
 
-/* the about menu entry callback */
-static void cb_license(GtkWidget *widget _U_, gpointer data _U_, guint action _U_) {
+/*--------------------------------------------------------------------------*/
+
+static void cb_license(GtkWidget *widget _U_, gpointer data _U_, guint action _U_)
+{
   GtkWidget *window = ok_dialog_get(_("ANT License"),
     _("ANT (ANT is Not a Telephone)\n"
       "Copyright (C) 2002, 2003 Roland Stigge\n"
@@ -438,15 +625,10 @@ static void cb_license(GtkWidget *widget _U_, gpointer data _U_, guint action _U
   gtk_widget_show(window);
 }
 
-/*
- * get the main menu widget
- *
- * input: window: parent window to integrate accelerators
- * returns: the widget yet to pack
- *
- * NOTE: assumes other parts to be initialized (maybe not shown already)
- */
-GtkWidget *get_main_menu(GtkWidget *window, session_t *session) {
+/*--------------------------------------------------------------------------*/
+
+static GtkWidget *get_main_menu(GtkWidget *window, session_t *session)
+{
   /* The main menu structure */
   GtkItemFactoryEntry main_menu_items[] = {
 /*path                  accel.    callb.         cb par. kind           extra */
@@ -515,10 +697,10 @@ GtkWidget *get_main_menu(GtkWidget *window, session_t *session) {
   return gtk_item_factory_get_widget(item_factory, "<main>");
 }
 
-/*
- * called on key pressed in combo box entry
- */
-static gint entry_key_cb(GtkWidget *entry, GdkEventKey *event, gpointer data) {
+/*--------------------------------------------------------------------------*/
+
+static gint entry_key_cb(GtkWidget *entry, GdkEventKey *event, gpointer data)
+{
   session_t *session = (session_t *) data;
 
   if (event->keyval == GDK_KP_Enter) { /* catch keyboard keypad Enter */
@@ -532,12 +714,10 @@ static gint entry_key_cb(GtkWidget *entry, GdkEventKey *event, gpointer data) {
   }
 }
 
-/*
- * Get the basic dial box with entry and dial / hang up buttons
- * sets dial box members in session
- * NOTE: caller has to gtk_widget_show it itself
- */
-GtkWidget *get_dial_box(session_t *session) {
+/*--------------------------------------------------------------------------*/
+
+static GtkWidget *get_dial_box(session_t *session)
+{
   GtkWidget *frame;
   GtkWidget *hbox;
   GtkWidget *label;
@@ -649,12 +829,10 @@ GtkWidget *get_dial_box(session_t *session) {
   return frame;
 }
 
-/*
- * main function for gtk GUI
- *
- * returns int to be returned from main()
- */
-int main_gtk(session_t *session) {
+/*--------------------------------------------------------------------------*/
+
+int main_gtk(session_t *session)
+{
   GList* icon_list = NULL;
   
   GtkWidget *main_window;
@@ -690,6 +868,8 @@ int main_gtk(session_t *session) {
   
   gtk_signal_connect(GTK_OBJECT(main_window), "delete_event",
 		     GTK_SIGNAL_FUNC(delete_event), (gpointer) session);
+  gtk_signal_connect(GTK_OBJECT(main_window), "window_state_event",
+                     GTK_SIGNAL_FUNC(window_state_event), (gpointer) session);
 
   gtk_container_set_border_width(GTK_CONTAINER(main_window), 0);
   gtk_widget_realize(main_window);
@@ -715,7 +895,7 @@ int main_gtk(session_t *session) {
 
   /* key pad */
   session->controlpad = controlpad_new(session); /* show later */
-  
+
   /* the caller id section */
   cidbox = cid_new(session); /* show later */
 
@@ -807,6 +987,17 @@ int main_gtk(session_t *session) {
   if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(session->mute_button)))
     gtk_widget_show(session->muted_warning);
 
+  /* create status bar icon */
+  session->status_icon = gtk_status_icon_new_from_pixbuf(
+      gdk_pixbuf_new_from_xpm_data((const char**) icon48x48));
+  gtk_status_icon_set_tooltip(session->status_icon, _("Ant ISDN Telephone"));
+  g_signal_connect(session->status_icon, "activate",
+                   GTK_SIGNAL_FUNC(icon_activate), (gpointer) session);
+  g_signal_connect(session->status_icon, "popup-menu",
+                   GTK_SIGNAL_FUNC(icon_popup_menu), (gpointer) session);
+  //gtk_status_icon_set_visible(session->status_icon, FALSE);
+  gtk_status_icon_set_visible(session->status_icon, TRUE);
+
   /* show everything */
   gtk_widget_show(main_window);
 
@@ -839,3 +1030,4 @@ int main_gtk(session_t *session) {
   return 0;
 }
 
+/*--------------------------------------------------------------------------*/
