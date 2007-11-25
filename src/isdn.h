@@ -146,6 +146,7 @@ typedef struct {
 
   unsigned int ctrl_count;  /*!< controller count */
   char *own_msn;            /*!< own MSN (for originating calls) */
+  char *listen_msns;        /*!< set of comma-delimited MSNs or * for all/wildcard at end */
 
   unsigned int info_mask;   /*!< info mask for received info from CAPI */
   unsigned int cip_mask;    /*!< CIP mask for listening on services */

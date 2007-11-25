@@ -40,6 +40,7 @@
 #include <sys/stat.h>
 
 #include <string.h>
+#include <ctype.h>
 #include <errno.h>
 
 /* ISDN CAPI header */
@@ -53,14 +54,74 @@ static char* calls_filenames[] =
 { "/var/lib/isdn/calls", "/var/log/isdn/calls", "/var/log/isdn.log" };
 char* isdn_calls_filename_from_config = NULL;
 
+
+/*!
+ * @brief Initiate listen on ISDN device.
+ *
+ * @param isdn ISDN device structure.
+ * @param controller controller number.
+ * @return 0 on success, -1 on error.
+ */
+static int isdn_listen(isdn_t *isdn, unsigned int controller);
+
+/*!
+ * @brief Check if listening on MSN.
+ *
+ * @param isdn ISDN device structure.
+ * @param msn local MSN to check.
+ * @return TRUE if listening, FALSE otherwise.
+ */
+static int isdn_is_listening(isdn_t *isdn, char *msn);
+
+/*!
+ * @brief Set local number on ISDN connection object.
+ *
+ * @param isdn ISDN device structure.
+ * @param number local number (in ISDN format).
+ */
+static void isdn_set_local_number(isdn_t *isdn, char *number);
+
+/*!
+ * @brief Set remote number on ISDN connection object.
+ *
+ * @param isdn ISDN device structure.
+ * @param number remote number (in ISDN format).
+ */
+static void isdn_set_remote_number(isdn_t *isdn, char *number);
+
+/*!
+ * @brief Trigger disconnect on ISDN connection.
+ *
+ * @param isdn ISDN device structure.
+ * @return 0 on success, -1 on error.
+ */
+static int isdn_trigger_disconnect(isdn_t *isdn);
+
+/*!
+ * @brief Handle CAPI confirmation message.
+ *
+ * @param isdn ISDN device structure.
+ * @param msg message to process.
+ */
+static void isdn_handle_confirmation(isdn_t *isdn, _cmsg *msg);
+
+/*!
+ * @brief Handle CAPI indication message.
+ *
+ * @param isdn ISDN device structure.
+ * @param msg message to process.
+ */
+static void isdn_handle_indication(isdn_t *isdn, _cmsg *msg);
+
+/*!
+ * @brief ISDN processing thread.
+ *
+ * @param param ISDN device structure.
+ */
+static gpointer isdn_reply_thread(gpointer param);
+
 /*--------------------------------------------------------------------------*/
 
-/*
- * initiate listen on ISDN device
- *
- * isdn ISDN device structure
- * controller controller number
- */
 static int isdn_listen(isdn_t *isdn, unsigned int controller)
 {
   _cmsg CMSG;  /* structure for the message */
@@ -84,15 +145,12 @@ static int isdn_listen(isdn_t *isdn, unsigned int controller)
 
 /*--------------------------------------------------------------------------*/
 
-/*!
- * @brief Set remote number on ISDN connection object.
- */
 static void isdn_set_remote_number(isdn_t *isdn, char *number)
 {
   char *tmp, *tofree = isdn->remote_number;
 
   if (number) {
-    /* NOTE: number format:
+    /* Number format:
      * Byte 0: length of structure
      * Byte 1: numbering plan
      * Byte 2: presentation indicator (0x80 standard, 0xA0 for CLIR)
@@ -117,19 +175,16 @@ static void isdn_set_remote_number(isdn_t *isdn, char *number)
 
 /*--------------------------------------------------------------------------*/
 
-/*!
- * @brief Set local number on ISDN connection object.
- */
 static void isdn_set_local_number(isdn_t *isdn, char *number)
 {
   char *tmp, *tofree = isdn->local_number;
 
   if (number) {
-    /* NOTE: number format:
-    * Byte 0: length of structure
-    * Byte 1: numbering plan
-    * Byte 2..n: number digits
-    */
+    /* Number format:
+     * Byte 0: length of structure
+     * Byte 1: numbering plan
+     * Byte 2..n: number digits
+     */
     int len = number[0] - 1;
     if (len <= 0) {
       isdn->local_number = 0;
@@ -145,6 +200,70 @@ static void isdn_set_local_number(isdn_t *isdn, char *number)
 
   if (tofree)
     free(tofree);
+}
+
+/*--------------------------------------------------------------------------*/
+
+static int isdn_is_listening(isdn_t *isdn, char *msn)
+{
+  char *cur, *p, *end, *tocheck;
+  int wildcard, msnlen;
+
+  if (!msn || !*msn || strcmp(msn, "0") == 0 || !isdn->listen_msns) {
+    /* empty MSN or no MSNS set, accept */
+    return TRUE;
+  }
+
+  p = isdn->listen_msns;
+  tocheck = isdn->local_number;
+  msnlen = strlen(tocheck);
+
+  dbgprintf(1, "Checking MSN '%s' against listen set '%s'\n", tocheck, p);
+
+  for (;;) {
+    /* process next entry */
+
+    /* position to next MSN */
+    while (*p && (*p == ',' || *p == ';' || isspace(*p)))
+      ++p;
+    if (!*p)
+      break;
+
+    cur = p;
+
+    /* find end of MSN in listen set */
+    while (*p && *p != ',' && *p != ';')
+      ++p;
+    end = p;
+
+    while (end > cur && isspace(*(end-1)))
+      --end;
+
+    if (end == cur)
+      continue;   /* empty entry */
+
+    /* OK, entry is between cur and end */
+    if (*(end-1) == '*') {
+      wildcard = 1;
+      --end;
+    } else {
+      wildcard = 0;
+    }
+
+    /* check prefix */
+    if (msnlen < (end - cur))
+      continue;     /* MSN too short, cannot match */
+    if (strncmp(tocheck, cur, (end-cur)) != 0)
+      continue;     /* prefix doesn't match */
+
+    if (wildcard)
+      return TRUE;  /* prefix matched, wildcard allowed */
+    if (msnlen == (end-cur))
+      return TRUE;  /* exact match */
+  }
+
+  /* no matching entry found */
+  return FALSE;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -428,15 +547,17 @@ static void isdn_handle_indication(isdn_t *isdn, _cmsg *msg)
           reject = 1; /* ignore */
         } else if (isdn->state != ISDN_IDLE) {
           reject = 3; /* user busy */
+        } else {
+          /* check called number, if in listening MSN set */
+          isdn_set_remote_number(isdn, number);
+          isdn_set_local_number(isdn, called);
+          if (!isdn_is_listening(isdn, isdn->local_number))
+            reject = 1; /* ignore here */
         }
-        /* TODO: check called number, if in listening MSN set, set reject=1 (ignore), if not */
 
         if (!reject) {
           /* may ring now */
           isdn->active_plci = plci;
-
-          isdn_set_remote_number(isdn, number);
-          isdn_set_local_number(isdn, called);
 
 #if 0
           isdn->state = ISDN_RINGING;
@@ -934,6 +1055,10 @@ int close_isdn_device(isdn_t *isdn)
     free(isdn->own_msn);
     isdn->own_msn = 0;
   }
+  if (isdn->listen_msns) {
+    free(isdn->listen_msns);
+    isdn->listen_msns = 0;
+  }
   if (isdn->lock) {
     g_mutex_free(isdn->lock);
     isdn->lock = 0;
@@ -1186,7 +1311,8 @@ int isdn_pickup(isdn_t *isdn _U_)
 
 /*--------------------------------------------------------------------------*/
 
-int isdn_setMSN(isdn_t *isdn, char *msn) {
+int isdn_setMSN(isdn_t *isdn, char *msn)
+{
   char *to_free = isdn->own_msn;
 
   if (msn && strcmp(msn, "0") != 0)
@@ -1201,8 +1327,12 @@ int isdn_setMSN(isdn_t *isdn, char *msn) {
 
 /*--------------------------------------------------------------------------*/
 
-int isdn_setMSNs(isdn_t *isdn _U_, char *msns _U_) {
-  // TODO
+int isdn_setMSNs(isdn_t *isdn _U_, char *msns _U_)
+{
+  if (isdn->listen_msns)
+    free(isdn->listen_msns);
+
+  isdn->listen_msns = msns ? strdup(msns) : strdup(DEFAULT_MSNS);
   return 0;
 }
 
