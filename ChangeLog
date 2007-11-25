@@ -8,6 +8,7 @@ ant-phone 0.2.0, 2007-11-25, Ivan Schreter <schreter@gmx.net>
 	* Add tray icon and minimize to tray instead of close
 	* Added --sleep and --wakeup remote commands to facilitate release
 	  and re-acquire of CAPI connection
+	* Save caller ID after each call
 	* Code documentation (partial)
 
 ant-phone 0.1.13, 2007-04-29, Roland Stigge <stigge@antcom.de>

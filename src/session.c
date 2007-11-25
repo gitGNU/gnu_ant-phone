@@ -1084,6 +1084,9 @@ static void isdn_hangup_callback(void *context, void *error)
   session_set_state(session, STATE_READY);
   cid_set_duration(session, reason);
 
+  settings_history_write(session); /* write history */
+  settings_callerid_write(session); /* write callerid history */
+
   if (!session->isdn_active) {
     /* we were asked to deactivate ISDN */
     activate_isdn_device(&session->isdn, 0);
