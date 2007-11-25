@@ -938,6 +938,7 @@ int session_start_recording(session_t *session)
 static void session_start_conversation(session_t *session)
 {
   session->vcon_time = time(NULL); /* for caller id monitor */
+  session->hangup_reason = NULL;
   cid_set_date(session, session->vcon_time);
   session_effect_stop(session);
   session_set_state(session, STATE_CONVERSATION);
