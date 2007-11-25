@@ -32,34 +32,37 @@
 YYLTYPE callerid_lloc;
 
 void callerid_locate();
+char *strdup_trim(char *text);
 %}
 
-LETTER    [a-zA-Z]
-DIGIT     [0-9]
-NOEM      {LETTER}|{DIGIT}|[-:)(*#]
+LETTER      [a-zA-Z]
+INOUT       IN\ *|OUT\ *
+DIGIT       [0-9]
+YEAR        {DIGIT}{DIGIT}{DIGIT}{DIGIT}
+MD          {DIGIT}{DIGIT}
+HMS         {DIGIT}{DIGIT}
+DATE        {YEAR}-{MD}-{MD}\ {HMS}:{HMS}:{HMS}\ *
+NOEM        {LETTER}|{DIGIT}|[-:)(*#\ ]
+NUMBER      ({DIGIT}|[*#+?A-D])+\ *
+NUMBERORMSG {NOEM}*
 
 %%
 
 "|"|!!                         callerid_locate(); return CID_TOKEN_DELIMITER;
-{DIGIT}+-{DIGIT}+-{DIGIT}+" "{DIGIT}+:{DIGIT}+:{DIGIT}+ {
+{DATE}                         {
                                  callerid_locate();
-                                 callerid_lval = strdup(callerid_text);
+                                 callerid_lval = strdup_trim(callerid_text);
                                  return CID_TOKEN_DATE;
                                }
-IN|OUT                         {
+{INOUT}                        {
                                  callerid_locate();
-				 callerid_lval = strdup(callerid_text);
+				 callerid_lval = strdup_trim(callerid_text);
 				 return CID_TOKEN_TYPE;
 			       }
-({DIGIT}|[*#+?A-D])+           {
+{NUMBERORMSG}                  {
                                  callerid_locate();
-				 callerid_lval = strdup(callerid_text);
-				 return CID_TOKEN_NUMBER;
-			       }
-(!?{NOEM}+)+!?                 {
-                                 callerid_locate();
-				 callerid_lval = strdup(callerid_text);
-				 return CID_TOKEN_MSG;
+                                 callerid_lval = strdup_trim(callerid_text);
+				 return CID_TOKEN_TEXT;
 			       }
 
 \n                             callerid_locate(); return *callerid_text;
@@ -90,3 +93,27 @@ void callerid_locate() {
   }
 }
 
+char *strdup_trim(char *text)
+{
+  char *end, *data;
+
+  /* skip leading spaces */
+  while (*text && isspace(*text))
+    ++text;
+
+  /* skip trailing spaces */
+  end = text + strlen(text);
+  while (--end >= text) {
+    if (!isspace(*end))
+      break;
+  }
+  ++end;  /* points just behind text */
+
+  /* allocate new string */
+  data = (char*) malloc((end - text) + 1);
+  if (!data)
+    return strdup(text);  /* fallback */
+  memcpy(data, text, end - text);
+  data[end - text] = 0;
+  return data;
+}

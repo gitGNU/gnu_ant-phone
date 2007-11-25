@@ -45,8 +45,7 @@ void callerid_error(const char *message);
 /* terminal symbols */
 %token CID_TOKEN_DATE
 %token CID_TOKEN_TYPE
-%token CID_TOKEN_NUMBER
-%token CID_TOKEN_MSG
+%token CID_TOKEN_TEXT
 %token CID_TOKEN_DELIMITER
 
 %%
@@ -57,9 +56,9 @@ settings   :
 line       : '\n'
            | CID_TOKEN_DATE CID_TOKEN_DELIMITER
              CID_TOKEN_TYPE CID_TOKEN_DELIMITER
-             CID_TOKEN_NUMBER CID_TOKEN_DELIMITER
-             CID_TOKEN_NUMBER CID_TOKEN_DELIMITER
-             CID_TOKEN_MSG '\n'
+             CID_TOKEN_TEXT CID_TOKEN_DELIMITER
+             CID_TOKEN_TEXT CID_TOKEN_DELIMITER
+             CID_TOKEN_TEXT '\n'
                { cid_add_saved_line(session, $1, $3, $5, $7, $9);
 	         free($1); free($3); free($5); free($7); free($9); }
            | error '\n'
