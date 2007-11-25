@@ -24,12 +24,8 @@ Feature requests:
 * database connection (caller id, times of incoming / outgoing, ...)
 
 Ivan Schreter <schreter@gmx.net>:
-* Small popup to accept/reject call, with recording checkbox (above tray icon)
-  to not interfere with user's work by popping up a large window.
 * Integration with address book software and internet white pages to look up
   the caller based on his number and show caller's name.
-* Better integration with capisuite (e.g., to allow capisuite work as
-  answering machine).
 
 Christoph Schütz <ch.schuetz@addcom.de>:
 * echo compensation

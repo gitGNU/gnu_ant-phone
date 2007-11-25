@@ -6,6 +6,9 @@ ant-phone 0.2.0, 2007-11-25, Ivan Schreter <schreter@gmx.net>
 	* Re-work of recording subsystem to produce better results
 	* Re-work of debug and error message handling (centralized)
 	* Add tray icon and minimize to tray instead of close
+	* Display Accept/Reject buttons in a small popup at bottom right, to
+	  not interfere with your work (you can still enable popup of whole
+	  window)
 	* Added --sleep and --wakeup remote commands to facilitate release
 	  and re-acquire of CAPI connection
 	* Save caller ID after each call

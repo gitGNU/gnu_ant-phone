@@ -539,6 +539,8 @@ static void isdn_ring_callback(void *context, void *data)
   } *numbers = (struct msg*) data;
   char *callee = numbers->callee;
   char *called = numbers->called;
+  char buffer[256];
+  gint w, h;
 
   /* caller id update */
   session->ring_time = time(NULL);
@@ -546,10 +548,17 @@ static void isdn_ring_callback(void *context, void *data)
   /* save callee's number */
   free(session->from);
   free(session->to);
-  session->from = strdup(callee ? (char*) callee : "(no caller ID)");
-  session->to = strdup(called ? (char*) called : "(no caller ID)");
+  session->from = strdup(callee ? (char*) callee : _("(no caller ID)"));
+  session->to = strdup(called ? (char*) called : _("(no caller ID)"));
 
   cid_add_line(session, CALL_IN, session->from, session->to);
+
+  snprintf(buffer, sizeof(buffer), _("<b>Call from: %s</b>"), session->from);
+  gtk_label_set_markup(GTK_LABEL(session->call_info_number), buffer);
+
+  /* set position of the incoming call window */
+  gtk_window_get_size(GTK_WINDOW(session->call_window), &w, &h);
+  gtk_window_move(GTK_WINDOW(session->call_window), gdk_screen_width() - w, gdk_screen_height() - h);
 
   if (session_set_state(session, STATE_RINGING))
     session_set_state(session, STATE_RINGING_QUIET);
@@ -921,6 +930,8 @@ int session_start_recording(session_t *session)
       errprintf("SESSION: Error opening audio file for recording.\n");
       gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
                                    session->record_checkbutton), FALSE);
+      gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
+                                   session->call_record_checkbutton), FALSE);
       result = -1;
     } else {
       cid_row_mark_record(session, session->cid_num - 1);
@@ -930,6 +941,8 @@ int session_start_recording(session_t *session)
     errprintf("SESSION: Error generating audio filename for recording.\n");
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
                                  session->record_checkbutton), FALSE);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
+                                 session->call_record_checkbutton), FALSE);
     result = -1;
   }
   return result;
@@ -1450,6 +1463,7 @@ int session_set_state(session_t *session, enum state_t state)
 
   /* start / stop effects when needed */
   gtk_status_icon_set_blinking(session->status_icon, FALSE);
+  gtk_widget_hide(session->call_window);
   switch (state) {
   case STATE_DIALING:
     if (session->effect == EFFECT_NONE)
@@ -1461,6 +1475,7 @@ int session_set_state(session_t *session, enum state_t state)
       gtk_window_present(GTK_WINDOW(session->main_window));
     }
     gtk_status_icon_set_blinking(session->status_icon, TRUE);
+    gtk_widget_show(session->call_window);
     if (session->effect == EFFECT_NONE)
       session_effect_start(session, EFFECT_RING);
     dbgprintf(1, "SESSION: New state: STATE_RINGING\n");
@@ -1470,6 +1485,7 @@ int session_set_state(session_t *session, enum state_t state)
       gtk_window_present(GTK_WINDOW(session->main_window));
     }
     gtk_status_icon_set_blinking(session->status_icon, TRUE);
+    gtk_widget_show(session->call_window);
     dbgprintf(1, "SESSION: New state: STATE_RINGING_QUIET\n");
     break;
   case STATE_READY:
@@ -1516,11 +1532,15 @@ int session_set_state(session_t *session, enum state_t state)
 		     _(state_data[state].pick_up_label));
   gtk_widget_set_sensitive(session->pick_up_button,
 			   state_data[state].pick_up_state);
+  gtk_widget_set_sensitive(session->call_pick_up_button,
+                           state_data[state].pick_up_state);
 
   gtk_label_set_text(GTK_LABEL(session->hang_up_label),
 		     _(state_data[state].hang_up_label));
   gtk_widget_set_sensitive(session->hang_up_button,
 			   state_data[state].hang_up_state);
+  gtk_widget_set_sensitive(session->call_hang_up_button,
+                           state_data[state].hang_up_state);
 
   if (state == STATE_READY) {
     llcheck_bar_reset(session->llcheck_in);

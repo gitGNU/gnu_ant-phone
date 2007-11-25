@@ -129,7 +129,7 @@ static void terminate_signal_callback(int sig);
 /*!
  * @brief Create the basic dial box with entry and dial / hang up buttons.
  *
- * Also sets dial box members in session.
+ * Also sets dial box members in session and creates incoming call dial box buttons.
  *
  * @note caller has to gtk_widget_show it himself.
  *
@@ -718,10 +718,10 @@ static gint entry_key_cb(GtkWidget *entry, GdkEventKey *event, gpointer data)
 
 static GtkWidget *get_dial_box(session_t *session)
 {
-  GtkWidget *frame;
-  GtkWidget *hbox;
+  GtkWidget *frame, *call_frame;
+  GtkWidget *hbox, *call_hbox, *call_topbox;
   GtkWidget *label;
-  GtkWidget *label_hbox;
+  GtkWidget *label_hbox, *call_label_hbox;
   GdkPixmap *pixmap;
   GdkBitmap *mask;
   GtkStyle *style;
@@ -730,10 +730,28 @@ static GtkWidget *get_dial_box(session_t *session)
   frame = gtk_frame_new(_("Dialing"));
   gtk_container_set_border_width(GTK_CONTAINER(frame), 8);
 
+  /* incoming call topbox */
+  call_frame = gtk_frame_new(NULL);
+  gtk_frame_set_shadow_type(GTK_FRAME(call_frame), GTK_SHADOW_ETCHED_OUT);
+  gtk_widget_show(call_frame);
+  gtk_container_add(GTK_CONTAINER(session->call_window), call_frame);
+  session->call_topbox = call_topbox = gtk_vbox_new(FALSE, 10);
+  gtk_container_add(GTK_CONTAINER(call_frame), call_topbox);
+  gtk_container_set_border_width(GTK_CONTAINER(call_topbox), 8);
+
+  /* incoming number label */
+  session->call_info_number = gtk_label_new(NULL);
+  gtk_label_set_markup(GTK_LABEL(session->call_info_number), "<b>Call from:</b>");
+  gtk_container_add(GTK_CONTAINER(call_topbox), session->call_info_number);
+  gtk_widget_show(session->call_info_number);
+
   /* dial hbox */
   hbox = gtk_hbox_new(FALSE, 10);
+  call_hbox = gtk_hbox_new(TRUE, 10);
   gtk_container_add(GTK_CONTAINER(frame), hbox);
+  gtk_container_add(GTK_CONTAINER(call_topbox), call_hbox);
   gtk_container_set_border_width(GTK_CONTAINER(hbox), 8);
+  gtk_container_set_border_width(GTK_CONTAINER(call_hbox), 0);
   gtk_widget_show(hbox);
 
   /* dial label */
@@ -755,11 +773,17 @@ static GtkWidget *get_dial_box(session_t *session)
 
   /* pick up button */
   session->pick_up_button = gtk_button_new();
+  session->call_pick_up_button = gtk_button_new();
   gtk_box_pack_start(GTK_BOX(hbox), session->pick_up_button, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(call_hbox), session->call_pick_up_button, FALSE, FALSE, 0);
   gtk_signal_connect(GTK_OBJECT(session->pick_up_button), "clicked",
 		     GTK_SIGNAL_FUNC(gtk_handle_pick_up_button),
 		     (gpointer) session);
+  gtk_signal_connect(GTK_OBJECT(session->call_pick_up_button), "clicked",
+                     GTK_SIGNAL_FUNC(gtk_handle_pick_up_button),
+                     (gpointer) session);
   gtk_widget_show(session->pick_up_button);
+  gtk_widget_show(session->call_pick_up_button);
 
   /* activate dial button when pressing enter in entry widget */
   gtk_signal_connect_object(GTK_OBJECT(GTK_COMBO(session->dial_number_box)
@@ -773,8 +797,11 @@ static GtkWidget *get_dial_box(session_t *session)
 
   /* pick up button hbox */
   label_hbox = gtk_hbox_new(FALSE, 0);
+  call_label_hbox = gtk_hbox_new(FALSE, 0);
   gtk_container_add(GTK_CONTAINER(session->pick_up_button), label_hbox);
+  gtk_container_add(GTK_CONTAINER(session->call_pick_up_button), call_label_hbox);
   gtk_widget_show(label_hbox);
+  gtk_widget_show(call_label_hbox);
 
   /* pick up button symbol */
   style = gtk_widget_get_style(session->main_window);
@@ -786,28 +813,45 @@ static GtkWidget *get_dial_box(session_t *session)
   pixmapwid = gtk_pixmap_new(pixmap, mask);
   gtk_box_pack_start(GTK_BOX(label_hbox), pixmapwid, FALSE, FALSE, 2);
   gtk_widget_show(pixmapwid);
-  
+  pixmapwid = gtk_pixmap_new(pixmap, mask);
+  gtk_box_pack_start(GTK_BOX(call_label_hbox), pixmapwid, FALSE, FALSE, 2);
+  gtk_widget_show(pixmapwid);
+
   /* pick up button label */
   session->pick_up_label = gtk_label_new(NULL);
   gtk_box_pack_start(GTK_BOX(label_hbox), session->pick_up_label,
 		     TRUE, FALSE, 16); /* expand but fill up outside label */
   gtk_widget_show(session->pick_up_label);
+  label = gtk_label_new(N_("Answer"));
+  gtk_box_pack_start(GTK_BOX(call_label_hbox), label,
+                     TRUE, FALSE, 16); /* expand but fill up outside label */
+  gtk_widget_show(label);
 
-   /* hang up button */
+  /* hang up button */
   session->hang_up_button = gtk_button_new();
+  session->call_hang_up_button = gtk_button_new();
   gtk_box_pack_start(GTK_BOX(hbox), session->hang_up_button, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(call_hbox), session->call_hang_up_button, FALSE, FALSE, 0);
   gtk_signal_connect(GTK_OBJECT(session->hang_up_button), "clicked",
 		     GTK_SIGNAL_FUNC(gtk_handle_hang_up_button),
 		     (gpointer) session);
+  gtk_signal_connect(GTK_OBJECT(session->call_hang_up_button), "clicked",
+                     GTK_SIGNAL_FUNC(gtk_handle_hang_up_button),
+                     (gpointer) session);
   gtk_widget_show(session->hang_up_button);
+  gtk_widget_show(session->call_hang_up_button);
 
-  /* pick up button hbox */
+  /* hang up button hbox */
   label_hbox = gtk_hbox_new(FALSE, 0);
+  call_label_hbox = gtk_hbox_new(FALSE, 0);
   gtk_container_add(GTK_CONTAINER(session->hang_up_button),
 		    label_hbox);
+  gtk_container_add(GTK_CONTAINER(session->call_hang_up_button),
+                    call_label_hbox);
   gtk_widget_show(label_hbox);
+  gtk_widget_show(call_label_hbox);
 
-  /* pick up button symbol*/
+  /* hang up button symbol*/
   /* style = gtk_widget_get_style(session->main_window); */
     /* (already done for pickup button) */
 
@@ -819,13 +863,24 @@ static GtkWidget *get_dial_box(session_t *session)
   pixmapwid = gtk_pixmap_new(pixmap, mask);
   gtk_box_pack_start(GTK_BOX(label_hbox), pixmapwid, FALSE, FALSE, 2);
   gtk_widget_show(pixmapwid);
-  
+  pixmapwid = gtk_pixmap_new(pixmap, mask);
+  gtk_box_pack_start(GTK_BOX(call_label_hbox), pixmapwid, FALSE, FALSE, 2);
+  gtk_widget_show(pixmapwid);
+
   /* hang up button label */
   session->hang_up_label = gtk_label_new(NULL);
   gtk_box_pack_start(GTK_BOX(label_hbox), session->hang_up_label,
 		     TRUE, FALSE, 16); /* expand but fill up outside label */
   gtk_widget_show(session->hang_up_label);
-  
+  label = gtk_label_new(N_("Reject"));
+  gtk_box_pack_start(GTK_BOX(call_label_hbox), label,
+                     TRUE, FALSE, 16); /* expand but fill up outside label */
+  gtk_widget_show(label);
+
+  /* show incoming call info boxes */
+  gtk_widget_show(call_hbox);
+  gtk_widget_show(call_topbox);
+
   return frame;
 }
 
@@ -842,6 +897,8 @@ int main_gtk(session_t *session)
   GtkWidget *dialbox;
   GtkWidget *cidbox;
 
+  GtkWidget *call_window;
+
   GtkWidget *dummy_label; /* needed to calculate the length of a text label */
   GtkRequisition requisition;
 
@@ -851,6 +908,13 @@ int main_gtk(session_t *session)
   /* the main window */
   session->main_window = main_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title(GTK_WINDOW(main_window), "ANT " VERSION);
+
+  /* incoming call window */
+  session->call_window = call_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_decorated(GTK_WINDOW(call_window), FALSE);
+  gtk_window_set_accept_focus(GTK_WINDOW(call_window), FALSE);
+  gtk_window_set_keep_above(GTK_WINDOW(call_window), TRUE);
+  gtk_window_stick(GTK_WINDOW(call_window));
 
   /* seems to cause window managers only to use the first one as icon (e.g.FVWM)
   icon_list = g_list_append(icon_list,
@@ -995,7 +1059,6 @@ int main_gtk(session_t *session)
                    GTK_SIGNAL_FUNC(icon_activate), (gpointer) session);
   g_signal_connect(session->status_icon, "popup-menu",
                    GTK_SIGNAL_FUNC(icon_popup_menu), (gpointer) session);
-  //gtk_status_icon_set_visible(session->status_icon, FALSE);
   gtk_status_icon_set_visible(session->status_icon, TRUE);
 
   /* show everything */

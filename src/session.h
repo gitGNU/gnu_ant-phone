@@ -153,10 +153,15 @@ typedef struct {
 
   /* GUI elements in this session (GTK specific) */
   GtkWidget *main_window;             /*!< the main window (with style ...) */
+  GtkWidget *call_window;             /*!< small incoming call info window */
+  GtkWidget *call_topbox;             /*!< incoming call info window top-level box */
+  GtkWidget *call_info_number;        /*!< label displaying incoming call number */
   GtkStatusIcon *status_icon;         /*!< status icon in WM panel */
   GtkWidget *pick_up_button;          /*!< the pick up button to enable / disable */
+  GtkWidget *call_pick_up_button;     /*!< the pick up button in incoming call window to enable / disable */
   GtkWidget *pick_up_label;           /*!< the label on the pick up button */
   GtkWidget *hang_up_button;          /*!< the hang up button to enable / disable */
+  GtkWidget *call_hang_up_button;     /*!< the hang up button in incoming call window to enable / disable */
   GtkWidget *hang_up_label;           /*!< the label on the hang up button */
   GtkWidget *dial_number_box;         /*!< the dial number combo box */
   GList *dial_number_history;         /*!< the last called numbers */
@@ -179,6 +184,7 @@ typedef struct {
   gint muted_context_id;              /*!< a context for mute in the status bar */
 
   GtkWidget *record_checkbutton;      /*!< recording checkbutton */
+  GtkWidget *call_record_checkbutton; /*!< recording checkbutton in incoming call info window */
   GtkWidget *record_checkbutton_local;  /*!< local recording checkbutton */
   GtkWidget *record_checkbutton_remote; /*!< remote recording checkbutton */
   

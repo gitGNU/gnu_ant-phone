@@ -4,6 +4,7 @@
  * This file is part of ANT (Ant is Not a Telephone)
  *
  * Copyright 2002, 2003 Roland Stigge
+ * Copyright 2007 Ivan Schreter
  *
  * ANT is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -253,16 +254,31 @@ static void controlpad_mute_cb(GtkWidget *button, gpointer data) {
 static void controlpad_record_cb(GtkWidget *button, gpointer data) {
   session_t *session = (session_t *) data;
 
-  if (button == session->record_checkbutton) {
+  if (button == session->call_record_checkbutton) {
+    /* forward toggle to primary checkbox */
     if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button))) { /* record! */
+      gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
+                                   session->record_checkbutton), TRUE);
+    } else {
+      gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
+                                   session->record_checkbutton), FALSE);
+    }
+  } else if (button == session->record_checkbutton) {
+    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button))) { /* record! */
+      session->option_record = 1;
+      gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
+                                   session->call_record_checkbutton), TRUE);
+
       if (session->state == STATE_CONVERSATION) {
         if (session_start_recording(session) == 0) {
-          session->option_record = 1;
           cid_row_mark_record(session, session->cid_num - 1);
         }
       }
     } else { /* don't record! */
       session->option_record = 0;
+      gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
+                                   session->call_record_checkbutton), FALSE);
+
       if (session->state == STATE_CONVERSATION) {
         recording_close(session->recorder);
       }
@@ -425,6 +441,15 @@ GtkWidget *controlpad_new(session_t *session) {
   gtk_signal_connect(GTK_OBJECT(record_checkbutton), "toggled",
 		     GTK_SIGNAL_FUNC(controlpad_record_cb), session);
   session->record_checkbutton = record_checkbutton;
+
+  session->call_record_checkbutton =
+      gtk_check_button_new_with_label(_("Record to file"));
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(session->call_record_checkbutton),
+                               session->option_record);
+  gtk_widget_show(session->call_record_checkbutton);
+  gtk_signal_connect(GTK_OBJECT(session->call_record_checkbutton), "toggled",
+                     GTK_SIGNAL_FUNC(controlpad_record_cb), session);
+  gtk_container_add(GTK_CONTAINER(session->call_topbox), session->call_record_checkbutton);
 
   record_checkbutton_local =
     gtk_check_button_new_with_label(_("Record local channel"));
