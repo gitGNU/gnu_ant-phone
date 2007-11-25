@@ -27,6 +27,7 @@
 #define YYSTYPE char *
 
 #include <string.h>
+#include <ctype.h>
 #include "globals.h"
 #include "calleridparser.h"
 YYLTYPE callerid_lloc;
