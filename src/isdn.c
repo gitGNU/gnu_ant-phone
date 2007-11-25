@@ -128,15 +128,14 @@ static void isdn_set_local_number(isdn_t *isdn, char *number)
     /* NOTE: number format:
     * Byte 0: length of structure
     * Byte 1: numbering plan
-    * Byte 2: presentation indicator (0x80 standard, 0xA0 for CLIR)
-    * Byte 3..n: number digits
+    * Byte 2..n: number digits
     */
-    int len = number[0] - 2;
+    int len = number[0] - 1;
     if (len <= 0) {
       isdn->local_number = 0;
     } else {
       tmp = (char*) malloc(len + 1);
-      memcpy(tmp, number + 3, len);
+      memcpy(tmp, number + 2, len);
       tmp[len] = 0;
       isdn->local_number = tmp;
     }
