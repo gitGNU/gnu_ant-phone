@@ -5,7 +5,7 @@ ant-phone \- an interactive ISDN telephone application
 .B ant-phone
 .RI [ options ]
 .SH DESCRIPTION
-ant-phone is part of ANT (ANT is Not a Telephone). It let's you make and receive telephone calls and talk via sound devices. It uses ISDN4Linux ttyI devices.
+ant-phone is part of ANT (ANT is Not a Telephone). It let's you make and receive telephone calls and talk via sound devices. It uses CAPI 2.0 as ISDN interface.
 .SH OPTIONS
 ant-phone accepts the following options:
 .TP
@@ -19,15 +19,15 @@ Print version information
 Remove stale socket file left by accident by a previous run of ANT. You only need this option if ANT says: "local bind: Address already in use"
 .TP
 .BI "\-d, \-\-debug" [ = debuglevel]
-Print additional runtime debugging data to stdout, debuglevel = 1..2
+Print additional runtime debugging data to stdout, debuglevel = 1..4
 .TP
 .BI "\-i, \-\-soundin=" device
-OSS compatible device for input (recording),
-default: /dev/dsp
+ALSA device name for input (recording),
+default: "default"
 .TP
 .BI "\-o, \-\-soundout=" device
-OSS compatible device for output (playback),
-default: /dev/dsp
+ALSA device name for output (playback),
+default: "default"
 .TP
 .BI "\-m, \-\-msn=" msn
 identifying MSN (for outgoing calls), 0 for master MSN of this
@@ -41,6 +41,15 @@ default: *
 .BI "\-c, \-\-call=" number
 Make a running instance of ANT make a call to the specified number,
 useful for calling from an external address book application
+.TP
+.BI "\-s, \-\-sleep"
+Shut down CAPI connection to prepare for removal of broken kernel modules,
+which don't survive suspend/restore.
+.TP
+.BI "\-w, \-\-wakeup"
+Restore CAPI connection after ISDN modules loaded again. The connection will
+be also restored by dialing a number, but before the connection is restored,
+you won't be able to accept calls.
 .SH NOTES
 If the used sound devices (arguments of \-\-soundin and \-\-soundout)
 are equal, a full duplex sound device is needed.
@@ -54,7 +63,11 @@ user specific options file
 .TP
 .I ~/.ant-phone/callerid
 saved history of incoming and outgoing calls
+.TP
+.I ~/.ant-phone/recordings/*
+recordings of recorded phone calls
 .SH BUGS
-The GTK+ main loop consumes all the system CPU time. This is due to the Linux kernel select() call consuming the time while waiting for a completed data block. This only appears with some Linux kernel OSS drivers, not with ALSA.
+Caller ID stores hangup reason localized. This will break, if someone uses
+letters outside of English alphabet for translation of hangup reasons.
 .SH AUTHORS
-ANT was developed by Roland Stigge <stigge@antcom.de>, based on ideas from IVCALL, Copyright 2002 Lennart Poettering. G.711 handling by Sun Microsystems. Contributions by Joerg Mayer <jmayer@loplof.de>, Lars Volkhardt <Lars.Volkhardt@uni-konstanz.de>.
+ANT was developed by Roland Stigge <stigge@antcom.de>, based on ideas from IVCALL, Copyright 2002 Lennart Poettering. G.711 handling by Sun Microsystems. Contributions by Joerg Mayer <jmayer@loplof.de>, Lars Volkhardt <Lars.Volkhardt@uni-konstanz.de>, Ivan Schreter <schreter@gmx.net>.

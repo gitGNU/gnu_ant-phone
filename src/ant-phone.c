@@ -177,11 +177,11 @@ Options:\n\
   -r, --cleanup           Remove stale socket file (left by accident by\n\
                             previous run)\n\
   -d, --debug[=level]     Print additional runtime debugging data to stdout\n\
-                            level = 1..2\n\
-  -i, --soundin=DEVICE    OSS compatible device for input (recording),\n\
-                            default: /dev/dsp\n\
-  -o, --soundout=DEVICE   OSS compatible device for output (playback),\n\
-                            default: /dev/dsp\n\
+                            level = 1..4\n\
+  -i, --soundin=DEVICE    ALSA device name for input (recording),\n\
+                            default: \"default\"\n\
+  -o, --soundout=DEVICE   ALSA device name for output (playback),\n\
+                            default: \"default\"\n\
   -m, --msn=MSN           identifying MSN (for outgoing calls), 0 for master\n\
                           MSN of this termination/port\n\
                             default: 0\n\

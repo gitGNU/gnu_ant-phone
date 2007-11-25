@@ -559,10 +559,6 @@ static void isdn_handle_indication(isdn_t *isdn, _cmsg *msg)
           /* may ring now */
           isdn->active_plci = plci;
 
-#if 0
-          isdn->state = ISDN_RINGING;
-          isdn->callback->info_ring(isdn->cb_context, isdn->remote_number, isdn->local_number);
-#else
           /* tell the network, we are interested in the call and ring */
           dbgprintf(2, "CAPI 2.0: ALERT_REQ ApplID %d msgno %d plci 0x%x\n",
                     isdn->appl_id, isdn->msg_no, plci);
@@ -579,7 +575,6 @@ static void isdn_handle_indication(isdn_t *isdn, _cmsg *msg)
             errprintf("CAPI 2.0: ALERT_REQ failed, RC=0x%x, rejecting call\n", info);
             reject = 3;
           }
-#endif
         }
 
         if (reject) {
