@@ -125,18 +125,16 @@ void history_reset(struct history_t *history) {
  */
 static void llcheck_quit(GtkObject *window) {
   session_t *session = gtk_object_get_data(window, "session");
-  GtkWidget *bar = gtk_object_get_data(window, "bar");
+  GtkWidget *bar = gtk_object_get_data(GTK_OBJECT(window), "bar");
 
-  /* remove own and restore old handlers */
-#ifdef USE_GTK_LOOP
-  gtk_input_remove(session->gtk_audio_input_tag);
-#endif
+  /* reset i/o handlers */
   session_io_handlers_start(session);
 
   /* stop effect */
   session_effect_stop(session);
 
   llcheck_bar_deinit(bar);
+  gtk_object_set_data(GTK_OBJECT(session->llcheck_out), "bar", NULL);
 
   gtk_widget_destroy(GTK_WIDGET(window));
   session_set_state(session, STATE_READY);
@@ -235,6 +233,9 @@ void llcheck_bar_set(GtkWidget *bar, double max) {
   /* the dark area */
   GtkWidget *pbar2 =
     (GtkWidget *)gtk_object_get_data(GTK_OBJECT(bar), "pbar2");
+  /* related bar (for llcheck dialog box) */
+  GtkWidget *related =
+    (GtkWidget*) gtk_object_get_data(GTK_OBJECT(bar), "bar");
   struct history_t *history =
     (struct history_t *)gtk_object_get_data(GTK_OBJECT(bar), "history");
   double maxmax = history ? history_append(&history, max) : max;
@@ -251,6 +252,9 @@ void llcheck_bar_set(GtkWidget *bar, double max) {
   gtk_widget_set_size_request(pbar2, width - pbar1size, -1);
   percentage = maxmax > 0.0 ? max / maxmax : 0.0;
   gtk_progress_set_percentage(GTK_PROGRESS(pbar1), percentage);
+
+  if (related)
+    llcheck_bar_set(related, max);
 }
 
 /*
@@ -339,8 +343,8 @@ void llcheck(GtkWidget *widget _U_, gpointer data, guint action _U_) {
   gtk_object_set_data(GTK_OBJECT(window), "bar", (gpointer) bar);
   /* save session in bar widget (input handling) */
   gtk_object_set_data(GTK_OBJECT(bar), "session", (gpointer) session);
-  /* save bar in button (in case play button is pressed) */
-  gtk_object_set_data(GTK_OBJECT(button), "bar", (gpointer) bar);
+  /* save bar as related in llcheck_out */
+  gtk_object_set_data(GTK_OBJECT(session->llcheck_out), "bar", (gpointer) bar);
 
   /* the OK button */
   button = gtk_button_new_with_label(_("OK"));
