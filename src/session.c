@@ -1449,6 +1449,7 @@ int session_set_state(session_t *session, enum state_t state)
   gtk_widget_set_sensitive(session->menuitem_line_check, state == STATE_READY);
 
   /* start / stop effects when needed */
+  gtk_status_icon_set_blinking(session->status_icon, FALSE);
   switch (state) {
   case STATE_DIALING:
     if (session->effect == EFFECT_NONE)
@@ -1459,6 +1460,7 @@ int session_set_state(session_t *session, enum state_t state)
     if (session->option_popup) {
       gtk_window_present(GTK_WINDOW(session->main_window));
     }
+    gtk_status_icon_set_blinking(session->status_icon, TRUE);
     if (session->effect == EFFECT_NONE)
       session_effect_start(session, EFFECT_RING);
     dbgprintf(1, "SESSION: New state: STATE_RINGING\n");
@@ -1467,6 +1469,7 @@ int session_set_state(session_t *session, enum state_t state)
     if (session->option_popup) {
       gtk_window_present(GTK_WINDOW(session->main_window));
     }
+    gtk_status_icon_set_blinking(session->status_icon, TRUE);
     dbgprintf(1, "SESSION: New state: STATE_RINGING_QUIET\n");
     break;
   case STATE_READY:
