@@ -10,6 +10,9 @@ Bugs:
 * Audio device choosing is still done via textbox. With ALSA now, it should be
   done via combobox, as device names can be queried.
 * Surely some new ones after rewrite of large parts of the code...
+* Caller ID stores hangup reason localized. This will break, if someone uses
+  letters outside of English alphabet for translation of hangup reasons.
+* Hide-to-tray should be optional (add preference for it)
 
 Feature requests:
 =================
@@ -19,6 +22,14 @@ Feature requests:
    => can be now handled by remote CAPI, no need for special code
 * Makeln (Joerg Brueggemann <jb@neviges.net>)
 * database connection (caller id, times of incoming / outgoing, ...)
+
+Ivan Schreter <schreter@gmx.net>:
+* Small popup to accept/reject call, with recording checkbox (above tray icon)
+  to not interfere with user's work by popping up a large window.
+* Integration with address book software and internet white pages to look up
+  the caller based on his number and show caller's name.
+* Better integration with capisuite (e.g., to allow capisuite work as
+  answering machine).
 
 Christoph Schütz <ch.schuetz@addcom.de>:
 * echo compensation
