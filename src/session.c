@@ -1114,7 +1114,7 @@ static void isdn_connect_callback(void *context, void *number)
 
   if (session->state == STATE_RINGING || session->state == STATE_RINGING_QUIET) {
     char *old = session->from;
-    session->from = strdup((char*) number);
+    session->from = strdup(number ? (char*) number : _("(no caller ID)"));
     free(old);
   }
 
