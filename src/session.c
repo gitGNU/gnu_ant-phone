@@ -706,7 +706,7 @@ int session_init(session_t *session,
   session->option_record_remote = 1;
   session->option_recording_format =
     RECORDING_FORMAT_WAV | RECORDING_FORMAT_ULAW;
-  session->option_popup = 1;
+  session->option_popup = 0;
 
   session->option_calls_merge = 1;
   session->option_calls_merge_max_days = 10;
