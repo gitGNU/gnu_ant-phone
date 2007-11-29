@@ -3,7 +3,7 @@
  *  ANT (ANT is Not a Telephone)
  *  Copyright 2002, 2003 Roland Stigge
  *
- *  ISDN Telephone application for Linux and OSS
+ *  ISDN Telephone application for Linux CAPI and ALSA
  *  (full duplex or multiple sound devices needed)
  *
  *  Author: Roland Stigge, stigge@antcom.de

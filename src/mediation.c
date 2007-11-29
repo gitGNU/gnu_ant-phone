@@ -1,5 +1,5 @@
 /*
- * functions for mediation between ISDN and OSS
+ * functions for mediation between ISDN and ALSA
  *
  * This file is part of ANT (Ant is Not a Telephone)
  *
