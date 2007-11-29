@@ -1,5 +1,5 @@
 /*
- * OSS sound handling functions
+ * ALSA sound handling functions
  *
  * This file is part of ANT (Ant is Not a Telephone)
  *

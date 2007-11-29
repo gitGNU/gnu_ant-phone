@@ -520,7 +520,7 @@ void gtksettings_cb(GtkWidget *widget _U_, gpointer data, guint action _U_) {
   gtk_notebook_append_page(GTK_NOTEBOOK(notebook), vbox,
 			   gtk_label_new(_("Sound Devices")));
 
-  frame = gtk_frame_new(_("OSS"));
+  frame = gtk_frame_new(_("ALSA"));
   gtk_container_set_border_width(GTK_CONTAINER(frame), 10);
   gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 0);
   gtk_widget_show(frame);
