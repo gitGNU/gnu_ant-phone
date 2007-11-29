@@ -396,7 +396,7 @@ static void isdn_handle_confirmation(isdn_t *isdn, _cmsg *msg)
         dbgprintf(2, "CAPI 2.0: ALERT_CONF ApplID %d plci 0x%x info 0x%x\n",
                   isdn->appl_id, plci, info);
 
-        if (info != 0) {
+        if (info != 0 && info != 3) {
           /* connection error */
           isdn->state = ISDN_IDLE;
         } else {

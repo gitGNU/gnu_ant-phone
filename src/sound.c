@@ -115,7 +115,8 @@ static int init_audio_device(snd_pcm_t *audio,
   if (rspeed != *speed) {
     errprintf("AUDIO: Audio speed doesn't match (requested %dHz, got %dHz)\n",
               *speed, rspeed);
-    return -EINVAL;
+    *speed = rspeed;
+    /*return -EINVAL;*/
   }
 
   buffer_time = 150000;
@@ -177,6 +178,17 @@ static int init_audio_device(snd_pcm_t *audio,
     return err;
   }
 
+  if ((err = snd_pcm_sw_params(audio, swparams)) < 0) {
+    printf("Unable to set sw params for audio (required): %s\n", snd_strerror(err));
+    return err;
+  }
+
+  if ((err = snd_pcm_sw_params_current(audio, swparams)) < 0) {
+    errprintf("AUDIO: Unable to determine current swparams for audio: %s\n",
+              snd_strerror(err));
+    return err;
+  }
+
   if ((err = snd_pcm_sw_params_set_silence_size(audio, swparams, period_size * 2)) < 0) {
     errprintf("AUDIO: Unable to set silence threshold: %s\n",
               snd_strerror(err));
@@ -191,12 +203,9 @@ static int init_audio_device(snd_pcm_t *audio,
   }
   */
 
-  //snd_pcm_sw_params_set_avail_min(Handle,swparams,Frames);
-
-
   if ((err = snd_pcm_sw_params(audio, swparams)) < 0) {
-    printf("Unable to set sw params for audio: %s\n", snd_strerror(err));
-    return err;
+    printf("Unable to set sw params for audio (optional): %s\n", snd_strerror(err));
+    /*return err;*/
   }
 
 #if 0
@@ -245,7 +254,7 @@ int open_audio_devices(char *in_audio_device_name,
 
   /* set format and sampling rate */
   for (initresult = -1, priority = format_priorities;
-       initresult && priority; priority++) {
+       initresult && *priority; priority++) {
 
     *format_in = *priority;
     initresult = init_audio_device(*audio_in, *format_in, channels, speed_in, fragment_size_in);
