@@ -30,6 +30,34 @@
 extern int default_audio_priorities[];
 
 /*!
+ * @brief Audio direction.
+ */
+typedef enum {
+  AUDIO_DIR_CAPTURE,    /*!< Audio capture */
+  AUDIO_DIR_PLAYBACK    /*!< Audio playback */
+} audio_direction_t;
+
+/*!
+ * @brief Callback function to enumerate sound devices.
+ *
+ * @param context context passed from the user.
+ * @param hwname device hardware name.
+ * @param cardname card name.
+ */
+typedef void (*audio_enum_fnc_t)(void *context, const char *hwname, const char *cardname);
+
+/*!
+ * @brief Enumerate all audio devices.
+ *
+ * @param callback callback function to call.
+ * @param dir audio direction.
+ * @param context context to pass to the callback.
+ */
+int audio_enum_devices(audio_enum_fnc_t callback,
+                       audio_direction_t dir,
+                       void *context);
+
+/*!
  * @brief Opens the audio device(s).
  *
  * @param in_audio_device_name name of input device.

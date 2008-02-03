@@ -41,6 +41,7 @@
   #include <stdlib.h>
 #endif
 #include <string.h>
+#include <ctype.h>
 
 /* own header files */
 #include "globals.h"
@@ -57,6 +58,76 @@ int default_audio_priorities[] = {SND_PCM_FORMAT_S16_LE,
                                   SND_PCM_FORMAT_A_LAW,
                                   SND_PCM_FORMAT_MU_LAW,
                                   0}; /* end of list */
+
+/*--------------------------------------------------------------------------*/
+
+int audio_enum_devices(audio_enum_fnc_t callback,
+                       audio_direction_t dir,
+                       void *context)
+{
+  static void **hints = 0;
+  void **n;
+  char *name, *descr, *io, *d, *p, *r;
+  const char *filter;
+  int err;
+  int wasspace;
+
+  if (hints == 0)
+  {
+    err = snd_device_name_hint(-1, "pcm", &hints);
+    if (err < 0)
+    {
+      errprintf("AUDIO: snd_device_name_hint for pcm failed: %s\n",
+              snd_strerror(err));
+      return err;
+    }
+  }
+
+  n = hints;
+  filter = (dir == AUDIO_DIR_CAPTURE) ? "Input" : "Output";
+  while (*n != NULL) {
+    name = snd_device_name_get_hint(*n, "NAME");
+    descr = snd_device_name_get_hint(*n, "DESC");
+    io = snd_device_name_get_hint(*n, "IOID");
+
+    if (io == NULL || strcmp(io, filter) == 0)
+    {
+      // have a device
+      dbgprintf(2, "AUDIO: have device (%s): %s\n", io, name);
+
+      p = r = d = strdup(descr);
+      wasspace = 0;
+
+      while (*p)
+      {
+        if (!isspace(*p)) {
+          if (wasspace)
+            *d++ = ' ';
+          *d++ = *p++;
+          wasspace = 0;
+        } else {
+          wasspace = 1;
+          p++;
+        }
+      }
+      *d = 0;
+
+      callback(context, name, r);
+      free(r);
+    }
+
+    if (name != NULL)
+      free(name);
+    if (descr != NULL)
+      free(descr);
+    if (io != NULL)
+      free(io);
+
+    n++;
+  }
+
+  return 0;
+}
 
 /*--------------------------------------------------------------------------*/
 

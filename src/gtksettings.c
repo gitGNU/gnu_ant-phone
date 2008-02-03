@@ -15,6 +15,7 @@
 #ifdef HAVE_STDLIB_H
   #include <stdlib.h>
 #endif
+#include <ctype.h>
 
 /* GTK */
 #include <gtk/gtk.h>
@@ -27,6 +28,32 @@
 #include "gtk.h"
 #include "settings.h"
 #include "recording.h"
+
+/*!
+ * @brief Filter device name from string in format "name (card)".
+ *
+ * @param name.
+ * @return device name.
+ */
+static char *filter_device_name(char *name)
+{
+  char *p = name, *res;
+
+  while (*p && *p != '(')
+    ++p;
+  while (p > name && isspace(*(p-1)))
+    --p;
+  *p = 0;
+
+  p = name;
+  while (*p && isspace(*p))
+    ++p;
+
+  res = strdup(p);
+  free(name);
+
+  return res;
+}
 
 /*
  * Load all settings from widgets into session
@@ -156,8 +183,8 @@ static int gtksettings_try(GtkWidget *widget) {
   entry = (GtkWidget *) gtk_object_get_data(GTK_OBJECT(widget),
 					    "audio_device_name_in_entry");
   if (entry)
-    session->audio_device_name_in =
-      strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
+    session->audio_device_name_in = filter_device_name(
+      strdup(gtk_entry_get_text(GTK_ENTRY(GTK_BIN(entry)->child))));
   else
     errprintf("gtksettings_cb_ok: Error getting audio_device_name_in.\n");
 
@@ -165,8 +192,8 @@ static int gtksettings_try(GtkWidget *widget) {
   entry = (GtkWidget *) gtk_object_get_data(GTK_OBJECT(widget),
 					    "audio_device_name_out_entry");
   if (entry)
-    session->audio_device_name_out =
-      strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
+    session->audio_device_name_out = filter_device_name(
+      strdup(gtk_entry_get_text(GTK_ENTRY(GTK_BIN(entry)->child))));
   else
     errprintf(
 	    "gtksettings_cb_ok: Error getting audio_device_name_out.\n");
@@ -257,6 +284,14 @@ static void gtksettings_cb_cancel(GtkWidget *window) {
 static void toggle_sensitive_register(GtkToggleButton *button,
                                       GtkWidget *widget) {
   gtk_widget_set_sensitive(widget, gtk_toggle_button_get_active(button));
+}
+
+/* Callback for sound device enumeration */
+void gtk_combo_callback(void *context, const char *hwname, const char *cardname)
+{
+  char buf[256];
+  snprintf(buf, sizeof(buf), "%s (%s)", hwname, cardname);
+  gtk_combo_box_append_text(GTK_COMBO_BOX(context), buf);
 }
 
 /* Settings menu entry callback */
@@ -537,10 +572,12 @@ void gtksettings_cb(GtkWidget *widget _U_, gpointer data, guint action _U_) {
   gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
   gtk_widget_show(label);
 
-  audio_device_name_in_entry = gtk_entry_new();
+  audio_device_name_in_entry = gtk_combo_box_entry_new_text();
+  audio_enum_devices(gtk_combo_callback, AUDIO_DIR_CAPTURE, audio_device_name_in_entry);
+
   gtk_table_attach_defaults(GTK_TABLE(table), audio_device_name_in_entry,
 			    1,2,0,1);
-  gtk_entry_set_text(GTK_ENTRY(audio_device_name_in_entry),
+  gtk_entry_set_text(GTK_ENTRY(GTK_BIN(audio_device_name_in_entry)->child),
 		     session->audio_device_name_in);
   gtk_widget_show(audio_device_name_in_entry);
 
@@ -549,10 +586,12 @@ void gtksettings_cb(GtkWidget *widget _U_, gpointer data, guint action _U_) {
   gtk_misc_set_alignment(GTK_MISC(label), 1, 0.5);
   gtk_widget_show(label);
 
-  audio_device_name_out_entry = gtk_entry_new();
+  audio_device_name_out_entry = gtk_combo_box_entry_new_text();
+  audio_enum_devices(gtk_combo_callback, AUDIO_DIR_PLAYBACK, audio_device_name_out_entry);
+
   gtk_table_attach_defaults(GTK_TABLE(table), audio_device_name_out_entry,
 			    1,2,1,2);
-  gtk_entry_set_text(GTK_ENTRY(audio_device_name_out_entry),
+  gtk_entry_set_text(GTK_ENTRY(GTK_BIN(audio_device_name_out_entry)->child),
 		     session->audio_device_name_out);
   gtk_widget_show(audio_device_name_out_entry);
 
