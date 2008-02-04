@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 AC_INIT(ant-phone)
-AM_INIT_AUTOMAKE(ant-phone, "0.2.0", ant-phone-devel@nongnu.org)
+AM_INIT_AUTOMAKE(ant-phone, "0.2.1", ant-phone-devel@nongnu.org)
 AC_PREREQ(2.53)
 AC_CONFIG_SRCDIR([config.h.in])
 AM_CONFIG_HEADER([config.h])
