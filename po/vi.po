@@ -1,14 +1,14 @@
 # Vietnamese translation for ANT Phone.
-# Copyright © 2005 Roland Stigge
-# This file is distributed under the same license as the ant-phone-0.2.0 package.
-# Clytie Siddall <clytie@riverland.net.au>, 2005-2007.
+# Copyright © 2008 Roland Stigge
+# This file is distributed under the same license as the ant-phone-0.2.1 package.
+# Clytie Siddall <clytie@riverland.net.au>, 2005-2008.
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: ant-phone 0.2.0\n"
+"Project-Id-Version: ant-phone 0.2.1\n"
 "Report-Msgid-Bugs-To: stigge@antcom.de\n"
-"POT-Creation-Date: 2007-11-26 21:07+0100\n"
-"PO-Revision-Date: 2007-11-28 22:51+1030\n"
+"POT-Creation-Date: 2008-02-03 20:51+0100\n"
+"PO-Revision-Date: 2008-02-09 13:38+1030\n"
 "Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
 "Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -139,7 +139,7 @@ msgstr "/Xoá mục _ghi"
 msgid "/_Delete Row"
 msgstr "/Xoá _hàng"
 
-#: src/callerid.c:449 src/gtksettings.c:456
+#: src/callerid.c:449 src/gtksettings.c:491
 msgid "Caller ID"
 msgstr "Số người gọi"
 
@@ -191,11 +191,11 @@ msgid "Number:"
 msgstr "Số :"
 
 #: src/controlpad.c:145 src/gtk.c:388 src/gtk.c:508 src/gtk.c:592
-#: src/gtksettings.c:572 src/llcheck.c:350
+#: src/gtksettings.c:611 src/llcheck.c:350
 msgid "OK"
 msgstr "OK"
 
-#: src/controlpad.c:158 src/gtksettings.c:617 src/session.c:73
+#: src/controlpad.c:158 src/gtksettings.c:656 src/session.c:73
 msgid "Cancel"
 msgstr "Thôi"
 
@@ -251,7 +251,7 @@ msgstr "Thu kênh cục bộ"
 msgid "Record remote channel"
 msgstr "Thu kênh từ xa"
 
-#: src/gtk.c:406 src/gtksettings.c:230
+#: src/gtk.c:406 src/gtksettings.c:257
 msgid "ANT Note"
 msgstr "Ant: ghi chú"
 
@@ -447,7 +447,7 @@ msgstr "/Trợ giúp/_Giới thiệu"
 msgid "/Help/_License"
 msgstr "/Trợ giúp/Giấy _phép"
 
-#: src/gtk.c:730 src/gtksettings.c:432 src/session.c:73
+#: src/gtk.c:730 src/gtksettings.c:467 src/session.c:73
 msgid "Dialing"
 msgstr "Quay số"
 
@@ -467,111 +467,111 @@ msgstr "CÂM"
 msgid "Ant ISDN Telephone"
 msgstr "Điện thoại ISDN Ant"
 
-#: src/gtksettings.c:231
+#: src/gtksettings.c:258
 msgid "Bad isdn/sound device settings, please try again."
 msgstr "Sai thiết lập thiết bị ISDN/âm thanh nên hay thử lại."
 
-#: src/gtksettings.c:294
+#: src/gtksettings.c:329
 msgid "ANT Settings"
 msgstr "Thiết lập ANT"
 
-#: src/gtksettings.c:307
+#: src/gtksettings.c:342
 msgid "Application"
 msgstr "Ứng dụng"
 
-#: src/gtksettings.c:309
+#: src/gtksettings.c:344
 msgid "Options"
 msgstr "Tùy chọn"
 
-#: src/gtksettings.c:321
+#: src/gtksettings.c:356
 msgid "Save options on exit"
 msgstr "Lưu tùy chọn khi thoát"
 
-#: src/gtksettings.c:328
+#: src/gtksettings.c:363
 msgid "Popup main window on incoming call"
 msgstr "Bật lên cửa sổ chính khi nhận được cuộc gọi"
 
-#: src/gtksettings.c:334
+#: src/gtksettings.c:369
 msgid "Execute on incoming call:"
 msgstr "Thi hành khi nhận được cuộc gọi"
 
-#: src/gtksettings.c:345
+#: src/gtksettings.c:380
 msgid "Recording Format"
 msgstr "Định dạng thu"
 
-#: src/gtksettings.c:355
+#: src/gtksettings.c:390
 msgid "Microsoft WAV, uLaw"
 msgstr "Microsoft WAV, uLaw"
 
-#: src/gtksettings.c:365
+#: src/gtksettings.c:400
 msgid "Microsoft WAV, 16-bit signed"
 msgstr "Microsoft WAV, 16-bit đã ký"
 
-#: src/gtksettings.c:375
+#: src/gtksettings.c:410
 msgid "Apple/SGI AIFF, uLaw"
 msgstr "Apple/SGI AIFF, uLaw"
 
-#: src/gtksettings.c:385
+#: src/gtksettings.c:420
 msgid "Apple/SGI AIFF, 16-bit signed"
 msgstr "Apple/SGI AIFF, 16-bit đã ký"
 
-#: src/gtksettings.c:398
+#: src/gtksettings.c:433
 msgid "Phone"
 msgstr "Điện thoại"
 
-#: src/gtksettings.c:400
+#: src/gtksettings.c:435
 msgid "ISDN"
 msgstr "ISDN"
 
-#: src/gtksettings.c:412
+#: src/gtksettings.c:447
 msgid "Identifying MSN:"
 msgstr "MSN nhận diện:"
 
-#: src/gtksettings.c:422
+#: src/gtksettings.c:457
 msgid "Listen to MSNs:"
 msgstr "Lắng nghe các MSN:"
 
-#: src/gtksettings.c:444
+#: src/gtksettings.c:479
 msgid "Dial history size:"
 msgstr "Cỡ lịch sử quay số :"
 
-#: src/gtksettings.c:468
+#: src/gtksettings.c:503
 msgid "Maximum CID rows:"
 msgstr "Số hàng số người gởi tối đa:"
 
-#: src/gtksettings.c:476 src/gtksettings.c:504
+#: src/gtksettings.c:511 src/gtksettings.c:539
 msgid "[no limit]"
 msgstr "[vô hạn] "
 
-#: src/gtksettings.c:485
+#: src/gtksettings.c:520
 msgid "Read isdnlog data on startup"
 msgstr "Đọc dữ liệu bản ghi isdnlog khi khởi chạy"
 
-#: src/gtksettings.c:492
+#: src/gtksettings.c:527
 msgid "Maximum days to read from isdnlog:"
 msgstr "Số ngày tối đa cần đọc từ isdnlog:"
 
-#: src/gtksettings.c:521
+#: src/gtksettings.c:556
 msgid "Sound Devices"
 msgstr "Thiết bị âm thanh"
 
-#: src/gtksettings.c:523
-msgid "OSS"
-msgstr "OSS"
+#: src/gtksettings.c:558
+msgid "ALSA"
+msgstr "ALSA"
 
-#: src/gtksettings.c:535
+#: src/gtksettings.c:570
 msgid "Input sound device:"
 msgstr "Thiết bị âm thanh nhập:"
 
-#: src/gtksettings.c:547
+#: src/gtksettings.c:584
 msgid "Output sound device:"
 msgstr "Thiết bị âm thanh xuất:"
 
-#: src/gtksettings.c:560
+#: src/gtksettings.c:599
 msgid "Release unused devices"
 msgstr "Nhả các thiết bị không dùng"
 
-#: src/gtksettings.c:610
+#: src/gtksettings.c:649
 msgid "Save"
 msgstr "Lưu"
 
