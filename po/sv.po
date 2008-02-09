@@ -1,14 +1,14 @@
 # Swedish translation of ant-phone.
-# Copyright (C) 2005, 2007 Roland Stigge
+# Copyright (C) 2005, 2007, 2008 Roland Stigge
 # This file is distributed under the same license as the ant-phone package.
-# Daniel Nylander <po@danielnylander.se>, 2005, 2007.
+# Daniel Nylander <po@danielnylander.se>, 2005, 2007, 2008.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: ant-phone 0.2.0\n"
+"Project-Id-Version: ant-phone 0.2.1\n"
 "Report-Msgid-Bugs-To: stigge@antcom.de\n"
-"POT-Creation-Date: 2007-11-26 21:07+0100\n"
-"PO-Revision-Date: 2007-11-28 13:32+0100\n"
+"POT-Creation-Date: 2008-02-03 20:51+0100\n"
+"PO-Revision-Date: 2008-02-09 20:53+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
@@ -137,7 +137,7 @@ msgstr "/Ta bo_rt inspelning"
 msgid "/_Delete Row"
 msgstr "/Ta bort ra_d"
 
-#: src/callerid.c:449 src/gtksettings.c:456
+#: src/callerid.c:449 src/gtksettings.c:491
 msgid "Caller ID"
 msgstr "Nummerpresentation"
 
@@ -189,11 +189,11 @@ msgid "Number:"
 msgstr "Nummer:"
 
 #: src/controlpad.c:145 src/gtk.c:388 src/gtk.c:508 src/gtk.c:592
-#: src/gtksettings.c:572 src/llcheck.c:350
+#: src/gtksettings.c:611 src/llcheck.c:350
 msgid "OK"
 msgstr "OK"
 
-#: src/controlpad.c:158 src/gtksettings.c:617 src/session.c:73
+#: src/controlpad.c:158 src/gtksettings.c:656 src/session.c:73
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -249,7 +249,7 @@ msgstr "Spela in lokal kanal"
 msgid "Record remote channel"
 msgstr "Spela in fjärrkanal"
 
-#: src/gtk.c:406 src/gtksettings.c:230
+#: src/gtk.c:406 src/gtksettings.c:257
 msgid "ANT Note"
 msgstr "ANT-notering"
 
@@ -272,7 +272,7 @@ msgstr "Enhet för ljudindata:"
 
 #: src/gtk.c:438
 msgid "Input speed:"
-msgstr "Hastighet för indata:"
+msgstr "Indatahastighet:"
 
 #: src/gtk.c:438 src/gtk.c:441 src/gtk.c:442 src/gtk.c:444 src/gtk.c:448
 #: src/gtk.c:451 src/gtk.c:452 src/gtk.c:454
@@ -309,7 +309,7 @@ msgstr "Kanaler för utdata:"
 
 #: src/gtk.c:458
 msgid "ISDN speed (samples):"
-msgstr "ISDN-hastighet (sampling):"
+msgstr "ISDN-hastighet (samplingar):"
 
 #: src/gtk.c:459
 msgid "ISDN sample size (bits):"
@@ -454,7 +454,7 @@ msgstr "/Hjälp/Om"
 msgid "/Help/_License"
 msgstr "/Hjälp/_Licens"
 
-#: src/gtk.c:730 src/gtksettings.c:432 src/session.c:73
+#: src/gtk.c:730 src/gtksettings.c:467 src/session.c:73
 msgid "Dialing"
 msgstr "Ringer"
 
@@ -474,111 +474,111 @@ msgstr "TYST"
 msgid "Ant ISDN Telephone"
 msgstr "Ant ISDN-telefon"
 
-#: src/gtksettings.c:231
+#: src/gtksettings.c:258
 msgid "Bad isdn/sound device settings, please try again."
 msgstr "Felaktiga inställningar för ISDN/ljudenhet, försök igen."
 
-#: src/gtksettings.c:294
+#: src/gtksettings.c:329
 msgid "ANT Settings"
 msgstr "ANT-inställningar"
 
-#: src/gtksettings.c:307
+#: src/gtksettings.c:342
 msgid "Application"
 msgstr "Applikation"
 
-#: src/gtksettings.c:309
+#: src/gtksettings.c:344
 msgid "Options"
 msgstr "Inställningar"
 
-#: src/gtksettings.c:321
+#: src/gtksettings.c:356
 msgid "Save options on exit"
 msgstr "Spara inställningar vid avslut"
 
-#: src/gtksettings.c:328
+#: src/gtksettings.c:363
 msgid "Popup main window on incoming call"
 msgstr "Visa huvudfönster vid inkommande samtal"
 
-#: src/gtksettings.c:334
+#: src/gtksettings.c:369
 msgid "Execute on incoming call:"
 msgstr "Kör vid inkommande samtal:"
 
-#: src/gtksettings.c:345
+#: src/gtksettings.c:380
 msgid "Recording Format"
 msgstr "Inspelningsformat"
 
-#: src/gtksettings.c:355
+#: src/gtksettings.c:390
 msgid "Microsoft WAV, uLaw"
 msgstr "Microsoft WAV, uLaw"
 
-#: src/gtksettings.c:365
+#: src/gtksettings.c:400
 msgid "Microsoft WAV, 16-bit signed"
 msgstr "Microsoft WAV, 16-bit signed"
 
-#: src/gtksettings.c:375
+#: src/gtksettings.c:410
 msgid "Apple/SGI AIFF, uLaw"
 msgstr "Apple/SGI AIFF, uLaw"
 
-#: src/gtksettings.c:385
+#: src/gtksettings.c:420
 msgid "Apple/SGI AIFF, 16-bit signed"
 msgstr "Apple/SGI AIFF, 16-bit signed"
 
-#: src/gtksettings.c:398
+#: src/gtksettings.c:433
 msgid "Phone"
 msgstr "Telefon"
 
-#: src/gtksettings.c:400
+#: src/gtksettings.c:435
 msgid "ISDN"
 msgstr "ISDN"
 
-#: src/gtksettings.c:412
+#: src/gtksettings.c:447
 msgid "Identifying MSN:"
 msgstr "Identifierar MSN:"
 
-#: src/gtksettings.c:422
+#: src/gtksettings.c:457
 msgid "Listen to MSNs:"
 msgstr "Lyssnar till MSN:"
 
-#: src/gtksettings.c:444
+#: src/gtksettings.c:479
 msgid "Dial history size:"
 msgstr "Storlek för samtalshistorik:"
 
-#: src/gtksettings.c:468
+#: src/gtksettings.c:503
 msgid "Maximum CID rows:"
 msgstr "Max rader för nummerpresentation:"
 
-#: src/gtksettings.c:476 src/gtksettings.c:504
+#: src/gtksettings.c:511 src/gtksettings.c:539
 msgid "[no limit]"
 msgstr "[ingen gräns]"
 
-#: src/gtksettings.c:485
+#: src/gtksettings.c:520
 msgid "Read isdnlog data on startup"
 msgstr "Läs isdnlog-data vid uppstart"
 
-#: src/gtksettings.c:492
+#: src/gtksettings.c:527
 msgid "Maximum days to read from isdnlog:"
 msgstr "Max antal dagar att läsa från isdnlog:"
 
-#: src/gtksettings.c:521
+#: src/gtksettings.c:556
 msgid "Sound Devices"
 msgstr "Ljudenheter"
 
-#: src/gtksettings.c:523
-msgid "OSS"
-msgstr "OSS"
+#: src/gtksettings.c:558
+msgid "ALSA"
+msgstr "ALSA"
 
-#: src/gtksettings.c:535
+#: src/gtksettings.c:570
 msgid "Input sound device:"
 msgstr "Enhet för ljudindata:"
 
-#: src/gtksettings.c:547
+#: src/gtksettings.c:584
 msgid "Output sound device:"
 msgstr "Enhet för ljudutdata:"
 
-#: src/gtksettings.c:560
+#: src/gtksettings.c:599
 msgid "Release unused devices"
 msgstr "Släpp oanvända enheter"
 
-#: src/gtksettings.c:610
+#: src/gtksettings.c:649
 msgid "Save"
 msgstr "Spara"
 
@@ -737,6 +737,9 @@ msgstr "Ljud PÅ"
 #: src/session.c:1657
 msgid "(REJECTED)"
 msgstr "(NEKAD)"
+
+#~ msgid "OSS"
+#~ msgstr "OSS"
 
 #~ msgid "ISDN device:"
 #~ msgstr "ISDN-enhet:"
