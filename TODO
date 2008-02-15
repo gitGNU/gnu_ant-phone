@@ -7,8 +7,6 @@ Bugs:
   skipping small frames (~20ms) on overruns. In some rare cases, however,
   it happens frequently for up to a minute. Hanging up and redialing is one
   option how to get rid of this problem.
-* Audio device choosing is still done via textbox. With ALSA now, it should be
-  done via combobox, as device names can be queried.
 * Surely some new ones after rewrite of large parts of the code...
 * Caller ID stores hangup reason localized. This will break, if someone uses
   letters outside of English alphabet for translation of hangup reasons.
@@ -60,10 +58,6 @@ Daniel Nöthen <bipak@gmx.net>:
 * mixer support (muting)
 * (configurable?) auto set input to mic (reset on exit)
 * separate configuration of logged / ringing msns
-
-Philipp Thomas <pthomas@suse.de>:
-* CAPI support, native ALSA support (both in Linux 2.6) (needed for SuSE 9.1 prepared for 02/2004)
-    => both done
 
 wolfgang@rohdewald.de:
 * "execute on recorded message" option
