@@ -20,6 +20,7 @@ AC_PROG_YACC
 # Checks for libraries.
 AC_CHECK_LIB([m], [floor])
 AC_CHECK_LIB([sndfile], [sf_open],, AC_MSG_ERROR(You need the libsndfile headers to build this package))
+AC_CHECK_LIB([capi20], [capi20_register],, AC_MSG_ERROR(You need the libcapi20 headers to build this package))
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -39,7 +40,7 @@ AC_FUNC_STRFTIME
 AC_CHECK_FUNCS([floor select strdup strstr strtol mkdir strcasecmp])
 
 # GTK+ 2.0:
-PKG_CHECK_MODULES(DEPS, gtk+-2.0)
+PKG_CHECK_MODULES(DEPS, gtk+-2.0 glib-2.0 alsa)
 AC_SUBST(DEPS_CFLAGS)
 AC_SUBST(DEPS_LIBS)
 
