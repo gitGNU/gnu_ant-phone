@@ -1,22 +1,25 @@
 # Dutch translation of ant-phone.
-# Copyright (C) 2003 Free Software Foundation, Inc.
+# Copyright (C) 2008 Roland Stigge (msgids)
 # This file is distributed under the same license as the ant-phone package.
 # Elros Cyriatan <cyriatan@fastmail.fm>, 2003.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: ant-phone 0.1.4\n"
+"Project-Id-Version: ant-phone 0.2.1\n"
 "Report-Msgid-Bugs-To: stigge@antcom.de\n"
-"POT-Creation-Date: 2004-04-03 18:51+0200\n"
-"PO-Revision-Date: 2003-10-19 21:54+0100\n"
-"Last-Translator: Elros Cyriatan <cyriatan@fastmail.fm>\n"
-"Language-Team: Dutch <vertaling@nl.linux.org>\n"
+"POT-Creation-Date: 2008-02-03 20:51+0100\n"
+"PO-Revision-Date: 2008-09-15 07:28+0100\n"
+"Last-Translator: Erwin Poeze <erwin.poeze@gmail.com>\n"
+"Language-Team: Dutch <vertaling@vrijschrift.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2;plural=(n!=1);\n"
+"X-Poedit-Language: Dutch\n"
+"X-Poedit-Country: Netherlands\n"
 
-#: src/ant-phone.c:170
-#, c-format
+#: src/ant-phone.c:172
+#, fuzzy, c-format
 msgid ""
 "Usage: %s [OPTION...]\n"
 "\n"
@@ -26,19 +29,20 @@ msgid ""
 "  -r, --cleanup           Remove stale socket file (left by accident by\n"
 "                            previous run)\n"
 "  -d, --debug[=level]     Print additional runtime debugging data to stdout\n"
-"                            level = 1..2\n"
-"  -i, --soundin=DEVICE    OSS compatible device for input (recording),\n"
-"                            default: /dev/dsp\n"
-"  -o, --soundout=DEVICE   OSS compatible device for output (playback),\n"
-"                            default: /dev/dsp\n"
-"  -m, --msn=MSN           identifying MSN (for outgoing calls), 0 for "
-"master\n"
+"                            level = 1..4\n"
+"  -i, --soundin=DEVICE    ALSA device name for input (recording),\n"
+"                            default: \"default\"\n"
+"  -o, --soundout=DEVICE   ALSA device name for output (playback),\n"
+"                            default: \"default\"\n"
+"  -m, --msn=MSN           identifying MSN (for outgoing calls), 0 for master\n"
 "                          MSN of this termination/port\n"
 "                            default: 0\n"
-"  -l, --msns=MSNS         MSNs to listen on, semicolon-separated list or "
-"'*'\n"
+"  -l, --msns=MSNS         MSNs to listen on, semicolon-separated list or '*'\n"
 "                            default: *\n"
 "  -c, --call=NUMBER       Call specified number\n"
+"  -s, --sleep             Put ISDN thread to sleep (to be able to remove CAPI\n"
+"                            modules before suspending the computer).\n"
+"  -w, --wakeup            Restart ISDN thread after sleep.\n"
 "\n"
 "Note: If arguments of --soundin and --soundout are equal, a full duplex\n"
 "      sound device is needed.\n"
@@ -47,7 +51,7 @@ msgstr ""
 "\n"
 "Opties:\n"
 "  -h, --help              Dit hulpbericht weergeven\n"
-"  -v, --version           Versie informatie weergeven\n"
+"  -v, --version           Versieinformatie weergeven\n"
 "  -r, --cleanup           Per ongeluk (van vorige sessie) overgebleven\n"
 "                            socket-bestand verwijderen\n"
 "  -d, --debug[=niveau]     Extra runtime debug gegevens naar stdout zenden\n"
@@ -56,32 +60,39 @@ msgstr ""
 "                            standaard: /dev/dsp\n"
 "  -o, --soundout=APPARAAT OSS-compatibel apparaat voor uitvoer (afspelen),\n"
 "                            standaard: /dev/dsp\n"
-"  -m, --msn=MSN           identificerende MSN (voor uitgaande gesprekken), 0 "
-"voor hoofd\n"
+"  -m, --msn=MSN           identificerende MSN (voor uitgaande gesprekken), 0 voor hoofd\n"
 "                          MSN van deze afsluiting/poort\n"
 "                            standaard: 0\n"
-"  -l, --msns=MSNS         MSNs om naar te luisteren, punt-komma gescheiden "
-"lijst of '*'\n"
+"  -l, --msns=MSNS         MSNs om naar te luisteren, punt-komma gescheiden lijst of '*'\n"
 "                            standaard: *\n"
 "  -c, --call=NUMMER       Opgegeven nummer bellen\n"
 "\n"
-"Let op: als argumenten van --soundin en --soundout gelijk zijn, is een full "
-"duplex\n"
+"Let op: als argumenten van --soundin en --soundout gelijk zijn, is een full-duplex\n"
 "      geluidsapparaat nodig.\n"
 
-#: src/ant-phone.c:221
+#: src/ant-phone.c:226
 #, c-format
 msgid "Calling %s... "
-msgstr "Bezig met bellen %s..."
+msgstr "Belt nu %s..."
 
-#: src/ant-phone.c:225
+#: src/ant-phone.c:230 src/ant-phone.c:239 src/ant-phone.c:248
 #, c-format
 msgid "successful.\n"
-msgstr "succesvol.\n"
+msgstr "Gelukt.\n"
+
+#: src/ant-phone.c:235
+#, c-format
+msgid "Suspending ISDN thread... "
+msgstr ""
+
+#: src/ant-phone.c:244
+#, c-format
+msgid "Waking up ISDN thread... "
+msgstr ""
 
 #: src/callerid.c:131
 msgid "Delete Entry"
-msgstr "Ingang verwijderen"
+msgstr "Regel verwijderen"
 
 #: src/callerid.c:143
 msgid ""
@@ -89,154 +100,158 @@ msgid ""
 "delete this entry?"
 msgstr ""
 "Weet u zeker dat u deze\n"
-"ingang wilt verwijderen?"
+"regel wilt verwijderen?"
 
 #: src/callerid.c:148
 msgid "Delete recording"
 msgstr "Opname verwijderen"
 
-#: src/callerid.c:266
+#: src/callerid.c:283
 #, c-format
 msgid "Enter the base filename for %s file"
-msgstr "Geef de basis-bestandsnaam voor %s bestand"
+msgstr "Geef de basisbestandsnaam voor %s bestand"
 
-#: src/callerid.c:312
+#: src/callerid.c:329
 msgid "Do you really want to delete this recording?"
 msgstr "Wilt u deze opname echt verwijderen?"
 
-#: src/callerid.c:336 src/callerid.c:362
+#: src/callerid.c:353 src/callerid.c:381
+msgid "/_Call"
+msgstr ""
+
+#: src/callerid.c:354 src/callerid.c:385
 msgid "/_Playback"
 msgstr "/_Afspelen"
 
-#: src/callerid.c:337 src/callerid.c:366
+#: src/callerid.c:355 src/callerid.c:389
 msgid "/_Save as..."
 msgstr "/_Opslaan als..."
 
-#: src/callerid.c:338 src/callerid.c:370
+#: src/callerid.c:356 src/callerid.c:393
 msgid "/Delete _Recording"
 msgstr "/_Opname verwijderen"
 
-#: src/callerid.c:340 src/callerid.c:374
+#: src/callerid.c:358 src/callerid.c:397
 msgid "/_Delete Row"
 msgstr "/_Rij verwijderen"
 
-#: src/callerid.c:423 src/gtksettings.c:455
+#: src/callerid.c:449 src/gtksettings.c:491
 msgid "Caller ID"
 msgstr "Beller ID"
 
-#: src/callerid.c:426
+#: src/callerid.c:452
 msgid "Date/Time"
 msgstr "Datum/Tijd"
 
-#: src/callerid.c:427
+#: src/callerid.c:453
 msgid "Type"
 msgstr "Soort"
 
-#: src/callerid.c:428
+#: src/callerid.c:454
 msgid "From"
 msgstr "Van"
 
-#: src/callerid.c:429
+#: src/callerid.c:455
 msgid "To"
 msgstr "Naar"
 
-#: src/callerid.c:430
+#: src/callerid.c:456
 msgid "Duration"
 msgstr "Lengte"
 
-#: src/callerid.c:759
+#: src/callerid.c:783
 msgid "(UNKNOWN)"
 msgstr "(ONBEKEND)"
 
-#: src/callerid.c:828
+#: src/callerid.c:852
 #, c-format
 msgid "ANT: %d unanswered"
 msgstr "ANT: %d niet-beantwoord"
 
-#: src/controlpad.c:101
+#: src/controlpad.c:102
 #, c-format
 msgid "Preset %c"
 msgstr "Voorkeuze %c"
 
-#: src/controlpad.c:108
+#: src/controlpad.c:109
 #, c-format
 msgid "Please input new preset data for button %c:"
-msgstr "Geef a.u.b. nieuwe voorkeuze gegevens voor knop %c:"
+msgstr "Geef a.u.b. nieuwe voorkeuzegegevens voor knop %c:"
 
-#: src/controlpad.c:121
+#: src/controlpad.c:122
 msgid "Name:"
 msgstr "Naam:"
 
-#: src/controlpad.c:124 src/gtk.c:561
+#: src/controlpad.c:125 src/gtk.c:758
 msgid "Number:"
 msgstr "Nummer:"
 
-#: src/controlpad.c:144 src/gtk.c:212 src/gtk.c:331 src/gtk.c:408
-#: src/gtksettings.c:571 src/llcheck.c:422
+#: src/controlpad.c:145 src/gtk.c:388 src/gtk.c:508 src/gtk.c:592
+#: src/gtksettings.c:611 src/llcheck.c:350
 msgid "OK"
 msgstr "OK"
 
-#: src/controlpad.c:157 src/gtksettings.c:616 src/session.c:68
+#: src/controlpad.c:158 src/gtksettings.c:656 src/session.c:73
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: src/controlpad.c:315
+#: src/controlpad.c:316
 msgid "Backspace"
 msgstr "Backspace"
 
-#: src/controlpad.c:315
+#: src/controlpad.c:316
 msgid "Preset 1"
 msgstr "Voorkeuze 1"
 
-#: src/controlpad.c:316
+#: src/controlpad.c:317
 msgid "Clear Number"
 msgstr "Nummer wissen"
 
-#: src/controlpad.c:316
+#: src/controlpad.c:317
 msgid "Preset 2"
 msgstr "Voorkeuze 2"
 
-#: src/controlpad.c:317
+#: src/controlpad.c:318
 msgid "Redial"
 msgstr "Opnieuw bellen"
 
-#: src/controlpad.c:317
+#: src/controlpad.c:318
 msgid "Preset 3"
 msgstr "Voorkeuze 3"
 
-#: src/controlpad.c:318
+#: src/controlpad.c:319
 msgid "Mute Microphone"
 msgstr "Microfoon uit"
 
-#: src/controlpad.c:318
+#: src/controlpad.c:319
 msgid "Preset 4"
 msgstr "Voorkeuze 4"
 
-#: src/controlpad.c:351
+#: src/controlpad.c:352
 msgid "Control"
 msgstr "Bediening"
 
-#: src/controlpad.c:423
+#: src/controlpad.c:424
 msgid "Recording"
 msgstr "Opname"
 
-#: src/controlpad.c:434
+#: src/controlpad.c:435 src/controlpad.c:446
 msgid "Record to file"
 msgstr "Opnemen naar bestand"
 
-#: src/controlpad.c:445
+#: src/controlpad.c:455
 msgid "Record local channel"
 msgstr "Lokaal kanaal opnemen"
 
-#: src/controlpad.c:456
+#: src/controlpad.c:466
 msgid "Record remote channel"
 msgstr "Kanaal op afstand opnemen"
 
-#: src/gtk.c:230 src/gtksettings.c:229
+#: src/gtk.c:406 src/gtksettings.c:257
 msgid "ANT Note"
 msgstr "ANT Bericht"
 
-#: src/gtk.c:231
+#: src/gtk.c:407
 msgid ""
 "Can't open audio device.\n"
 "Please stop other applications using\n"
@@ -249,72 +264,64 @@ msgstr ""
 "of controleer uw apparaatinstellingen,\n"
 "en probeer het opnieuw."
 
-#: src/gtk.c:260
+#: src/gtk.c:437
 msgid "Sound input device:"
 msgstr "Geluidsapparaat invoer:"
 
-#: src/gtk.c:261
+#: src/gtk.c:438
 msgid "Input speed:"
-msgstr "Invoersnelheid:"
+msgstr "Snelheid invoer:"
 
-#: src/gtk.c:261 src/gtk.c:264 src/gtk.c:265 src/gtk.c:267 src/gtk.c:271
-#: src/gtk.c:274 src/gtk.c:275 src/gtk.c:277
+#: src/gtk.c:438 src/gtk.c:441 src/gtk.c:442 src/gtk.c:444 src/gtk.c:448
+#: src/gtk.c:451 src/gtk.c:452 src/gtk.c:454
 msgid "[inactive]"
 msgstr "[inactief]"
 
-#: src/gtk.c:263
+#: src/gtk.c:440
 msgid "Input sample size (bits):"
-msgstr "Invoer monstergrootte (bits):"
+msgstr "Monstergrootte invoer (bits):"
 
-#: src/gtk.c:265 src/gtk.c:275
+#: src/gtk.c:442 src/gtk.c:452
 msgid "Input fragment size (samples):"
-msgstr "Invoer fragmentgrootte (monsters):"
+msgstr "Fragmentgrootte invoer (monsters):"
 
-#: src/gtk.c:267
+#: src/gtk.c:444
 msgid "Input channels:"
-msgstr "Invoerkanalen:"
+msgstr "Kanalen invoer:"
 
-#: src/gtk.c:270
+#: src/gtk.c:447
 msgid "Sound output device:"
 msgstr "Geluidsapparaat uitvoer:"
 
-#: src/gtk.c:271
+#: src/gtk.c:448
 msgid "Output speed:"
-msgstr "Uitvoersnelheid:"
+msgstr "Snelheid uitvoer:"
 
-#: src/gtk.c:273
+#: src/gtk.c:450
 msgid "Output sample size (bits):"
-msgstr "Uitvoer monstergrootte (bits):"
+msgstr "Monstergrootte uitvoer (bits):"
 
-#: src/gtk.c:277
+#: src/gtk.c:454
 msgid "Output channels:"
-msgstr "Uitvoerkanalen:"
+msgstr "Kanalen uitvoer:"
 
-#: src/gtk.c:280
-msgid "ISDN device:"
-msgstr "ISDN-apparaat:"
-
-#: src/gtk.c:281
+#: src/gtk.c:458
 msgid "ISDN speed (samples):"
-msgstr "ISDN snelheid (monsters):"
+msgstr "ISDN-snelheid (monsters):"
 
-#: src/gtk.c:282
+#: src/gtk.c:459
 msgid "ISDN sample size (bits):"
-msgstr "ISDN monstergrootte (bits):"
+msgstr "ISDN-monstergrootte (bits):"
 
-#: src/gtk.c:283
-msgid "ISDN fragment size (bytes):"
-msgstr "ISDN fragmentgrootte (bytes):"
-
-#: src/gtk.c:295
+#: src/gtk.c:472
 msgid "ANT Info"
-msgstr "ANT Info"
+msgstr "ANT-info"
 
-#: src/gtk.c:366
+#: src/gtk.c:550
 msgid "About ANT"
 msgstr "Over ANT"
 
-#: src/gtk.c:382
+#: src/gtk.c:566
 #, c-format
 msgid ""
 "ANT (ANT is Not a Telephone) Version %s\n"
@@ -331,12 +338,12 @@ msgid ""
 "http://www.antcom.de/\n"
 "Mailing list: ant-phone-devel@nongnu.org"
 msgstr ""
-"ANT (ANT is Niet een Telefoon) Versie %s\n"
+"ANT (ANT is Niet een Telefoon) versie %s\n"
 "Copyright 2002, 2003 Roland Stigge\n"
 "\n"
-"Dit is een ISDN telefoon toepassing\n"
+"Dit is een ISDN-telefoontoepassing\n"
 "geschreven voor GNU/Linux en ISDN4Linux om\n"
-"te communiceren via een full duplex geluidskaart\n"
+"te communiceren via een full-duplex geluidskaart\n"
 "(of meerdere geluidsapparaten als u dat wilt) en\n"
 "een ISDN4Linux ISDN-apparaat dat geluid\n"
 "ondersteunt.\n"
@@ -346,11 +353,12 @@ msgstr ""
 "http://www.antcom.de/\n"
 "E-mail lijst: ant-phone-devel@nongnu.org"
 
-#: src/gtk.c:420
+#: src/gtk.c:606
 msgid "ANT License"
-msgstr "ANT Licentie"
+msgstr "ANT-licentie"
 
-#: src/gtk.c:421
+#: src/gtk.c:607
+#, fuzzy
 msgid ""
 "ANT (ANT is Not a Telephone)\n"
 "Copyright (C) 2002, 2003 Roland Stigge\n"
@@ -386,184 +394,195 @@ msgstr ""
 "along with this program; if not, write to the Free Software\n"
 "Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
 
-#: src/gtk.c:454
+#: src/gtk.c:635
 msgid "/Phon_e"
 msgstr "/_Telefoon"
 
-#: src/gtk.c:455
+#: src/gtk.c:636
 msgid "/Phone/_Info Window"
 msgstr "/Telefoon/_Info"
 
-#: src/gtk.c:456 src/gtk.c:504
+#: src/gtk.c:637 src/gtk.c:685
 msgid "/Phone/_Line Level Check"
 msgstr "/Telefoon/Lijnniveau _controle"
 
-#: src/gtk.c:458
+#: src/gtk.c:639
 msgid "/Phone/"
 msgstr "/Telefoon/"
 
-#: src/gtk.c:459
+#: src/gtk.c:640
 msgid "/Phone/_Quit"
 msgstr "/Telefoon/_Afsluiten"
 
-#: src/gtk.c:461
+#: src/gtk.c:642
 msgid "/_View"
 msgstr "/B_eeld"
 
-#: src/gtk.c:462 src/gtk.c:492
+#: src/gtk.c:643 src/gtk.c:673
 msgid "/View/_Caller ID Monitor"
-msgstr "/Beeld/_Beller ID lijst"
+msgstr "/Beeld/_BellerIDlijst"
 
-#: src/gtk.c:464 src/gtk.c:495
+#: src/gtk.c:645 src/gtk.c:676
 msgid "/View/_Line Level Meters"
-msgstr "/Beeld/_Lijnniveau meters"
+msgstr "/Beeld/_Lijnniveaumeters"
 
-#: src/gtk.c:466 src/gtk.c:498
+#: src/gtk.c:647 src/gtk.c:679
 msgid "/View/Control _Pad"
 msgstr "/Beeld/Bedienings_paneel"
 
-#: src/gtk.c:468
+#: src/gtk.c:649
 msgid "/_Options"
 msgstr "/_Opties"
 
-#: src/gtk.c:469 src/gtk.c:501
+#: src/gtk.c:650 src/gtk.c:682
 msgid "/Options/_Settings"
 msgstr "/Opties/_Instellingen"
 
-#: src/gtk.c:471
+#: src/gtk.c:652
 msgid "/_Help"
 msgstr "/_Hulp"
 
-#: src/gtk.c:472
+#: src/gtk.c:653
 msgid "/Help/_About"
 msgstr "/Hulp/_Info"
 
-#: src/gtk.c:473
+#: src/gtk.c:654
 msgid "/Help/_License"
 msgstr "/Help/_Licentie"
 
-#: src/gtk.c:551 src/gtksettings.c:431 src/session.c:68
+#: src/gtk.c:730 src/gtksettings.c:467 src/session.c:73
 msgid "Dialing"
 msgstr "Bezig met bellen"
 
-#: src/gtk.c:783 src/gtk.c:784
+#: src/gtk.c:825 src/session.c:71 src/session.c:72
+msgid "Answer"
+msgstr "Beantwoorden"
+
+#: src/gtk.c:875 src/session.c:71 src/session.c:72
+msgid "Reject"
+msgstr "Verwerpen"
+
+#: src/gtk.c:1026 src/gtk.c:1027
 msgid "MUTED"
 msgstr "GELUID UIT"
 
-#: src/gtksettings.c:230
-msgid "Bad isdn/sound device settings, please try again."
+#: src/gtk.c:1057
+msgid "Ant ISDN Telephone"
 msgstr ""
-"Slechte ISDN/geluid apparaat instellingen, probeer alstublieft opnieuw."
 
-#: src/gtksettings.c:293
+#: src/gtksettings.c:258
+msgid "Bad isdn/sound device settings, please try again."
+msgstr "Verkeerde instellingen ISDN/geluidsapparaat, probeer opnieuw."
+
+#: src/gtksettings.c:329
 msgid "ANT Settings"
-msgstr "ANT Instellingen"
+msgstr "ANT-instellingen"
 
-#: src/gtksettings.c:306
+#: src/gtksettings.c:342
 msgid "Application"
 msgstr "Toepassing"
 
-#: src/gtksettings.c:308
+#: src/gtksettings.c:344
 msgid "Options"
 msgstr "Opties"
 
-#: src/gtksettings.c:320
+#: src/gtksettings.c:356
 msgid "Save options on exit"
 msgstr "Opties opslaan bij afsluiten"
 
-#: src/gtksettings.c:327
+#: src/gtksettings.c:363
 msgid "Popup main window on incoming call"
 msgstr "Venster openen bij inkomend gesprek"
 
-#: src/gtksettings.c:333
+#: src/gtksettings.c:369
 msgid "Execute on incoming call:"
 msgstr "Uitvoeren bij inkomend gesprek:"
 
-#: src/gtksettings.c:344
+#: src/gtksettings.c:380
 msgid "Recording Format"
-msgstr "Opname formaat"
+msgstr "Opnameformat"
 
-#: src/gtksettings.c:354
+#: src/gtksettings.c:390
 msgid "Microsoft WAV, uLaw"
 msgstr "Microsoft WAV, uLaw"
 
-#: src/gtksettings.c:364
+#: src/gtksettings.c:400
 msgid "Microsoft WAV, 16-bit signed"
 msgstr "Microsoft WAV, 16-bit met teken"
 
-#: src/gtksettings.c:374
+#: src/gtksettings.c:410
 msgid "Apple/SGI AIFF, uLaw"
 msgstr "Apple/SGI AIFF, uLaw"
 
-#: src/gtksettings.c:384
+#: src/gtksettings.c:420
 msgid "Apple/SGI AIFF, 16-bit signed"
 msgstr "Apple/SGI AIFF, 16-bit met teken"
 
-#: src/gtksettings.c:397
+#: src/gtksettings.c:433
 msgid "Phone"
 msgstr "Telefoon"
 
-#: src/gtksettings.c:399
+#: src/gtksettings.c:435
 msgid "ISDN"
 msgstr "ISDN"
 
-#: src/gtksettings.c:411
+#: src/gtksettings.c:447
 msgid "Identifying MSN:"
 msgstr "Identificerende MSN:"
 
-#: src/gtksettings.c:421
+#: src/gtksettings.c:457
 msgid "Listen to MSNs:"
 msgstr "Luisteren-naar MSNs:"
 
-#: src/gtksettings.c:443
+#: src/gtksettings.c:479
 msgid "Dial history size:"
-msgstr "Belgeschiedenis grootte:"
+msgstr "Grootte belgeschiedenis:"
 
-#: src/gtksettings.c:467
+#: src/gtksettings.c:503
 msgid "Maximum CID rows:"
 msgstr "Maximaal aantal CID rijen:"
 
-#: src/gtksettings.c:475 src/gtksettings.c:503
+#: src/gtksettings.c:511 src/gtksettings.c:539
 msgid "[no limit]"
-msgstr "[geen grens]"
-
-#: src/gtksettings.c:484
-msgid "Read isdnlog data on startup"
-msgstr "Gegevens isdnlog lezen bij opstarten"
-
-#: src/gtksettings.c:491
-msgid "Maximum days to read from isdnlog:"
-msgstr "Maximaal aantal dagen om te lezen van isdnlog:"
+msgstr "[onbegrensd]"
 
 #: src/gtksettings.c:520
+msgid "Read isdnlog data on startup"
+msgstr "Gegevens ISDN-log lezen bij opstarten"
+
+#: src/gtksettings.c:527
+msgid "Maximum days to read from isdnlog:"
+msgstr "Maximaal aantal dagen om uit ISDN-log te lezen:"
+
+#: src/gtksettings.c:556
 msgid "Sound Devices"
 msgstr "Geluidsapparaten"
 
-#: src/gtksettings.c:522
-msgid "OSS"
-msgstr "OSS"
+#: src/gtksettings.c:558
+msgid "ALSA"
+msgstr ""
 
-#: src/gtksettings.c:534
+#: src/gtksettings.c:570
 msgid "Input sound device:"
 msgstr "Geluidsapparaat invoer:"
 
-#: src/gtksettings.c:546
+#: src/gtksettings.c:584
 msgid "Output sound device:"
 msgstr "Geluidsapparaat uitvoer:"
 
-#: src/gtksettings.c:559
+#: src/gtksettings.c:599
 msgid "Release unused devices"
 msgstr "Ongebruikte apparaten vrijgeven"
 
-#: src/gtksettings.c:609
+#: src/gtksettings.c:649
 msgid "Save"
 msgstr "Opslaan"
 
-#: src/llcheck.c:371
+#: src/llcheck.c:299
 msgid "Line Level Check"
-msgstr "Lijnniveau controle"
+msgstr "Controle lijnniveau"
 
-#: src/llcheck.c:383
+#: src/llcheck.c:311
 msgid ""
 "Please check the line input level\n"
 "and adjust it using your favorite\n"
@@ -571,93 +590,166 @@ msgid ""
 "You can also play a sound\n"
 "to test the sound output."
 msgstr ""
-"Controleer alstublieft het lijn invoer\n"
-"niveau en pas het aan met de\n"
-"volumeregeling toepassing.\n"
+"Controleer alstublieft het invoerniveau\n"
+"van de lijn en pas het aan met een\n"
+"toepassing voor volumeregeling.\n"
 "U kunt ook een geluid afspelen om\n"
-"geluidsuitvoer te testen."
+"de geluidsuitvoer te testen."
 
-#: src/llcheck.c:405
+#: src/llcheck.c:333
 msgid "Play sound"
 msgstr "Geluid afspelen"
 
-#: src/session.c:65
+#: src/session.c:70
 msgid "Ready"
 msgstr "Gereed"
 
-#: src/session.c:65
+#: src/session.c:70
 msgid "Dial"
 msgstr "Bellen"
 
-#: src/session.c:65 src/session.c:69 src/session.c:70
+#: src/session.c:70 src/session.c:74 src/session.c:75
 msgid "Hang up"
 msgstr "Ophangen"
 
-#: src/session.c:66 src/session.c:67
+#: src/session.c:71 src/session.c:72
 msgid "RING"
 msgstr "TELEFOON GAAT OVER"
 
-#: src/session.c:66 src/session.c:67
-msgid "Answer"
-msgstr "Beantwoorden"
-
-#: src/session.c:66 src/session.c:67
-msgid "Reject"
-msgstr "Verwerpen"
-
-#: src/session.c:68 src/session.c:69 src/session.c:70 src/session.c:71
+#: src/session.c:73 src/session.c:74 src/session.c:75 src/session.c:76
 msgid "Pick up"
 msgstr "Opnemen"
 
-#: src/session.c:69
+#: src/session.c:74
 msgid "B-Channel open"
 msgstr "B-kanaal open"
 
-#: src/session.c:70
+#: src/session.c:75
 msgid "Setup"
 msgstr "Configuratie"
 
-#: src/session.c:71
+#: src/session.c:76
 msgid "Playback"
 msgstr "Afspelen"
 
-#: src/session.c:71
+#: src/session.c:76
 msgid "Stop"
 msgstr "Stoppen"
 
-#: src/session.c:377
+#: src/session.c:551 src/session.c:552 src/session.c:1117
+#, fuzzy
+msgid "(no caller ID)"
+msgstr "Beller ID"
+
+#: src/session.c:556
+#, c-format
+msgid "<b>Call from: %s</b>"
+msgstr ""
+
+#: src/session.c:636 src/session.c:1652
+msgid "(ABORTED)"
+msgstr "(AFGEBROKEN)"
+
+#: src/session.c:717
 #, c-format
 msgid "Preset %d"
 msgstr "Voorkeuze %d"
 
-#: src/session.c:699
-msgid "(HW ERROR)"
+#: src/session.c:985
+#, fuzzy
+msgid "ERROR"
 msgstr "(HW FOUT)"
 
-#: src/session.c:1000
+#: src/session.c:992
+msgid "PROTOCOL ERROR"
+msgstr ""
+
+#: src/session.c:997
+msgid "WRONG NUMBER"
+msgstr ""
+
+#: src/session.c:1002
+msgid "NO ROUTE"
+msgstr ""
+
+#: src/session.c:1012
+msgid "CHANNEL UNAVAILABLE"
+msgstr ""
+
+#: src/session.c:1016
+#, fuzzy
+msgid "BUSY"
+msgstr "(BEZIG)"
+
+#: src/session.c:1021
+msgid "NO ANSWER"
+msgstr ""
+
+#: src/session.c:1025
+#, fuzzy
+msgid "REJECTED"
+msgstr "(VERWORPEN)"
+
+#: src/session.c:1029
+msgid "NUMBER CHANGED"
+msgstr ""
+
+#: src/session.c:1033
+msgid "DISCONNECT"
+msgstr ""
+
+#: src/session.c:1037
+msgid "REMOTE FAILURE"
+msgstr ""
+
+#: src/session.c:1042
+#, fuzzy
+msgid "NETWORK ERROR"
+msgstr "(HW FOUT)"
+
+#: src/session.c:1048
+msgid "SERVICE UNAVAILABLE"
+msgstr ""
+
+#: src/session.c:1053
+msgid "NOT SUBSCRIBED"
+msgstr ""
+
+#: src/session.c:1061
+msgid "NOT IMPLEMENTED"
+msgstr ""
+
+#: src/session.c:1065
+msgid "NOT COMPATIBLE"
+msgstr ""
+
+#: src/session.c:1094
+msgid "(MISSED)"
+msgstr ""
+
+#: src/session.c:1519
 msgid "Audio OFF"
 msgstr "Geluid UIT"
 
-#: src/session.c:1000
+#: src/session.c:1519
 msgid "Audio ON"
 msgstr "Geluid AAN"
 
-#: src/session.c:1097
-msgid "(BUSY)"
-msgstr "(BEZIG)"
-
-#: src/session.c:1103
-msgid "(TIMEOUT)"
-msgstr "(TIME-OUT)"
-
-#: src/session.c:1139
-msgid "(RUNG)"
-msgstr "(TELEFOON GING OVER)"
-
-#: src/session.c:1381
-msgid "(ABORTED)"
-msgstr "(AFGEBROKEN)"
-
-#: src/session.c:1389
+#: src/session.c:1657
 msgid "(REJECTED)"
 msgstr "(VERWORPEN)"
+
+#~ msgid "ISDN device:"
+#~ msgstr "ISDN-apparaat:"
+
+#~ msgid "ISDN fragment size (bytes):"
+#~ msgstr "ISDN-fragmentgrootte (bytes):"
+
+#~ msgid "OSS"
+#~ msgstr "OSS"
+
+#~ msgid "(TIMEOUT)"
+#~ msgstr "(TIME-OUT)"
+
+#~ msgid "(RUNG)"
+#~ msgstr "(TELEFOON GING OVER)"
