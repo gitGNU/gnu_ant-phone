@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ant-phone 0.1.4\n"
 "Report-Msgid-Bugs-To: stigge@antcom.de\n"
-"POT-Creation-Date: 2004-04-03 18:51+0200\n"
+"POT-Creation-Date: 2008-02-06 14:20+0100\n"
 "PO-Revision-Date: 2004-12-05 20:44+0200\n"
 "Last-Translator: Ayşegül Kurşun <roxelana_83@hotmail.com>\n"
 "Language-Team: Turkish <gnu-tr-u12a@lists.sourceforge.net>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.3.1\n"
 
-#: src/ant-phone.c:170
-#, c-format
+#: src/ant-phone.c:172
+#, fuzzy, c-format
 msgid ""
 "Usage: %s [OPTION...]\n"
 "\n"
@@ -27,11 +27,11 @@ msgid ""
 "  -r, --cleanup           Remove stale socket file (left by accident by\n"
 "                            previous run)\n"
 "  -d, --debug[=level]     Print additional runtime debugging data to stdout\n"
-"                            level = 1..2\n"
-"  -i, --soundin=DEVICE    OSS compatible device for input (recording),\n"
-"                            default: /dev/dsp\n"
-"  -o, --soundout=DEVICE   OSS compatible device for output (playback),\n"
-"                            default: /dev/dsp\n"
+"                            level = 1..4\n"
+"  -i, --soundin=DEVICE    ALSA device name for input (recording),\n"
+"                            default: \"default\"\n"
+"  -o, --soundout=DEVICE   ALSA device name for output (playback),\n"
+"                            default: \"default\"\n"
 "  -m, --msn=MSN           identifying MSN (for outgoing calls), 0 for "
 "master\n"
 "                          MSN of this termination/port\n"
@@ -40,6 +40,10 @@ msgid ""
 "'*'\n"
 "                            default: *\n"
 "  -c, --call=NUMBER       Call specified number\n"
+"  -s, --sleep             Put ISDN thread to sleep (to be able to remove "
+"CAPI\n"
+"                            modules before suspending the computer).\n"
+"  -w, --wakeup            Restart ISDN thread after sleep.\n"
 "\n"
 "Note: If arguments of --soundin and --soundout are equal, a full duplex\n"
 "      sound device is needed.\n"
@@ -68,15 +72,25 @@ msgstr ""
 "Not: Eğer --soundin ve --soundout seçeneklerinin değerleri aynı ise,\n"
 "tam duplex bir ses aygıtı gereklidir.\n"
 
-#: src/ant-phone.c:221
+#: src/ant-phone.c:226
 #, c-format
 msgid "Calling %s... "
 msgstr "%s aranıyor..."
 
-#: src/ant-phone.c:225
+#: src/ant-phone.c:230 src/ant-phone.c:239 src/ant-phone.c:248
 #, c-format
 msgid "successful.\n"
 msgstr "başarılı.\n"
+
+#: src/ant-phone.c:235
+#, c-format
+msgid "Suspending ISDN thread... "
+msgstr ""
+
+#: src/ant-phone.c:244
+#, c-format
+msgid "Waking up ISDN thread... "
+msgstr ""
 
 #: src/callerid.c:131
 msgid "Delete Entry"
@@ -94,148 +108,152 @@ msgstr ""
 msgid "Delete recording"
 msgstr "Kaydı sil"
 
-#: src/callerid.c:266
+#: src/callerid.c:283
 #, c-format
 msgid "Enter the base filename for %s file"
 msgstr "%s dosyasının temel dosya ismini girin"
 
-#: src/callerid.c:312
+#: src/callerid.c:329
 msgid "Do you really want to delete this recording?"
 msgstr "Gerçekten bu kaydı silmek istiyor musunuz?"
 
-#: src/callerid.c:336 src/callerid.c:362
+#: src/callerid.c:353 src/callerid.c:381
+msgid "/_Call"
+msgstr ""
+
+#: src/callerid.c:354 src/callerid.c:385
 msgid "/_Playback"
 msgstr "/_Çal"
 
-#: src/callerid.c:337 src/callerid.c:366
+#: src/callerid.c:355 src/callerid.c:389
 msgid "/_Save as..."
 msgstr "/_Farklı kaydet..."
 
-#: src/callerid.c:338 src/callerid.c:370
+#: src/callerid.c:356 src/callerid.c:393
 msgid "/Delete _Recording"
 msgstr "/Kaydı _Sil"
 
-#: src/callerid.c:340 src/callerid.c:374
+#: src/callerid.c:358 src/callerid.c:397
 msgid "/_Delete Row"
 msgstr "/S_atırı Sil"
 
-#: src/callerid.c:423 src/gtksettings.c:455
+#: src/callerid.c:449 src/gtksettings.c:491
 msgid "Caller ID"
 msgstr "Arayan Bilgisi"
 
-#: src/callerid.c:426
+#: src/callerid.c:452
 msgid "Date/Time"
 msgstr "Tarih/Zaman"
 
-#: src/callerid.c:427
+#: src/callerid.c:453
 msgid "Type"
 msgstr "Tür"
 
-#: src/callerid.c:428
+#: src/callerid.c:454
 msgid "From"
 msgstr "Kimden"
 
-#: src/callerid.c:429
+#: src/callerid.c:455
 msgid "To"
 msgstr "Kime"
 
-#: src/callerid.c:430
+#: src/callerid.c:456
 msgid "Duration"
 msgstr "Süre"
 
-#: src/callerid.c:759
+#: src/callerid.c:783
 msgid "(UNKNOWN)"
 msgstr "(BİLİNMEYEN)"
 
-#: src/callerid.c:828
+#: src/callerid.c:852
 #, c-format
 msgid "ANT: %d unanswered"
 msgstr "ANT:%d cevaplanmamış"
 
-#: src/controlpad.c:101
+#: src/controlpad.c:102
 #, c-format
 msgid "Preset %c"
 msgstr "Önkurum %c"
 
-#: src/controlpad.c:108
+#: src/controlpad.c:109
 #, c-format
 msgid "Please input new preset data for button %c:"
 msgstr "Lütfen %c tuşu için yeni önkurum bilgisini girin"
 
-#: src/controlpad.c:121
+#: src/controlpad.c:122
 msgid "Name:"
 msgstr "İsim:"
 
-#: src/controlpad.c:124 src/gtk.c:561
+#: src/controlpad.c:125 src/gtk.c:758
 msgid "Number:"
 msgstr "Numara:"
 
-#: src/controlpad.c:144 src/gtk.c:212 src/gtk.c:331 src/gtk.c:408
-#: src/gtksettings.c:571 src/llcheck.c:422
+#: src/controlpad.c:145 src/gtk.c:388 src/gtk.c:508 src/gtk.c:592
+#: src/gtksettings.c:611 src/llcheck.c:350
 msgid "OK"
 msgstr "Tamam"
 
-#: src/controlpad.c:157 src/gtksettings.c:616 src/session.c:68
+#: src/controlpad.c:158 src/gtksettings.c:656 src/session.c:73
 msgid "Cancel"
 msgstr "İptal"
 
-#: src/controlpad.c:315
+#: src/controlpad.c:316
 msgid "Backspace"
 msgstr "Geri al"
 
-#: src/controlpad.c:315
+#: src/controlpad.c:316
 msgid "Preset 1"
 msgstr "Önkurum 1"
 
-#: src/controlpad.c:316
+#: src/controlpad.c:317
 msgid "Clear Number"
 msgstr "Numarayı Sil"
 
-#: src/controlpad.c:316
+#: src/controlpad.c:317
 msgid "Preset 2"
 msgstr "Önkurum 2"
 
-#: src/controlpad.c:317
+#: src/controlpad.c:318
 msgid "Redial"
 msgstr "Yeniden Ara"
 
-#: src/controlpad.c:317
+#: src/controlpad.c:318
 msgid "Preset 3"
 msgstr "Önkurum 3"
 
-#: src/controlpad.c:318
+#: src/controlpad.c:319
 msgid "Mute Microphone"
 msgstr "Mikrofonu Sessizleştir"
 
-#: src/controlpad.c:318
+#: src/controlpad.c:319
 msgid "Preset 4"
 msgstr "Önkurum 4"
 
-#: src/controlpad.c:351
+#: src/controlpad.c:352
 msgid "Control"
 msgstr "Kontrol"
 
-#: src/controlpad.c:423
+#: src/controlpad.c:424
 msgid "Recording"
 msgstr "Kayıt"
 
-#: src/controlpad.c:434
+#: src/controlpad.c:435 src/controlpad.c:446
 msgid "Record to file"
 msgstr "Dosyaya kayıt"
 
-#: src/controlpad.c:445
+#: src/controlpad.c:455
 msgid "Record local channel"
 msgstr "Yerel kanalları kaydet"
 
-#: src/controlpad.c:456
+#: src/controlpad.c:466
 msgid "Record remote channel"
 msgstr "Uzak kanalları kaydet"
 
-#: src/gtk.c:230 src/gtksettings.c:229
+#: src/gtk.c:406 src/gtksettings.c:257
 msgid "ANT Note"
 msgstr "ANT Notu"
 
-#: src/gtk.c:231
+#: src/gtk.c:407
 msgid ""
 "Can't open audio device.\n"
 "Please stop other applications using\n"
@@ -248,72 +266,64 @@ msgstr ""
 "aygıt ayarlarını kontrol edin\n"
 "ve tekrar deneyin."
 
-#: src/gtk.c:260
+#: src/gtk.c:437
 msgid "Sound input device:"
 msgstr "Ses girdi aygıtı:"
 
-#: src/gtk.c:261
+#: src/gtk.c:438
 msgid "Input speed:"
 msgstr "Girdi hızı:"
 
-#: src/gtk.c:261 src/gtk.c:264 src/gtk.c:265 src/gtk.c:267 src/gtk.c:271
-#: src/gtk.c:274 src/gtk.c:275 src/gtk.c:277
+#: src/gtk.c:438 src/gtk.c:441 src/gtk.c:442 src/gtk.c:444 src/gtk.c:448
+#: src/gtk.c:451 src/gtk.c:452 src/gtk.c:454
 msgid "[inactive]"
 msgstr "[etkin değil]"
 
-#: src/gtk.c:263
+#: src/gtk.c:440
 msgid "Input sample size (bits):"
 msgstr "Girdi örnek boyu (bit):"
 
-#: src/gtk.c:265 src/gtk.c:275
+#: src/gtk.c:442 src/gtk.c:452
 msgid "Input fragment size (samples):"
 msgstr "Girdi parçacık boyu (örnek):"
 
-#: src/gtk.c:267
+#: src/gtk.c:444
 msgid "Input channels:"
 msgstr "Girdi kanalları:"
 
-#: src/gtk.c:270
+#: src/gtk.c:447
 msgid "Sound output device:"
 msgstr "Ses çıktı aygıtı:"
 
-#: src/gtk.c:271
+#: src/gtk.c:448
 msgid "Output speed:"
 msgstr "Çıktı hızı:"
 
-#: src/gtk.c:273
+#: src/gtk.c:450
 msgid "Output sample size (bits):"
 msgstr "Çıktı örnek boyu (bit):"
 
-#: src/gtk.c:277
+#: src/gtk.c:454
 msgid "Output channels:"
 msgstr "Çıktı kanalları:"
 
-#: src/gtk.c:280
-msgid "ISDN device:"
-msgstr "ISDN aygıtı:"
-
-#: src/gtk.c:281
+#: src/gtk.c:458
 msgid "ISDN speed (samples):"
 msgstr "ISDN hızı (örnekler):"
 
-#: src/gtk.c:282
+#: src/gtk.c:459
 msgid "ISDN sample size (bits):"
 msgstr "ISDN örnek boyu (bit):"
 
-#: src/gtk.c:283
-msgid "ISDN fragment size (bytes):"
-msgstr "ISDN parçacık boyu (bayt):"
-
-#: src/gtk.c:295
+#: src/gtk.c:472
 msgid "ANT Info"
 msgstr "ANT Bilgi"
 
-#: src/gtk.c:366
+#: src/gtk.c:550
 msgid "About ANT"
 msgstr "ANT hakkında"
 
-#: src/gtk.c:382
+#: src/gtk.c:566
 #, c-format
 msgid ""
 "ANT (ANT is Not a Telephone) Version %s\n"
@@ -346,11 +356,11 @@ msgstr ""
 "http://www.antcom.de/\n"
 "E-Posta Listesi: ant-phone-devel@nongnu.org"
 
-#: src/gtk.c:420
+#: src/gtk.c:606
 msgid "ANT License"
 msgstr "ANT Lisansı"
 
-#: src/gtk.c:421
+#: src/gtk.c:607
 msgid ""
 "ANT (ANT is Not a Telephone)\n"
 "Copyright (C) 2002, 2003 Roland Stigge\n"
@@ -386,183 +396,195 @@ msgstr ""
 "olacaksınız; yoksa Free Software Foundation, Inc., 59 Temple Place\n"
 "Suite 330, Boston, MA  02111-1307, USA. adresinden isteyebilirsiniz."
 
-#: src/gtk.c:454
+#: src/gtk.c:635
 msgid "/Phon_e"
 msgstr "/Telefon_"
 
-#: src/gtk.c:455
+#: src/gtk.c:636
 msgid "/Phone/_Info Window"
 msgstr "/Telefon/_Bilgi Penceresi"
 
-#: src/gtk.c:456 src/gtk.c:504
+#: src/gtk.c:637 src/gtk.c:685
 msgid "/Phone/_Line Level Check"
 msgstr "/Telefon/_Seviye Tespit Kontrolu"
 
-#: src/gtk.c:458
+#: src/gtk.c:639
 msgid "/Phone/"
 msgstr "/Telefon/"
 
-#: src/gtk.c:459
+#: src/gtk.c:640
 msgid "/Phone/_Quit"
 msgstr "/Telefon/_Vazgeçiş"
 
-#: src/gtk.c:461
+#: src/gtk.c:642
 msgid "/_View"
 msgstr "/_Görüntü"
 
-#: src/gtk.c:462 src/gtk.c:492
+#: src/gtk.c:643 src/gtk.c:673
 msgid "/View/_Caller ID Monitor"
 msgstr "/Görüntü/_Çağıran Birim Monitörü"
 
-#: src/gtk.c:464 src/gtk.c:495
+#: src/gtk.c:645 src/gtk.c:676
 msgid "/View/_Line Level Meters"
 msgstr "/Görüntü/_Satır Seviyesi Ölçümü"
 
-#: src/gtk.c:466 src/gtk.c:498
+#: src/gtk.c:647 src/gtk.c:679
 msgid "/View/Control _Pad"
 msgstr "/Görüntü/Kontrol_Yüzey"
 
-#: src/gtk.c:468
+#: src/gtk.c:649
 msgid "/_Options"
 msgstr "/_Seçenekler"
 
-#: src/gtk.c:469 src/gtk.c:501
+#: src/gtk.c:650 src/gtk.c:682
 msgid "/Options/_Settings"
 msgstr "/Seçenekler/_Ayarlar"
 
-#: src/gtk.c:471
+#: src/gtk.c:652
 msgid "/_Help"
 msgstr "/_Yardım"
 
-#: src/gtk.c:472
+#: src/gtk.c:653
 msgid "/Help/_About"
 msgstr "/Yardım/_Hakkında"
 
-#: src/gtk.c:473
+#: src/gtk.c:654
 msgid "/Help/_License"
 msgstr "/Yardım/_Lisans"
 
-#: src/gtk.c:551 src/gtksettings.c:431 src/session.c:68
+#: src/gtk.c:730 src/gtksettings.c:467 src/session.c:73
 msgid "Dialing"
 msgstr "Bağlantı"
 
-#: src/gtk.c:783 src/gtk.c:784
+#: src/gtk.c:825 src/session.c:71 src/session.c:72
+msgid "Answer"
+msgstr "Cevap ver"
+
+#: src/gtk.c:875 src/session.c:71 src/session.c:72
+msgid "Reject"
+msgstr "Reddet"
+
+#: src/gtk.c:1026 src/gtk.c:1027
 msgid "MUTED"
 msgstr "SESSİZ"
 
-#: src/gtksettings.c:230
+#: src/gtk.c:1057
+msgid "Ant ISDN Telephone"
+msgstr ""
+
+#: src/gtksettings.c:258
 msgid "Bad isdn/sound device settings, please try again."
 msgstr "Kötü isdn/SES aygıtı ayarları, lütfen tekrar deneyin"
 
-#: src/gtksettings.c:293
+#: src/gtksettings.c:329
 msgid "ANT Settings"
 msgstr "ANT Ayarları"
 
-#: src/gtksettings.c:306
+#: src/gtksettings.c:342
 msgid "Application"
 msgstr "Uygulamalar"
 
-#: src/gtksettings.c:308
+#: src/gtksettings.c:344
 msgid "Options"
 msgstr "Seçenekler"
 
-#: src/gtksettings.c:320
+#: src/gtksettings.c:356
 msgid "Save options on exit"
 msgstr "Çıkışta seçenekleri kaydedin"
 
-#: src/gtksettings.c:327
+#: src/gtksettings.c:363
 msgid "Popup main window on incoming call"
 msgstr "Gelen aramada ana pencereyi açar"
 
-#: src/gtksettings.c:333
+#: src/gtksettings.c:369
 msgid "Execute on incoming call:"
 msgstr "Gelen aramada çalıştırılır:"
 
-#: src/gtksettings.c:344
+#: src/gtksettings.c:380
 msgid "Recording Format"
 msgstr "Kayıt Biçemi"
 
-#: src/gtksettings.c:354
+#: src/gtksettings.c:390
 msgid "Microsoft WAV, uLaw"
 msgstr "Microsoft WAV, uLaw"
 
-#: src/gtksettings.c:364
+#: src/gtksettings.c:400
 msgid "Microsoft WAV, 16-bit signed"
 msgstr "Microsoft WAV, signed 16 bit "
 
-#: src/gtksettings.c:374
+#: src/gtksettings.c:410
 msgid "Apple/SGI AIFF, uLaw"
 msgstr "Apple/SGI AIFF, uLaw"
 
-#: src/gtksettings.c:384
+#: src/gtksettings.c:420
 msgid "Apple/SGI AIFF, 16-bit signed"
 msgstr "Apple/SGI AIFF, signed 16 bit"
 
-#: src/gtksettings.c:397
+#: src/gtksettings.c:433
 msgid "Phone"
 msgstr "Telefon"
 
-#: src/gtksettings.c:399
+#: src/gtksettings.c:435
 msgid "ISDN"
 msgstr "ISDN"
 
-#: src/gtksettings.c:411
+#: src/gtksettings.c:447
 msgid "Identifying MSN:"
 msgstr "MSN'i tanımlama:"
 
-#: src/gtksettings.c:421
+#: src/gtksettings.c:457
 msgid "Listen to MSNs:"
 msgstr "MSN'leri dinleyin:"
 
-#: src/gtksettings.c:443
+#: src/gtksettings.c:479
 msgid "Dial history size:"
 msgstr "Arama tarihçe boyutu:"
 
-#: src/gtksettings.c:467
+#: src/gtksettings.c:503
 msgid "Maximum CID rows:"
 msgstr "Maksimum CID satırı:"
 
-#: src/gtksettings.c:475 src/gtksettings.c:503
+#: src/gtksettings.c:511 src/gtksettings.c:539
 msgid "[no limit]"
 msgstr "[sınırsız]"
 
-#: src/gtksettings.c:484
+#: src/gtksettings.c:520
 msgid "Read isdnlog data on startup"
 msgstr "isdn kütük bilgisini başlangıçta okur"
 
-#: src/gtksettings.c:491
+#: src/gtksettings.c:527
 msgid "Maximum days to read from isdnlog:"
 msgstr "Isdn kütüğünden okunacak maksimum gün sayısı:"
 
-#: src/gtksettings.c:520
+#: src/gtksettings.c:556
 msgid "Sound Devices"
 msgstr "Ses Aygıtları"
 
-#: src/gtksettings.c:522
-msgid "OSS"
-msgstr "OSS"
+#: src/gtksettings.c:558
+msgid "ALSA"
+msgstr ""
 
-#: src/gtksettings.c:534
+#: src/gtksettings.c:570
 msgid "Input sound device:"
 msgstr "Girdi ses aygıtı:"
 
-#: src/gtksettings.c:546
+#: src/gtksettings.c:584
 msgid "Output sound device:"
 msgstr "Çıktı ses aygıtı:"
 
-#: src/gtksettings.c:559
+#: src/gtksettings.c:599
 msgid "Release unused devices"
 msgstr "Kullanılmayan aygıtları serbest bırakır"
 
-#: src/gtksettings.c:609
+#: src/gtksettings.c:649
 msgid "Save"
 msgstr "Kaydet"
 
-#: src/llcheck.c:371
+#: src/llcheck.c:299
 msgid "Line Level Check"
 msgstr "Ses Seviye Kontrolü"
 
-#: src/llcheck.c:383
+#: src/llcheck.c:311
 msgid ""
 "Please check the line input level\n"
 "and adjust it using your favorite\n"
@@ -576,87 +598,160 @@ msgstr ""
 "ayarlayın. Ses çıktısını kontrol etmek için\n"
 "bir ses çalabilirsiniz."
 
-#: src/llcheck.c:405
+#: src/llcheck.c:333
 msgid "Play sound"
 msgstr "Ses çalar"
 
-#: src/session.c:65
+#: src/session.c:70
 msgid "Ready"
 msgstr "Hazır"
 
-#: src/session.c:65
+#: src/session.c:70
 msgid "Dial"
 msgstr "Bağlan"
 
-#: src/session.c:65 src/session.c:69 src/session.c:70
+#: src/session.c:70 src/session.c:74 src/session.c:75
 msgid "Hang up"
 msgstr "Telefonu kapa"
 
-#: src/session.c:66 src/session.c:67
+#: src/session.c:71 src/session.c:72
 msgid "RING"
 msgstr "ÇAL"
 
-#: src/session.c:66 src/session.c:67
-msgid "Answer"
-msgstr "Cevap ver"
-
-#: src/session.c:66 src/session.c:67
-msgid "Reject"
-msgstr "Reddet"
-
-#: src/session.c:68 src/session.c:69 src/session.c:70 src/session.c:71
+#: src/session.c:73 src/session.c:74 src/session.c:75 src/session.c:76
 msgid "Pick up"
 msgstr "Telefonu aç"
 
-#: src/session.c:69
+#: src/session.c:74
 msgid "B-Channel open"
 msgstr "B kanalı açık"
 
-#: src/session.c:70
+#: src/session.c:75
 msgid "Setup"
 msgstr "Ayarlar"
 
-#: src/session.c:71
+#: src/session.c:76
 msgid "Playback"
 msgstr "Bantkaydı"
 
-#: src/session.c:71
+#: src/session.c:76
 msgid "Stop"
 msgstr "Dur"
 
-#: src/session.c:377
+#: src/session.c:551 src/session.c:552 src/session.c:1117
+#, fuzzy
+msgid "(no caller ID)"
+msgstr "Arayan Bilgisi"
+
+#: src/session.c:556
+#, c-format
+msgid "<b>Call from: %s</b>"
+msgstr ""
+
+#: src/session.c:636 src/session.c:1652
+msgid "(ABORTED)"
+msgstr "(DURDURULDU)"
+
+#: src/session.c:717
 #, c-format
 msgid "Preset %d"
 msgstr "%d'yi önkurun"
 
-#: src/session.c:699
-msgid "(HW ERROR)"
+#: src/session.c:985
+#, fuzzy
+msgid "ERROR"
 msgstr "(HW HATASI)"
 
-#: src/session.c:1000
+#: src/session.c:992
+msgid "PROTOCOL ERROR"
+msgstr ""
+
+#: src/session.c:997
+msgid "WRONG NUMBER"
+msgstr ""
+
+#: src/session.c:1002
+msgid "NO ROUTE"
+msgstr ""
+
+#: src/session.c:1012
+msgid "CHANNEL UNAVAILABLE"
+msgstr ""
+
+#: src/session.c:1016
+#, fuzzy
+msgid "BUSY"
+msgstr "(MEŞGUL)"
+
+#: src/session.c:1021
+msgid "NO ANSWER"
+msgstr ""
+
+#: src/session.c:1025
+#, fuzzy
+msgid "REJECTED"
+msgstr "(REDDEDİLDİ)"
+
+#: src/session.c:1029
+msgid "NUMBER CHANGED"
+msgstr ""
+
+#: src/session.c:1033
+msgid "DISCONNECT"
+msgstr ""
+
+#: src/session.c:1037
+msgid "REMOTE FAILURE"
+msgstr ""
+
+#: src/session.c:1042
+#, fuzzy
+msgid "NETWORK ERROR"
+msgstr "(HW HATASI)"
+
+#: src/session.c:1048
+msgid "SERVICE UNAVAILABLE"
+msgstr ""
+
+#: src/session.c:1053
+msgid "NOT SUBSCRIBED"
+msgstr ""
+
+#: src/session.c:1061
+msgid "NOT IMPLEMENTED"
+msgstr ""
+
+#: src/session.c:1065
+msgid "NOT COMPATIBLE"
+msgstr ""
+
+#: src/session.c:1094
+msgid "(MISSED)"
+msgstr ""
+
+#: src/session.c:1519
 msgid "Audio OFF"
 msgstr "Ses kapalı"
 
-#: src/session.c:1000
+#: src/session.c:1519
 msgid "Audio ON"
 msgstr "Ses açık"
 
-#: src/session.c:1097
-msgid "(BUSY)"
-msgstr "(MEŞGUL)"
-
-#: src/session.c:1103
-msgid "(TIMEOUT)"
-msgstr "(ZAMAN AŞIMI)"
-
-#: src/session.c:1139
-msgid "(RUNG)"
-msgstr "(ÇALMIŞ)"
-
-#: src/session.c:1381
-msgid "(ABORTED)"
-msgstr "(DURDURULDU)"
-
-#: src/session.c:1389
+#: src/session.c:1657
 msgid "(REJECTED)"
 msgstr "(REDDEDİLDİ)"
+
+#~ msgid "OSS"
+#~ msgstr "OSS"
+
+#~ msgid "ISDN device:"
+#~ msgstr "ISDN aygıtı:"
+
+#~ msgid "ISDN fragment size (bytes):"
+#~ msgstr "ISDN parçacık boyu (bayt):"
+
+#~ msgid "(TIMEOUT)"
+#~ msgstr "(ZAMAN AŞIMI)"
+
+#~ msgid "(RUNG)"
+#~ msgstr "(ÇALMIŞ)"
