@@ -1,0 +1,735 @@
+# Finnish messages for ant-phone.
+# Copyright © 2008 Roland Stigge (msgids)
+# This file is distributed under the same license as the ant-phone package.
+# Jorma Karvonen <karvonen.jorma@gmail.com>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ant-phone 0.2.1\n"
+"Report-Msgid-Bugs-To: stigge@antcom.de\n"
+"POT-Creation-Date: 2008-02-03 20:51+0100\n"
+"PO-Revision-Date: 2010-08-27 17:00+0200\n"
+"Last-Translator: Jorma Karvonen <karvonen.jorma@gmail.com>\n"
+"Language-Team: Finnish <translation-team-fi@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/ant-phone.c:172
+#, c-format
+msgid ""
+"Usage: %s [OPTION...]\n"
+"\n"
+"Options:\n"
+"  -h, --help              Show this help message\n"
+"  -v, --version           Print version information\n"
+"  -r, --cleanup           Remove stale socket file (left by accident by\n"
+"                            previous run)\n"
+"  -d, --debug[=level]     Print additional runtime debugging data to stdout\n"
+"                            level = 1..4\n"
+"  -i, --soundin=DEVICE    ALSA device name for input (recording),\n"
+"                            default: \"default\"\n"
+"  -o, --soundout=DEVICE   ALSA device name for output (playback),\n"
+"                            default: \"default\"\n"
+"  -m, --msn=MSN           identifying MSN (for outgoing calls), 0 for master\n"
+"                          MSN of this termination/port\n"
+"                            default: 0\n"
+"  -l, --msns=MSNS         MSNs to listen on, semicolon-separated list or '*'\n"
+"                            default: *\n"
+"  -c, --call=NUMBER       Call specified number\n"
+"  -s, --sleep             Put ISDN thread to sleep (to be able to remove CAPI\n"
+"                            modules before suspending the computer).\n"
+"  -w, --wakeup            Restart ISDN thread after sleep.\n"
+"\n"
+"Note: If arguments of --soundin and --soundout are equal, a full duplex\n"
+"      sound device is needed.\n"
+msgstr ""
+"Käyttö: %s [VALITSIN...]\n"
+"\n"
+"Valitsimet:\n"
+"  -h, --help              Näytä tämä opasteviesti\n"
+"  -v, --version           Tulosta versiotiedot\n"
+"  -r, --cleanup           Poista käytetty pistoketiedosto (edellisen suorituksen\n"
+"                            vahingossa jättämä)\n"
+"  -d, --debug[=taso]     Tulosta lisäajoaikaista vianjäljitystietoa vakiotulosteeseen\n"
+"                            taso = 1..4\n"
+"  -i, --soundin=LAITE     ALSA-laitenimi syötettä varten (äänitys),\n"
+"                            oletus: \"default\"\n"
+"  -o, --soundout=LAITE    ALSA-laitenimi tulostetta varten (toisto),\n"
+"                            oletus: \"default\"\n"
+"  -m, --msn=MSN           tunnistetaan MSN (lähteville puheluille), 0 tämän päätteen/\n"
+"                          portin MSN\n"
+"                            oletus: 0\n"
+"  -l, --msns=MSNS         Kuunneltavat MSN-yhteydet, puolipisteellä eroteltu luettelo\n"
+"                            tai '*'\n"
+"                            oletus: *\n"
+"  -c, --call=NUMERO       Kutsukohtainen numero\n"
+"  -s, --sleep             Laita ISDN-säie nukkumaan (jotta CAPI-moduulit\n"
+"                            voidaan poistaa ennen tietokoneen keskeytystä).\n"
+"  -w, --wakeup            Käynnistä ISDN-säie uudelleen nukkumisen jälkeen.\n"
+"\n"
+"Huomaa: Jos valitsimen --soundin ja --soundout argumentit ovat samat, tarvitaan\n"
+"      kaksisuuntainen äänilaite.\n"
+
+#: src/ant-phone.c:226
+#, c-format
+msgid "Calling %s... "
+msgstr "Kutsutaan %s..."
+
+#: src/ant-phone.c:230 src/ant-phone.c:239 src/ant-phone.c:248
+#, c-format
+msgid "successful.\n"
+msgstr "onnistui.\n"
+
+#: src/ant-phone.c:235
+#, c-format
+msgid "Suspending ISDN thread... "
+msgstr "Keskeytetään ISDN-säie..."
+
+#: src/ant-phone.c:244
+#, c-format
+msgid "Waking up ISDN thread... "
+msgstr "Herätetään ISDN-säie..."
+
+#: src/callerid.c:131
+msgid "Delete Entry"
+msgstr "Poista käyttäjä"
+
+#: src/callerid.c:143
+msgid ""
+"Are you sure you want to\n"
+"delete this entry?"
+msgstr ""
+"Oletko varma, että haluat\n"
+"poistaa tämän käyttäjän?"
+
+#: src/callerid.c:148
+msgid "Delete recording"
+msgstr "Poista äänitys"
+
+#: src/callerid.c:283
+#, c-format
+msgid "Enter the base filename for %s file"
+msgstr "Kirjoita perustiedostonimi %s-tiedostolle"
+
+#: src/callerid.c:329
+msgid "Do you really want to delete this recording?"
+msgstr "Haluatko todella poistaa tämän äänityksen?"
+
+#: src/callerid.c:353 src/callerid.c:381
+msgid "/_Call"
+msgstr "/_Puhelu"
+
+#: src/callerid.c:354 src/callerid.c:385
+msgid "/_Playback"
+msgstr "/_Toisto"
+
+#: src/callerid.c:355 src/callerid.c:389
+msgid "/_Save as..."
+msgstr "/Tallenna _nimellä..."
+
+#: src/callerid.c:356 src/callerid.c:393
+msgid "/Delete _Recording"
+msgstr "/Poist_a äänitys"
+
+#: src/callerid.c:358 src/callerid.c:397
+msgid "/_Delete Row"
+msgstr "/P_oista rivi"
+
+#: src/callerid.c:449 src/gtksettings.c:491
+msgid "Caller ID"
+msgstr "Soittajan puhelinnumero"
+
+#: src/callerid.c:452
+msgid "Date/Time"
+msgstr "Päivämäärä/Aika"
+
+#: src/callerid.c:453
+msgid "Type"
+msgstr "Tyyppi"
+
+#: src/callerid.c:454
+msgid "From"
+msgstr "Numerosta"
+
+#: src/callerid.c:455
+msgid "To"
+msgstr "Numeroon"
+
+#: src/callerid.c:456
+msgid "Duration"
+msgstr "Kesto"
+
+#: src/callerid.c:783
+msgid "(UNKNOWN)"
+msgstr "(TUNTEMATON)"
+
+#: src/callerid.c:852
+#, c-format
+msgid "ANT: %d unanswered"
+msgstr "ANT: %d vastaamatonta"
+
+#: src/controlpad.c:102
+#, c-format
+msgid "Preset %c"
+msgstr "Esiasetus %c"
+
+#: src/controlpad.c:109
+#, c-format
+msgid "Please input new preset data for button %c:"
+msgstr "Syötä uudet esiasetustiedot painikkeelle %c:"
+
+#: src/controlpad.c:122
+msgid "Name:"
+msgstr "Nimi:"
+
+#: src/controlpad.c:125 src/gtk.c:758
+msgid "Number:"
+msgstr "Numero:"
+
+#: src/controlpad.c:145 src/gtk.c:388 src/gtk.c:508 src/gtk.c:592
+#: src/gtksettings.c:611 src/llcheck.c:350
+msgid "OK"
+msgstr "Valmis"
+
+#: src/controlpad.c:158 src/gtksettings.c:656 src/session.c:73
+msgid "Cancel"
+msgstr "Peru"
+
+#: src/controlpad.c:316
+msgid "Backspace"
+msgstr "Paluunäppäin"
+
+#: src/controlpad.c:316
+msgid "Preset 1"
+msgstr "Esiasetus 1"
+
+#: src/controlpad.c:317
+msgid "Clear Number"
+msgstr "Nollaa numero"
+
+#: src/controlpad.c:317
+msgid "Preset 2"
+msgstr "Esiasetus 2"
+
+#: src/controlpad.c:318
+msgid "Redial"
+msgstr "Valitse uudelleen"
+
+#: src/controlpad.c:318
+msgid "Preset 3"
+msgstr "Esiasetus 3"
+
+#: src/controlpad.c:319
+msgid "Mute Microphone"
+msgstr "Mykistä mikrofoni"
+
+#: src/controlpad.c:319
+msgid "Preset 4"
+msgstr "Esiasetus 4"
+
+#: src/controlpad.c:352
+msgid "Control"
+msgstr "Ohjaus"
+
+#: src/controlpad.c:424
+msgid "Recording"
+msgstr "Äänitys"
+
+#: src/controlpad.c:435 src/controlpad.c:446
+msgid "Record to file"
+msgstr "Äänitä tiedostoon"
+
+#: src/controlpad.c:455
+msgid "Record local channel"
+msgstr "Äänitä paikallinen kanava"
+
+#: src/controlpad.c:466
+msgid "Record remote channel"
+msgstr "Äänitä etäkanava"
+
+#: src/gtk.c:406 src/gtksettings.c:257
+msgid "ANT Note"
+msgstr "ANT-ilmoitus"
+
+#: src/gtk.c:407
+msgid ""
+"Can't open audio device.\n"
+"Please stop other applications using\n"
+"the audio device(s) or check your\n"
+"device settings and try again."
+msgstr ""
+"Ei voida avata audiolaitetta.\n"
+"Pysäytä muut audiolaitetta käyttävät\n"
+"sovellukset tai tarkista laitteesi\n"
+"asetukset ja yritä uudelleen."
+
+#: src/gtk.c:437
+msgid "Sound input device:"
+msgstr "Äänisyötelaite:"
+
+#: src/gtk.c:438
+msgid "Input speed:"
+msgstr "Syötenopeus:"
+
+#: src/gtk.c:438 src/gtk.c:441 src/gtk.c:442 src/gtk.c:444 src/gtk.c:448
+#: src/gtk.c:451 src/gtk.c:452 src/gtk.c:454
+msgid "[inactive]"
+msgstr "[ei käytössä]"
+
+#: src/gtk.c:440
+msgid "Input sample size (bits):"
+msgstr "Syötenäytekoko (bittiä):"
+
+#: src/gtk.c:442 src/gtk.c:452
+msgid "Input fragment size (samples):"
+msgstr "Syötepalakoko (näytteet):"
+
+#: src/gtk.c:444
+msgid "Input channels:"
+msgstr "Syötekanavat:"
+
+#: src/gtk.c:447
+msgid "Sound output device:"
+msgstr "Äänitulostelaite:"
+
+#: src/gtk.c:448
+msgid "Output speed:"
+msgstr "Tulostenopeus:"
+
+#: src/gtk.c:450
+msgid "Output sample size (bits):"
+msgstr "Tulostenäytekoko (bittiä):"
+
+#: src/gtk.c:454
+msgid "Output channels:"
+msgstr "Tulostekavanat:"
+
+#: src/gtk.c:458
+msgid "ISDN speed (samples):"
+msgstr "ISDN-nopeus (näytteet):"
+
+#: src/gtk.c:459
+msgid "ISDN sample size (bits):"
+msgstr "ISDN-näytekoko (bittiä):"
+
+#: src/gtk.c:472
+msgid "ANT Info"
+msgstr "ANT-tiedot"
+
+#: src/gtk.c:550
+msgid "About ANT"
+msgstr "Ohjelmasta ANT"
+
+#: src/gtk.c:566
+#, c-format
+msgid ""
+"ANT (ANT is Not a Telephone) Version %s\n"
+"Copyright 2002, 2003 Roland Stigge\n"
+"\n"
+"This is an ISDN telephone application\n"
+"written for GNU/Linux and ISDN4Linux for\n"
+"communicating via a full duplex soundcard (or\n"
+"multiple sound devices if you like) and an\n"
+"audio capable ISDN4Linux ISDN device\n"
+"\n"
+"Contact:\n"
+"Roland Stigge, stigge@antcom.de\n"
+"http://www.antcom.de/\n"
+"Mailing list: ant-phone-devel@nongnu.org"
+msgstr ""
+"ANT (ANT is Not a Telephone) Versio %s\n"
+"Copyright 2002, 2003 Roland Stigge\n"
+"\n"
+"Tämä on ISDN-puhelisovellus, joka on\n"
+"kirjoitettu GNU/Linux- ja ISDN4Linux-viestintään\n"
+"kaksisuuntaisen äänikortin kautta (tai\n"
+"useiden äänilaitteiden kautta, jos haluat) ja\n"
+"on äänikelpoinen ISDN4Linux ISDN-laite\n"
+"\n"
+"Yhteydenotot:\n"
+"Roland Stigge, stigge@antcom.de\n"
+"http://www.antcom.de/\n"
+"Postituslista: ant-phone-devel@nongnu.org"
+
+#: src/gtk.c:606
+msgid "ANT License"
+msgstr "ANT-lisenssi"
+
+#: src/gtk.c:607
+msgid ""
+"ANT (ANT is Not a Telephone)\n"
+"Copyright (C) 2002, 2003 Roland Stigge\n"
+"\n"
+"This program is free software; you can redistribute it and/or\n"
+"modify it under the terms of the GNU General Public License\n"
+"as published by the Free Software Foundation; either version 2\n"
+"of the License, or (at your option) any later version.\n"
+"\n"
+"This program is distributed in the hope that it will be useful,\n"
+"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+"GNU General Public License for more details.\n"
+"\n"
+"You should have received a copy of the GNU General Public License\n"
+"along with this program; if not, write to the Free Software\n"
+"Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
+msgstr ""
+"ANT (ANT is Not a Telephone)\n"
+"Copyright © 2002, 2003 Roland Stigge\n"
+"\n"
+"Tämä ohjelma on ilmainen; voit jakaa sitä edelleen ja/tai muokata sitä\n"
+"Free Software Foundation julkaisemien GNU General Public License-lisenssin\n"
+"version 2, tai (valintasi mukaan) minkä tahansa myöhäisemmän version\n"
+"ehtojen mukaisesti.\n"
+"\n"
+"Tätä ohjelmaa levitetään toivossa, että se on hyödyllinen, mutta\n"
+"ILMAN MITÄÄN TAKUUTA; ilman edes viitattua takuuta KAUPALLISUUDESTA\n"
+"tai SOPIVUUDESTA TIETTYYN TARKOITUKSEEN. Katso yksityiskohdat\n"
+"GNU General Public License-ehdoista.\n"
+"\n"
+"Sinun pitäisi vastaanottaa kopion GNU General Public Licence-lisenssistä\n"
+"tämän ohjelman mukana. Jos näin ei ole, kirjoita osoitteeseen Free Software\n"
+"Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
+
+#: src/gtk.c:635
+msgid "/Phon_e"
+msgstr "/Puh_elin"
+
+#: src/gtk.c:636
+msgid "/Phone/_Info Window"
+msgstr "/Puhelin/T_ietoikkuna"
+
+#: src/gtk.c:637 src/gtk.c:685
+msgid "/Phone/_Line Level Check"
+msgstr "/Puhelin/_Linjatasotarkistus"
+
+#: src/gtk.c:639
+msgid "/Phone/"
+msgstr "/Puhelin/"
+
+#: src/gtk.c:640
+msgid "/Phone/_Quit"
+msgstr "/Puhelin/_Poistu"
+
+#: src/gtk.c:642
+msgid "/_View"
+msgstr "/_Näkymä"
+
+#: src/gtk.c:643 src/gtk.c:673
+msgid "/View/_Caller ID Monitor"
+msgstr "/Näkymä/K_utsujantunnuksen valvonta"
+
+#: src/gtk.c:645 src/gtk.c:676
+msgid "/View/_Line Level Meters"
+msgstr "/Näkymä/_Linjatasomittarit"
+
+#: src/gtk.c:647 src/gtk.c:679
+msgid "/View/Control _Pad"
+msgstr "/Näkymä/Ohja_usalusta"
+
+#: src/gtk.c:649
+msgid "/_Options"
+msgstr "/_Valitsimet"
+
+#: src/gtk.c:650 src/gtk.c:682
+msgid "/Options/_Settings"
+msgstr "/Valitsimet/A_setukset"
+
+#: src/gtk.c:652
+msgid "/_Help"
+msgstr "/_Opaste"
+
+#: src/gtk.c:653
+msgid "/Help/_About"
+msgstr "/Opaste/O_hjelmasta"
+
+#: src/gtk.c:654
+msgid "/Help/_License"
+msgstr "/Opaste/_Lisenssi"
+
+#: src/gtk.c:730 src/gtksettings.c:467 src/session.c:73
+msgid "Dialing"
+msgstr "Valitaan"
+
+#: src/gtk.c:825 src/session.c:71 src/session.c:72
+msgid "Answer"
+msgstr "Vastaus"
+
+#: src/gtk.c:875 src/session.c:71 src/session.c:72
+msgid "Reject"
+msgstr "Hylkää"
+
+#: src/gtk.c:1026 src/gtk.c:1027
+msgid "MUTED"
+msgstr "MYKISTETTY"
+
+#: src/gtk.c:1057
+msgid "Ant ISDN Telephone"
+msgstr "Ant ISDN-puhelin"
+
+#: src/gtksettings.c:258
+msgid "Bad isdn/sound device settings, please try again."
+msgstr "Väärät isdn/äänilaiteasetukset, yritä uudelleen."
+
+#: src/gtksettings.c:329
+msgid "ANT Settings"
+msgstr "ANT-asetukset"
+
+#: src/gtksettings.c:342
+msgid "Application"
+msgstr "Sovellus"
+
+#: src/gtksettings.c:344
+msgid "Options"
+msgstr "Valitsimet"
+
+#: src/gtksettings.c:356
+msgid "Save options on exit"
+msgstr "Tallenna valitsimet poistuttaessa"
+
+#: src/gtksettings.c:363
+msgid "Popup main window on incoming call"
+msgstr "Ponnahduspääikkuna tuleville puheluille"
+
+#: src/gtksettings.c:369
+msgid "Execute on incoming call:"
+msgstr "Suoritetaan tuleva puhelu:"
+
+#: src/gtksettings.c:380
+msgid "Recording Format"
+msgstr "Äänitysmuoto"
+
+#: src/gtksettings.c:390
+msgid "Microsoft WAV, uLaw"
+msgstr "Microsoft WAV, uLaw"
+
+#: src/gtksettings.c:400
+msgid "Microsoft WAV, 16-bit signed"
+msgstr "Microsoft WAV, 16-bittinen etumerkillinen"
+
+#: src/gtksettings.c:410
+msgid "Apple/SGI AIFF, uLaw"
+msgstr "Apple/SGI AIFF, uLaw"
+
+#: src/gtksettings.c:420
+msgid "Apple/SGI AIFF, 16-bit signed"
+msgstr "Apple/SGI AIFF, 16-bittinen etumerkillinen"
+
+#: src/gtksettings.c:433
+msgid "Phone"
+msgstr "Puhelin"
+
+#: src/gtksettings.c:435
+msgid "ISDN"
+msgstr "ISDN"
+
+#: src/gtksettings.c:447
+msgid "Identifying MSN:"
+msgstr "Tunnistetaan MSN:"
+
+#: src/gtksettings.c:457
+msgid "Listen to MSNs:"
+msgstr "Kuunnellaan MSN-yhteyksiä:"
+
+#: src/gtksettings.c:479
+msgid "Dial history size:"
+msgstr "Valintahistorian koko:"
+
+#  Tässä olen arvannut, että CID on lyhenne sanoista Caller ID.
+#: src/gtksettings.c:503
+msgid "Maximum CID rows:"
+msgstr "Enimmäismäärä soittajanumerorivejä:"
+
+#: src/gtksettings.c:511 src/gtksettings.c:539
+msgid "[no limit]"
+msgstr "[ei rajaa]"
+
+#: src/gtksettings.c:520
+msgid "Read isdnlog data on startup"
+msgstr "Lue isdn-lokitiedot käynnistymisen yhteydessä"
+
+#: src/gtksettings.c:527
+msgid "Maximum days to read from isdnlog:"
+msgstr "Enimmäispäivät lukea isdn-lokista:"
+
+#: src/gtksettings.c:556
+msgid "Sound Devices"
+msgstr "Äänilaitteet"
+
+#: src/gtksettings.c:558
+msgid "ALSA"
+msgstr "ALSA"
+
+#: src/gtksettings.c:570
+msgid "Input sound device:"
+msgstr "Syöteäänilaite:"
+
+#: src/gtksettings.c:584
+msgid "Output sound device:"
+msgstr "Tulosteäänilaite:"
+
+#: src/gtksettings.c:599
+msgid "Release unused devices"
+msgstr "Vapauta käyttämättömät laitteet"
+
+#: src/gtksettings.c:649
+msgid "Save"
+msgstr "Tallenna"
+
+#: src/llcheck.c:299
+msgid "Line Level Check"
+msgstr "Linjatasotarkistus"
+
+#: src/llcheck.c:311
+msgid ""
+"Please check the line input level\n"
+"and adjust it using your favorite\n"
+"mixer application.\n"
+"You can also play a sound\n"
+"to test the sound output."
+msgstr ""
+"Tarkista linjan syöttötaso ja\n"
+"säädä sitä käyttäen mieleistäsi\n"
+"sekoitinsovellusta.\n"
+"Voit myös soittaa äänen, jos\n"
+"haluat testata äänitulosteen."
+
+#: src/llcheck.c:333
+msgid "Play sound"
+msgstr "Soita ääntä"
+
+#: src/session.c:70
+msgid "Ready"
+msgstr "Valmis"
+
+#: src/session.c:70
+msgid "Dial"
+msgstr "Valitse"
+
+#: src/session.c:70 src/session.c:74 src/session.c:75
+msgid "Hang up"
+msgstr "Sulje puhelin"
+
+#: src/session.c:71 src/session.c:72
+msgid "RING"
+msgstr "SOITA"
+
+#: src/session.c:73 src/session.c:74 src/session.c:75 src/session.c:76
+msgid "Pick up"
+msgstr "Nosta kuuloke"
+
+#: src/session.c:74
+msgid "B-Channel open"
+msgstr "B-kanava avoin"
+
+#: src/session.c:75
+msgid "Setup"
+msgstr "Asetukset"
+
+#: src/session.c:76
+msgid "Playback"
+msgstr "Toisto"
+
+#: src/session.c:76
+msgid "Stop"
+msgstr "Pysäytä"
+
+#: src/session.c:551 src/session.c:552 src/session.c:1117
+msgid "(no caller ID)"
+msgstr "(ei soittajanumeroa)"
+
+#: src/session.c:556
+#, c-format
+msgid "<b>Call from: %s</b>"
+msgstr "<b>Soitto numerosta: %s</b>"
+
+#: src/session.c:636 src/session.c:1652
+msgid "(ABORTED)"
+msgstr "(KESKEYTETTY)"
+
+#: src/session.c:717
+#, c-format
+msgid "Preset %d"
+msgstr "Esiasetus %d"
+
+#: src/session.c:985
+msgid "ERROR"
+msgstr "VIRHE"
+
+#: src/session.c:992
+msgid "PROTOCOL ERROR"
+msgstr "YHTEYSKÄYTÄNTÖVIRHE"
+
+#: src/session.c:997
+msgid "WRONG NUMBER"
+msgstr "VÄÄRÄ NUMERO"
+
+#: src/session.c:1002
+msgid "NO ROUTE"
+msgstr "EI REITTIÄ"
+
+#: src/session.c:1012
+msgid "CHANNEL UNAVAILABLE"
+msgstr "KANAVA EI OLE KÄYTETTÄVISSÄ"
+
+#: src/session.c:1016
+msgid "BUSY"
+msgstr "VARATTU"
+
+#: src/session.c:1021
+msgid "NO ANSWER"
+msgstr "EI VASTAUSTA"
+
+#: src/session.c:1025
+msgid "REJECTED"
+msgstr "HYLÄTTY"
+
+#: src/session.c:1029
+msgid "NUMBER CHANGED"
+msgstr "NUMERO ON MUUTTUNUT"
+
+#: src/session.c:1033
+msgid "DISCONNECT"
+msgstr "YHTEYS KATKAISTU"
+
+#: src/session.c:1037
+msgid "REMOTE FAILURE"
+msgstr "ETÄVIRHE"
+
+#: src/session.c:1042
+msgid "NETWORK ERROR"
+msgstr "VERKKOVIRHE"
+
+#: src/session.c:1048
+msgid "SERVICE UNAVAILABLE"
+msgstr "PALVELU EI OLE KÄYTETTÄVISSÄ"
+
+#: src/session.c:1053
+msgid "NOT SUBSCRIBED"
+msgstr "EI TILATTU"
+
+#: src/session.c:1061
+msgid "NOT IMPLEMENTED"
+msgstr "EI TOTEUTETTU"
+
+#: src/session.c:1065
+msgid "NOT COMPATIBLE"
+msgstr "EI YHTEENSOPIVA"
+
+#: src/session.c:1094
+msgid "(MISSED)"
+msgstr "(EPÄONNISTUI)"
+
+#: src/session.c:1519
+msgid "Audio OFF"
+msgstr "Ääni pois"
+
+#: src/session.c:1519
+msgid "Audio ON"
+msgstr "Ääni päällä"
+
+#: src/session.c:1657
+msgid "(REJECTED)"
+msgstr "(TORJUTTU)"
