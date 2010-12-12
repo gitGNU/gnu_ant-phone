@@ -73,7 +73,9 @@ struct state_data_t state_data[STATE_NUMBER] = {
 {N_("Dialing"),       N_("Pick up"),0,N_("Cancel"), 1},/* STATE_DIALING       */
 {N_("B-Channel open"),N_("Pick up"),0,N_("Hang up"),1},/* STATE_CONVERSATION  */
 {N_("Setup"),         N_("Pick up"),0,N_("Hang up"),0},/* STATE_SERVICE       */
-{N_("Playback"),      N_("Pick up"),0,N_("Stop")   ,1} /* STATE_PLAYBACK      */
+{N_("Playback"),      N_("Pick up"),0,
+	                              /* TRANSLATORS: A Stop button (like playback) */
+                                      N_("Stop")   ,1} /* STATE_PLAYBACK      */
 };
 
 /*!
@@ -1649,11 +1651,13 @@ void gtk_handle_hang_up_button(GtkWidget *widget _U_, gpointer data)
   case STATE_READY: /* we are already in command mode */
     break;
   case STATE_DIALING:/* abort dialing */
+    /* TRANSLATORS: A status info about an aborted phone call */
     session->hangup_reason = _("(ABORTED)");
     isdn_hangup(&session->isdn);
     break;
   case STATE_RINGING: /* reject call */
   case STATE_RINGING_QUIET: /* reject call */
+    /* TRANSLATORS: A status info about an aborted phone call */
     session->hangup_reason = _("(REJECTED)");
     isdn_hangup(&session->isdn);
     break;

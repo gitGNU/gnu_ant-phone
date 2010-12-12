@@ -128,6 +128,7 @@ static void cid_request_delete(GtkWidget *widget _U_, gpointer data,
   GtkWidget* checkbutton;
   char *filename = cid_get_record_filename(session, row);
   
+  /* TRANSLATORS: A separate Dialog with Cancel/OK option */
   GtkWidget* dialog = gtk_dialog_new_with_buttons(_("Delete Entry"),
                          GTK_WINDOW(session->main_window),
 			 GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
@@ -145,6 +146,7 @@ static void cid_request_delete(GtkWidget *widget _U_, gpointer data,
   gtk_box_pack_start_defaults(GTK_BOX(vbox), label);
   gtk_widget_show(label);
 
+  /* TRANSLATORS: A button label */
   checkbutton = gtk_check_button_new_with_label(_("Delete recording"));
   if (filename) { /* default: checked */
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(checkbutton), TRUE);
