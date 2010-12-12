@@ -1,0 +1,730 @@
+# Czech translations for ant-phone package.
+# Copyright (C) 2010 Roland Stigge (msgids)
+# This file is distributed under the same license as the ant-phone package.
+# Marek Černocký <marek@manet.cz>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ant-phone 0.2.1\n"
+"Report-Msgid-Bugs-To: stigge@antcom.de\n"
+"POT-Creation-Date: 2008-02-03 20:51+0100\n"
+"PO-Revision-Date: 2010-10-11 05:13+0200\n"
+"Last-Translator: Marek Černocký <marek@manet.cz>\n"
+"Language-Team: Czech <translation-team-cs@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: cs\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+#: src/ant-phone.c:172
+#, c-format
+msgid ""
+"Usage: %s [OPTION...]\n"
+"\n"
+"Options:\n"
+"  -h, --help              Show this help message\n"
+"  -v, --version           Print version information\n"
+"  -r, --cleanup           Remove stale socket file (left by accident by\n"
+"                            previous run)\n"
+"  -d, --debug[=level]     Print additional runtime debugging data to stdout\n"
+"                            level = 1..4\n"
+"  -i, --soundin=DEVICE    ALSA device name for input (recording),\n"
+"                            default: \"default\"\n"
+"  -o, --soundout=DEVICE   ALSA device name for output (playback),\n"
+"                            default: \"default\"\n"
+"  -m, --msn=MSN           identifying MSN (for outgoing calls), 0 for master\n"
+"                          MSN of this termination/port\n"
+"                            default: 0\n"
+"  -l, --msns=MSNS         MSNs to listen on, semicolon-separated list or '*'\n"
+"                            default: *\n"
+"  -c, --call=NUMBER       Call specified number\n"
+"  -s, --sleep             Put ISDN thread to sleep (to be able to remove CAPI\n"
+"                            modules before suspending the computer).\n"
+"  -w, --wakeup            Restart ISDN thread after sleep.\n"
+"\n"
+"Note: If arguments of --soundin and --soundout are equal, a full duplex\n"
+"      sound device is needed.\n"
+msgstr ""
+"Použití: %s [PŘEPÍNAČE…]\n"
+"\n"
+"Přepínače:\n"
+"  -h, --help               Zobrazit tuto nápovědu\n"
+"  -v, --version            Vypsat informace o verzi\n"
+"  -r, --cleanup            Odstranit prošlý soubor soketu (ponechaný nechtěně z předchozího spuštění)\n"
+"  -d, --debug[=ÚROVEŇ]     Vypisovat na standardní výstup ladicí informace,\n"
+"                             úroveň = 1…4\n"
+"  -i, --soundin=ZAŘÍZENÍ   Název zařízení ALSA pro vstup (záznam),\n"
+"                             výchozí: „výchozí“\n"
+"  -o, --soundout=ZAŘÍZENÍ  Název zařízení ALSA pro výstup (přehrávání),\n"
+"                             výchozí: „výchozí“\n"
+"  -m, --msn=MSN            Identifikující MSN (pro odchozí volání), 0 pro hlavní MSN zakončení/portu,\n"
+"                             výchozí: 0\n"
+"  -l, --msns=MSNS          Na kterých MSN naslouchat, středníky oddělený seznam nebo  „*“,\n"
+"                             výchozí: *\n"
+"  -c, --call=ČÍSLO         Volat uvedené číslo\n"
+"  -s, --sleep              Uspat vlákno ISDN (aby bylo možné odebrat moduly CAPI před uspáním počítače)\n"
+"  -w, --wakeup             Po spánku restartovat vlákno ISDN\n"
+"\n"
+"Poznámka: Pokud jsou --soundin a --soundout stejné, je zapotřebí zvukové zařízení s plným duplexem.\n"
+
+#: src/ant-phone.c:226
+#, c-format
+msgid "Calling %s... "
+msgstr "Volá se %s… "
+
+#: src/ant-phone.c:230 src/ant-phone.c:239 src/ant-phone.c:248
+#, c-format
+msgid "successful.\n"
+msgstr "úspěšné.\n"
+
+#: src/ant-phone.c:235
+#, c-format
+msgid "Suspending ISDN thread... "
+msgstr "Uspává se vlákno ISDN… "
+
+#: src/ant-phone.c:244
+#, c-format
+msgid "Waking up ISDN thread... "
+msgstr "Probouzí se vlákno ISDN… "
+
+#: src/callerid.c:131
+msgid "Delete Entry"
+msgstr "Smazání položky"
+
+#: src/callerid.c:143
+msgid ""
+"Are you sure you want to\n"
+"delete this entry?"
+msgstr ""
+"Opravdu chcete smazat\n"
+"tuto položku?"
+
+#: src/callerid.c:148
+msgid "Delete recording"
+msgstr "Smazat záznam"
+
+#: src/callerid.c:283
+#, c-format
+msgid "Enter the base filename for %s file"
+msgstr "Zadejte základní název pro soubor %s"
+
+#: src/callerid.c:329
+msgid "Do you really want to delete this recording?"
+msgstr "Skutečně chcete smazat tento záznam?"
+
+#: src/callerid.c:353 src/callerid.c:381
+msgid "/_Call"
+msgstr "/_Volat"
+
+#: src/callerid.c:354 src/callerid.c:385
+msgid "/_Playback"
+msgstr "/_Přehrát"
+
+#: src/callerid.c:355 src/callerid.c:389
+msgid "/_Save as..."
+msgstr "/Uložit _jako…"
+
+#: src/callerid.c:356 src/callerid.c:393
+msgid "/Delete _Recording"
+msgstr "/Smazat _záznam"
+
+#: src/callerid.c:358 src/callerid.c:397
+msgid "/_Delete Row"
+msgstr "/Smazat řá_dek"
+
+#: src/callerid.c:449 src/gtksettings.c:491
+msgid "Caller ID"
+msgstr "ID volajícího"
+
+#: src/callerid.c:452
+msgid "Date/Time"
+msgstr "Datum/čas"
+
+#: src/callerid.c:453
+msgid "Type"
+msgstr "Typ"
+
+#: src/callerid.c:454
+msgid "From"
+msgstr "Odkud"
+
+#: src/callerid.c:455
+msgid "To"
+msgstr "Kam"
+
+#: src/callerid.c:456
+msgid "Duration"
+msgstr "Délka"
+
+#: src/callerid.c:783
+msgid "(UNKNOWN)"
+msgstr "(NEZNÁMÉ)"
+
+#: src/callerid.c:852
+#, c-format
+msgid "ANT: %d unanswered"
+msgstr "ANT: %d zmeškaných"
+
+#: src/controlpad.c:102
+#, c-format
+msgid "Preset %c"
+msgstr "Předvolba %c"
+
+#: src/controlpad.c:109
+#, c-format
+msgid "Please input new preset data for button %c:"
+msgstr "Vložte prosím údaje pro novou předvolbu tlačítka %c:"
+
+#: src/controlpad.c:122
+msgid "Name:"
+msgstr "Jméno:"
+
+#: src/controlpad.c:125 src/gtk.c:758
+msgid "Number:"
+msgstr "Číslo:"
+
+#: src/controlpad.c:145 src/gtk.c:388 src/gtk.c:508 src/gtk.c:592
+#: src/gtksettings.c:611 src/llcheck.c:350
+msgid "OK"
+msgstr "OK"
+
+#: src/controlpad.c:158 src/gtksettings.c:656 src/session.c:73
+msgid "Cancel"
+msgstr "Zrušit"
+
+#: src/controlpad.c:316
+msgid "Backspace"
+msgstr "Smazat znak"
+
+#: src/controlpad.c:316
+msgid "Preset 1"
+msgstr "Předvolba 1"
+
+#: src/controlpad.c:317
+msgid "Clear Number"
+msgstr "Smazat číslo"
+
+#: src/controlpad.c:317
+msgid "Preset 2"
+msgstr "Předvolba 2"
+
+#: src/controlpad.c:318
+msgid "Redial"
+msgstr "Vytočit znovu"
+
+#: src/controlpad.c:318
+msgid "Preset 3"
+msgstr "Předvolba 3"
+
+#: src/controlpad.c:319
+msgid "Mute Microphone"
+msgstr "Vypnout mikrofon"
+
+#: src/controlpad.c:319
+msgid "Preset 4"
+msgstr "Předvolba 4"
+
+#: src/controlpad.c:352
+msgid "Control"
+msgstr "Ovládání"
+
+#: src/controlpad.c:424
+msgid "Recording"
+msgstr "Záznam"
+
+#: src/controlpad.c:435 src/controlpad.c:446
+msgid "Record to file"
+msgstr "Zaznamenávat do souboru"
+
+#: src/controlpad.c:455
+msgid "Record local channel"
+msgstr "Zaznamenávat tuto stranu"
+
+#: src/controlpad.c:466
+msgid "Record remote channel"
+msgstr "Zaznamenávat druhou stranu"
+
+#: src/gtk.c:406 src/gtksettings.c:257
+msgid "ANT Note"
+msgstr "Upozornění ANT"
+
+#: src/gtk.c:407
+msgid ""
+"Can't open audio device.\n"
+"Please stop other applications using\n"
+"the audio device(s) or check your\n"
+"device settings and try again."
+msgstr ""
+"Nelze otevřít zvukové zařízení.\n"
+"Zastavte prosím ostatní aplikace používající\n"
+"zvukové zařízení nebo zkontrolujte své \n"
+"nastavení a zkuste to znovu."
+
+#: src/gtk.c:437
+msgid "Sound input device:"
+msgstr "Vstupní zvukové zařízení:"
+
+#: src/gtk.c:438
+msgid "Input speed:"
+msgstr "Rychlost vstupu:"
+
+#: src/gtk.c:438 src/gtk.c:441 src/gtk.c:442 src/gtk.c:444 src/gtk.c:448
+#: src/gtk.c:451 src/gtk.c:452 src/gtk.c:454
+msgid "[inactive]"
+msgstr "[neaktivní]"
+
+#: src/gtk.c:440
+msgid "Input sample size (bits):"
+msgstr "Velikost vzorků vstupu (bity):"
+
+#: src/gtk.c:442 src/gtk.c:452
+msgid "Input fragment size (samples):"
+msgstr "Velikost fragmentů vstupu (vzorky):"
+
+#: src/gtk.c:444
+msgid "Input channels:"
+msgstr "Kanály vstupu:"
+
+#: src/gtk.c:447
+msgid "Sound output device:"
+msgstr "Výstupní zvukové zařízení:"
+
+#: src/gtk.c:448
+msgid "Output speed:"
+msgstr "Rychlost výstupu:"
+
+#: src/gtk.c:450
+msgid "Output sample size (bits):"
+msgstr "Velikost vzorků výstupu (bity):"
+
+#: src/gtk.c:454
+msgid "Output channels:"
+msgstr "Kanály výstupu:"
+
+#: src/gtk.c:458
+msgid "ISDN speed (samples):"
+msgstr "Rychlost ISDN (vzorky):"
+
+#: src/gtk.c:459
+msgid "ISDN sample size (bits):"
+msgstr "Velikost vzorků ISDN (bity):"
+
+#: src/gtk.c:472
+msgid "ANT Info"
+msgstr "Informace ANT"
+
+#: src/gtk.c:550
+msgid "About ANT"
+msgstr "O aplikaci ANT"
+
+#: src/gtk.c:566
+#, c-format
+msgid ""
+"ANT (ANT is Not a Telephone) Version %s\n"
+"Copyright 2002, 2003 Roland Stigge\n"
+"\n"
+"This is an ISDN telephone application\n"
+"written for GNU/Linux and ISDN4Linux for\n"
+"communicating via a full duplex soundcard (or\n"
+"multiple sound devices if you like) and an\n"
+"audio capable ISDN4Linux ISDN device\n"
+"\n"
+"Contact:\n"
+"Roland Stigge, stigge@antcom.de\n"
+"http://www.antcom.de/\n"
+"Mailing list: ant-phone-devel@nongnu.org"
+msgstr ""
+"ANT (ANT Není Telefon) verze %s\n"
+"Copyright 2002, 2003 Roland Stigge\n"
+"\n"
+"Jedná se o aplikaci pro telefonii ISDN\n"
+"napsanou pro GNU/Linux a ISDN4Linux pro \n"
+"komunikaci skrze plně duplexní zvukovou kartu\n"
+"(nebo více zvukových zařízení, pokud chcete) a\n"
+"zařízení ISDN podporující zvuk v ISDN4Linux\n"
+"\n"
+"Kontakt:\n"
+"Roland Stigge, stigge@antcom.de\n"
+"http://www.antcom.de/\n"
+"Konference: ant-phone-devel@nongnu.org"
+
+#: src/gtk.c:606
+msgid "ANT License"
+msgstr "Licence ANT"
+
+#: src/gtk.c:607
+msgid ""
+"ANT (ANT is Not a Telephone)\n"
+"Copyright (C) 2002, 2003 Roland Stigge\n"
+"\n"
+"This program is free software; you can redistribute it and/or\n"
+"modify it under the terms of the GNU General Public License\n"
+"as published by the Free Software Foundation; either version 2\n"
+"of the License, or (at your option) any later version.\n"
+"\n"
+"This program is distributed in the hope that it will be useful,\n"
+"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+"GNU General Public License for more details.\n"
+"\n"
+"You should have received a copy of the GNU General Public License\n"
+"along with this program; if not, write to the Free Software\n"
+"Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
+msgstr ""
+"ANT (ANT Není Telefon)\n"
+"Copyright © 2002, 2003 Roland Stigge\n"
+"\n"
+"Tento program je svobodný software: Můžete jej dále šířit a/nebo\n"
+"upravovat za podmínek licence GNU General Public License v podobě,\n"
+"v jaké ji vydala Free Software Foundation, a to buď ve verzi 2 této\n"
+"licence nebo (dle vaší volby) v libovolné novější verzi.\n"
+"\n"
+"Tento program je šířen ve víře, že bude užitečný, ale BEZ JAKÝCHKOLIV\n"
+"ZÁRUK, a to i bez předpokládané záruky na PRODEJNOST nebo\n"
+"VHODNOST PRO KONKRÉTNÍ ÚČEL. Více podrobností najdete přímo\n"
+"v licenci GNU General Public License.\n"
+"\n"
+"Spolu s tímto programem byste měli obdržet kopii licence GNU\n"
+"General Public License. Pokud se tak nestalo, napište na Free Software\n"
+"Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA."
+
+#: src/gtk.c:635
+msgid "/Phon_e"
+msgstr "/T_elefon"
+
+#: src/gtk.c:636
+msgid "/Phone/_Info Window"
+msgstr "/Telefon/_Informační okno"
+
+#: src/gtk.c:637 src/gtk.c:685
+msgid "/Phone/_Line Level Check"
+msgstr "/Telefon/Zkontrolovat úroveň _linky"
+
+#: src/gtk.c:639
+msgid "/Phone/"
+msgstr "/Telefon/"
+
+#: src/gtk.c:640
+msgid "/Phone/_Quit"
+msgstr "/Telefon/U_končit"
+
+#: src/gtk.c:642
+msgid "/_View"
+msgstr "/_Zobrazit"
+
+#: src/gtk.c:643 src/gtk.c:673
+msgid "/View/_Caller ID Monitor"
+msgstr "/Zobrazit/Sledování ID volajícího"
+
+#: src/gtk.c:645 src/gtk.c:676
+msgid "/View/_Line Level Meters"
+msgstr "/Zobrazit/Ukazatele úrovně _linky"
+
+#: src/gtk.c:647 src/gtk.c:679
+msgid "/View/Control _Pad"
+msgstr "/Zobrazit/_Ovládací klávesnici"
+
+#: src/gtk.c:649
+msgid "/_Options"
+msgstr "/V_olby"
+
+#: src/gtk.c:650 src/gtk.c:682
+msgid "/Options/_Settings"
+msgstr "/Volby/Na_stavení"
+
+#: src/gtk.c:652
+msgid "/_Help"
+msgstr "/_Nápověda"
+
+#: src/gtk.c:653
+msgid "/Help/_About"
+msgstr "/Nápověda/O _aplikaci"
+
+#: src/gtk.c:654
+msgid "/Help/_License"
+msgstr "/Nápověda/_Licence"
+
+#: src/gtk.c:730 src/gtksettings.c:467 src/session.c:73
+msgid "Dialing"
+msgstr "Vytáčení"
+
+#: src/gtk.c:825 src/session.c:71 src/session.c:72
+msgid "Answer"
+msgstr "Odpovědět"
+
+#: src/gtk.c:875 src/session.c:71 src/session.c:72
+msgid "Reject"
+msgstr "Odmítnou"
+
+#: src/gtk.c:1026 src/gtk.c:1027
+msgid "MUTED"
+msgstr "ZTIŠENO"
+
+#: src/gtk.c:1057
+msgid "Ant ISDN Telephone"
+msgstr "Telefon ISDN Ant"
+
+#: src/gtksettings.c:258
+msgid "Bad isdn/sound device settings, please try again."
+msgstr "Špatné nastavení zařízení ISDN či zvukového zařízení, zkuste to prosím znovu."
+
+#: src/gtksettings.c:329
+msgid "ANT Settings"
+msgstr "Nastavení ANT"
+
+#: src/gtksettings.c:342
+msgid "Application"
+msgstr "Aplikace"
+
+#: src/gtksettings.c:344
+msgid "Options"
+msgstr "Volby"
+
+#: src/gtksettings.c:356
+msgid "Save options on exit"
+msgstr "Uložit volby při ukončení"
+
+#: src/gtksettings.c:363
+msgid "Popup main window on incoming call"
+msgstr "Zobrazit hlavní okno při příchozím volání"
+
+#: src/gtksettings.c:369
+msgid "Execute on incoming call:"
+msgstr "Spustit při příchozím volání:"
+
+#: src/gtksettings.c:380
+msgid "Recording Format"
+msgstr "Formát záznamu"
+
+#: src/gtksettings.c:390
+msgid "Microsoft WAV, uLaw"
+msgstr "Microsoft WAV, u-LAW"
+
+#: src/gtksettings.c:400
+msgid "Microsoft WAV, 16-bit signed"
+msgstr "Microsoft WAV, 16 bitů se znaménkem"
+
+#: src/gtksettings.c:410
+msgid "Apple/SGI AIFF, uLaw"
+msgstr "Apple/SGI AIFF, u-LAW"
+
+#: src/gtksettings.c:420
+msgid "Apple/SGI AIFF, 16-bit signed"
+msgstr "Apple/SGI AIFF, 16 bitů se znaménkem"
+
+#: src/gtksettings.c:433
+msgid "Phone"
+msgstr "Telefon"
+
+#: src/gtksettings.c:435
+msgid "ISDN"
+msgstr "ISDN"
+
+#: src/gtksettings.c:447
+msgid "Identifying MSN:"
+msgstr "Identifikující MSN:"
+
+#: src/gtksettings.c:457
+msgid "Listen to MSNs:"
+msgstr "Naslouchat na MSN:"
+
+#: src/gtksettings.c:479
+msgid "Dial history size:"
+msgstr "Velikost historie vytáčení:"
+
+#: src/gtksettings.c:503
+msgid "Maximum CID rows:"
+msgstr "Max. řádků s ID volajícího:"
+
+#: src/gtksettings.c:511 src/gtksettings.c:539
+msgid "[no limit]"
+msgstr "[bez omezení]"
+
+#: src/gtksettings.c:520
+msgid "Read isdnlog data on startup"
+msgstr "Při spuštění načíst data evidence ISDN"
+
+#: src/gtksettings.c:527
+msgid "Maximum days to read from isdnlog:"
+msgstr "Max. dní načtených z evidence ISDN:"
+
+#: src/gtksettings.c:556
+msgid "Sound Devices"
+msgstr "Zvuková zařízení"
+
+#: src/gtksettings.c:558
+msgid "ALSA"
+msgstr "ALSA"
+
+#: src/gtksettings.c:570
+msgid "Input sound device:"
+msgstr "Vstupní zvukové zařízení:"
+
+#: src/gtksettings.c:584
+msgid "Output sound device:"
+msgstr "Výstupní zvukové zařízení:"
+
+#: src/gtksettings.c:599
+msgid "Release unused devices"
+msgstr "Uvolnit nepoužívaná zařízení"
+
+#: src/gtksettings.c:649
+msgid "Save"
+msgstr "Uložit"
+
+#: src/llcheck.c:299
+msgid "Line Level Check"
+msgstr "Kontrola úrovně linky"
+
+#: src/llcheck.c:311
+msgid ""
+"Please check the line input level\n"
+"and adjust it using your favorite\n"
+"mixer application.\n"
+"You can also play a sound\n"
+"to test the sound output."
+msgstr ""
+"Zkontrolujte prosím úroveň vstupní\n"
+"linky a upravte ji svojí oblíbenou\n"
+"aplikací na mixování zvuku.\n"
+"Můžete si také přehrát zvuk na\n"
+"otestování zvukového výstupu."
+
+#: src/llcheck.c:333
+msgid "Play sound"
+msgstr "Přehrát zvuk"
+
+#: src/session.c:70
+msgid "Ready"
+msgstr "Připraveno"
+
+#: src/session.c:70
+msgid "Dial"
+msgstr "Vytočit"
+
+#: src/session.c:70 src/session.c:74 src/session.c:75
+msgid "Hang up"
+msgstr "Zavěsit"
+
+#: src/session.c:71 src/session.c:72
+msgid "RING"
+msgstr "ZVONÍ"
+
+#: src/session.c:73 src/session.c:74 src/session.c:75 src/session.c:76
+msgid "Pick up"
+msgstr "Zvednout"
+
+#: src/session.c:74
+msgid "B-Channel open"
+msgstr "Kanál B otevřen"
+
+#: src/session.c:75
+msgid "Setup"
+msgstr "Nastavení"
+
+#: src/session.c:76
+msgid "Playback"
+msgstr "Přehrávání"
+
+#: src/session.c:76
+msgid "Stop"
+msgstr "Zastavit"
+
+#: src/session.c:551 src/session.c:552 src/session.c:1117
+msgid "(no caller ID)"
+msgstr "(potlačené ID volajícího)"
+
+#: src/session.c:556
+#, c-format
+msgid "<b>Call from: %s</b>"
+msgstr "<b>Volání od: %s</b>"
+
+#: src/session.c:636 src/session.c:1652
+msgid "(ABORTED)"
+msgstr "(PŘERUŠENO)"
+
+#: src/session.c:717
+#, c-format
+msgid "Preset %d"
+msgstr "Předvolba %d"
+
+#: src/session.c:985
+msgid "ERROR"
+msgstr "CHYBA"
+
+#: src/session.c:992
+msgid "PROTOCOL ERROR"
+msgstr "CHYBA PROTOKOLU"
+
+#: src/session.c:997
+msgid "WRONG NUMBER"
+msgstr "NESPRÁVNÉ ČÍSLO"
+
+#: src/session.c:1002
+msgid "NO ROUTE"
+msgstr "NELZE NASMĚROVAT"
+
+#: src/session.c:1012
+msgid "CHANNEL UNAVAILABLE"
+msgstr "NEDOSTUPNÝ KANÁL"
+
+#: src/session.c:1016
+msgid "BUSY"
+msgstr "OBSAZENO"
+
+#: src/session.c:1021
+msgid "NO ANSWER"
+msgstr "BEZ ODPOVĚDI"
+
+#: src/session.c:1025
+msgid "REJECTED"
+msgstr "ODMÍTNUTO"
+
+#: src/session.c:1029
+msgid "NUMBER CHANGED"
+msgstr "ČÍSLO ZMĚNĚNO"
+
+#: src/session.c:1033
+msgid "DISCONNECT"
+msgstr "ODPOJENO"
+
+#: src/session.c:1037
+msgid "REMOTE FAILURE"
+msgstr "SELHÁNÍ DRUHÉ STRANY"
+
+#: src/session.c:1042
+msgid "NETWORK ERROR"
+msgstr "CHYBA SÍTĚ"
+
+#: src/session.c:1048
+msgid "SERVICE UNAVAILABLE"
+msgstr "NEDOSTUPNÁ SLUŽBA"
+
+#: src/session.c:1053
+msgid "NOT SUBSCRIBED"
+msgstr "NESCHVÁLENO"
+
+#: src/session.c:1061
+msgid "NOT IMPLEMENTED"
+msgstr "NEIMPLEMENTOVÁNO"
+
+#: src/session.c:1065
+msgid "NOT COMPATIBLE"
+msgstr "NEKOMPATIBILNÍ"
+
+#: src/session.c:1094
+msgid "(MISSED)"
+msgstr "(ZMEŠKÁNO)"
+
+#: src/session.c:1519
+msgid "Audio OFF"
+msgstr "Zvuk VYPNUT"
+
+#: src/session.c:1519
+msgid "Audio ON"
+msgstr "Zvuk ZAPNUT"
+
+#: src/session.c:1657
+msgid "(REJECTED)"
+msgstr "(ODMÍTNUTO)"
