@@ -9,10 +9,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ant-phone-0.2.1\n"
 "Report-Msgid-Bugs-To: stigge@antcom.de\n"
-"POT-Creation-Date: 2008-02-03 20:51+0100\n"
+"POT-Creation-Date: 2012-02-13 14:56+0100\n"
 "PO-Revision-Date: 2009-07-19 11:37+0200\n"
 "Last-Translator: Keld Simonsen <keld@dkuug.dk>\n"
 "Language-Team: Danish <dansk@dansk-gruppen.dk>\n"
+"Language: da\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -35,13 +36,16 @@ msgid ""
 "                            default: \"default\"\n"
 "  -o, --soundout=DEVICE   ALSA device name for output (playback),\n"
 "                            default: \"default\"\n"
-"  -m, --msn=MSN           identifying MSN (for outgoing calls), 0 for master\n"
+"  -m, --msn=MSN           identifying MSN (for outgoing calls), 0 for "
+"master\n"
 "                          MSN of this termination/port\n"
 "                            default: 0\n"
-"  -l, --msns=MSNS         MSNs to listen on, semicolon-separated list or '*'\n"
+"  -l, --msns=MSNS         MSNs to listen on, semicolon-separated list or "
+"'*'\n"
 "                            default: *\n"
 "  -c, --call=NUMBER       Call specified number\n"
-"  -s, --sleep             Put ISDN thread to sleep (to be able to remove CAPI\n"
+"  -s, --sleep             Put ISDN thread to sleep (to be able to remove "
+"CAPI\n"
 "                            modules before suspending the computer).\n"
 "  -w, --wakeup            Restart ISDN thread after sleep.\n"
 "\n"
@@ -53,25 +57,31 @@ msgstr ""
 "Options:\n"
 "  -h, --help              Vis denne hjÃŠlpetekst\n"
 "  -v, --version           Udskriv versionsinformation\n"
-"  -r, --cleanup           Fjern tiloversbleven sokkelfil (efterladt ved et uheld af \n"
+"  -r, --cleanup           Fjern tiloversbleven sokkelfil (efterladt ved et "
+"uheld af \n"
 "                            tidligere kÃžrsel)\n"
-"  -d, --debug[=level]     Udskriv yderligere kÃžrsels fejlsÃžgnings-data data til stdout\n"
+"  -d, --debug[=level]     Udskriv yderligere kÃžrsels fejlsÃžgnings-data "
+"data til stdout\n"
 "                            niveau = 1..4\n"
 "  -i, --soundin=DEVICE    ALSA enhedsnavn for input (optagelse),\n"
 "                            forvalgt: \"default\"\n"
 "  -o, --soundout=DEVICE   ALSA enhedsnavn for output (afspilning),\n"
 "                            forvalgt: \"default\"\n"
-"  -m, --msn=MSN           identificerende MSN (for udgÃ¥ende opkald), 0 for primÃŠr\n"
+"  -m, --msn=MSN           identificerende MSN (for udgÃ¥ende opkald), 0 for "
+"primÃŠr\n"
 "                          MSN for dette endepunkt/port\n"
 "                            forvalgt: 0\n"
-"  -l, --msns=MSNS         MSN'er der skal lyttes pÃ¥, semikolon-separeret liste eller'*'\n"
+"  -l, --msns=MSNS         MSN'er der skal lyttes pÃ¥, semikolon-separeret "
+"liste eller'*'\n"
 "                            forvalgt: *\n"
 "  -c, --call=NUMBER       Opkald til angivet nummer\n"
-"  -s, --sleep             LÃŠg ISDN-trÃ¥d til at sove (for at kunne fjerne CAPI-\n"
+"  -s, --sleep             LÃŠg ISDN-trÃ¥d til at sove (for at kunne fjerne "
+"CAPI-\n"
 "                            moduler fÃžr suspendering af maskinen).\n"
 "  -w, --wakeup            genstart ISDN trÃ¥d efter sÃžvn.\n"
 "\n"
-"Note: Hvis argumenter for --soundin og --soundout er ens, krÃŠves en fuld duplex\n"
+"Note: Hvis argumenter for --soundin og --soundout er ens, krÃŠves en fuld "
+"duplex\n"
 "      lydenhed.\n"
 
 #: src/ant-phone.c:226
@@ -94,11 +104,12 @@ msgstr "Suspenderer ISDN-trÃ¥d..."
 msgid "Waking up ISDN thread... "
 msgstr "VÃŠkker ISDN-trÃ¥d"
 
-#: src/callerid.c:131
+#. TRANSLATORS: A separate Dialog with Cancel/OK option
+#: src/callerid.c:132
 msgid "Delete Entry"
 msgstr "Slet post"
 
-#: src/callerid.c:143
+#: src/callerid.c:144
 msgid ""
 "Are you sure you want to\n"
 "delete this entry?"
@@ -106,69 +117,70 @@ msgstr ""
 "Er du sikker pÃ¥, at du\n"
 "Ãžnsker at slette denne post?"
 
-#: src/callerid.c:148
+#. TRANSLATORS: A button label
+#: src/callerid.c:150
 msgid "Delete recording"
 msgstr "Slet optagelse"
 
 # alternativ bestemt form basefilnavnet
-#: src/callerid.c:283
+#: src/callerid.c:285
 #, c-format
 msgid "Enter the base filename for %s file"
 msgstr "Indtast basefilnavn for %s fil"
 
-#: src/callerid.c:329
+#: src/callerid.c:331
 msgid "Do you really want to delete this recording?"
 msgstr "Ãnsker du virkelig at slette denne optagelse?"
 
-#: src/callerid.c:353 src/callerid.c:381
+#: src/callerid.c:355 src/callerid.c:383
 msgid "/_Call"
 msgstr "/_Opkald"
 
-#: src/callerid.c:354 src/callerid.c:385
+#: src/callerid.c:356 src/callerid.c:387
 msgid "/_Playback"
 msgstr "/_Afspil"
 
-#: src/callerid.c:355 src/callerid.c:389
+#: src/callerid.c:357 src/callerid.c:391
 msgid "/_Save as..."
 msgstr "/_Gem som..."
 
-#: src/callerid.c:356 src/callerid.c:393
+#: src/callerid.c:358 src/callerid.c:395
 msgid "/Delete _Recording"
 msgstr "/Slet _optagelse"
 
-#: src/callerid.c:358 src/callerid.c:397
+#: src/callerid.c:360 src/callerid.c:399
 msgid "/_Delete Row"
 msgstr "/_Slet rÃŠkke"
 
-#: src/callerid.c:449 src/gtksettings.c:491
+#: src/callerid.c:451 src/gtksettings.c:491
 msgid "Caller ID"
 msgstr "Opkalds-id"
 
-#: src/callerid.c:452
+#: src/callerid.c:454
 msgid "Date/Time"
 msgstr "Dato/tid"
 
-#: src/callerid.c:453
+#: src/callerid.c:455
 msgid "Type"
 msgstr "Type"
 
-#: src/callerid.c:454
+#: src/callerid.c:456
 msgid "From"
 msgstr "Fra"
 
-#: src/callerid.c:455
+#: src/callerid.c:457
 msgid "To"
 msgstr "Til"
 
-#: src/callerid.c:456
+#: src/callerid.c:458
 msgid "Duration"
 msgstr "Varighed"
 
-#: src/callerid.c:783
+#: src/callerid.c:785
 msgid "(UNKNOWN)"
 msgstr "(UKENDT)"
 
-#: src/callerid.c:852
+#: src/callerid.c:854
 #, c-format
 msgid "ANT: %d unanswered"
 msgstr "ANT: %d ubesvarede"
@@ -382,11 +394,17 @@ msgstr ""
 "ANT (ANT er ikke en telefon)\n"
 "Ophavsret (C) 2002, 2003 Roland Stigge\n"
 "\n"
-"Dette program er fri software. Du kan redistribuere og/eller modificere det under de betingelserne som er angivet i GNU General Public License, som er udgivet af Free Software Foundation. Enten version 2 af licensen eller (efter eget valg) enhver senere version.\n"
+"Dette program er fri software. Du kan redistribuere og/eller modificere det "
+"under de betingelserne som er angivet i GNU General Public License, som er "
+"udgivet af Free Software Foundation. Enten version 2 af licensen eller "
+"(efter eget valg) enhver senere version.\n"
 "\n"
-"Dette program distribueres i hÃ¥b om, at det vil vise sig nyttigt, men UDEN NOGEN FORM FOR GARANTI, uden selv de underforstÃ¥ede garantier omkring SALGBARHED eller EGNETHED TIL ET BESTEMT FORMÃL. Yderligere detaljer kan lÃŠses i GNU General Public License.\n"
+"Dette program distribueres i hÃ¥b om, at det vil vise sig nyttigt, men UDEN "
+"NOGEN FORM FOR GARANTI, uden selv de underforstÃ¥ede garantier omkring "
+"SALGBARHED eller EGNETHED TIL ET BESTEMT FORMÃL. Yderligere detaljer kan lÃŠses i GNU General Public License.\n"
 "\n"
-"Du skulle have modtaget en kopi af GNU General Public License sammen med dette program. Hvis ikke, sÃ¥ skriv til Free Software Foundation, Inc., \n"
+"Du skulle have modtaget en kopi af GNU General Public License sammen med "
+"dette program. Hvis ikke, sÃ¥ skriv til Free Software Foundation, Inc., \n"
 "59 Temple Place - Suite 330, Boston, MA  02111-1307, USA."
 
 #: src/gtk.c:635
@@ -630,104 +648,107 @@ msgstr "OpsÃŠtning"
 msgid "Playback"
 msgstr "Afspil"
 
-#: src/session.c:76
+#. TRANSLATORS: A Stop button (like playback)
+#: src/session.c:78
 msgid "Stop"
 msgstr "Stop"
 
-#: src/session.c:551 src/session.c:552 src/session.c:1117
+#: src/session.c:553 src/session.c:554 src/session.c:1119
 msgid "(no caller ID)"
 msgstr "(Ingen opkalds-identitet)"
 
-#: src/session.c:556
+#: src/session.c:558
 #, c-format
 msgid "<b>Call from: %s</b>"
 msgstr "<b>Opkald fra %s</b>"
 
-#: src/session.c:636 src/session.c:1652
+#. TRANSLATORS: A status info about an aborted phone call
+#: src/session.c:638 src/session.c:1655
 msgid "(ABORTED)"
 msgstr "(AFBRUDT)"
 
-#: src/session.c:717
+#: src/session.c:719
 #, c-format
 msgid "Preset %d"
 msgstr "Forvalg %d"
 
-#: src/session.c:985
+#: src/session.c:987
 msgid "ERROR"
 msgstr "FEJL"
 
-#: src/session.c:992
+#: src/session.c:994
 msgid "PROTOCOL ERROR"
 msgstr "PROTOKOLFEJL"
 
-#: src/session.c:997
+#: src/session.c:999
 msgid "WRONG NUMBER"
 msgstr "GALT NUMMER"
 
-#: src/session.c:1002
+#: src/session.c:1004
 msgid "NO ROUTE"
 msgstr "INGEN RUTE"
 
-#: src/session.c:1012
+#: src/session.c:1014
 msgid "CHANNEL UNAVAILABLE"
 msgstr "KANAL UTILGÃNGELIG"
 
-#: src/session.c:1016
+#: src/session.c:1018
 msgid "BUSY"
 msgstr "OPTAGET"
 
-#: src/session.c:1021
+#: src/session.c:1023
 msgid "NO ANSWER"
 msgstr "INTET SVAR"
 
-#: src/session.c:1025
+#: src/session.c:1027
 msgid "REJECTED"
 msgstr "AFVIST"
 
-#: src/session.c:1029
+#: src/session.c:1031
 msgid "NUMBER CHANGED"
 msgstr "NUMMER ÃNDRET"
 
-#: src/session.c:1033
+#: src/session.c:1035
 msgid "DISCONNECT"
 msgstr "LÃG PÃ"
 
-#: src/session.c:1037
+#: src/session.c:1039
 msgid "REMOTE FAILURE"
 msgstr "FEJL HOS MODTAGER"
 
-#: src/session.c:1042
+#: src/session.c:1044
 msgid "NETWORK ERROR"
 msgstr "NETVÃRKSFEJL"
 
-#: src/session.c:1048
+#: src/session.c:1050
 msgid "SERVICE UNAVAILABLE"
 msgstr "TJENESTE UTILGÃNGELIG"
 
-#: src/session.c:1053
+#: src/session.c:1055
 msgid "NOT SUBSCRIBED"
 msgstr "ABONNERER IKKE"
 
-#: src/session.c:1061
+#: src/session.c:1063
 msgid "NOT IMPLEMENTED"
 msgstr "IKKE IMPLEMENTERET"
 
-#: src/session.c:1065
+#: src/session.c:1067
 msgid "NOT COMPATIBLE"
 msgstr "IKKE KOMPATIBEL"
 
-#: src/session.c:1094
+#: src/session.c:1096
 msgid "(MISSED)"
 msgstr "(MANGLET)"
 
-#: src/session.c:1519
+#: src/session.c:1521
 msgid "Audio OFF"
 msgstr "Lyd slukket"
 
-#: src/session.c:1519
+#: src/session.c:1521
 msgid "Audio ON"
 msgstr "Lyd tÃŠndt"
 
-#: src/session.c:1657
+#. TRANSLATORS: A status info about an aborted phone call
+#: src/session.c:1661
 msgid "(REJECTED)"
 msgstr "(AFVIST)"

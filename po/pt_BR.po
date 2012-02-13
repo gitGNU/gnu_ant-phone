@@ -15,10 +15,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ant-phone 0.2.1\n"
 "Report-Msgid-Bugs-To: stigge@antcom.de\n"
-"POT-Creation-Date: 2008-02-03 20:51+0100\n"
+"POT-Creation-Date: 2012-02-13 14:56+0100\n"
 "PO-Revision-Date: 2010-03-31 10:04-0300\n"
 "Last-Translator: João Victor Duarte Martins <jvdm@sdf.lonestar.org>\n"
 "Language-Team: Brazilian Portuguese <ldp-br@bazar.conectiva.com.br>\n"
+"Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -39,13 +40,16 @@ msgid ""
 "                            default: \"default\"\n"
 "  -o, --soundout=DEVICE   ALSA device name for output (playback),\n"
 "                            default: \"default\"\n"
-"  -m, --msn=MSN           identifying MSN (for outgoing calls), 0 for master\n"
+"  -m, --msn=MSN           identifying MSN (for outgoing calls), 0 for "
+"master\n"
 "                          MSN of this termination/port\n"
 "                            default: 0\n"
-"  -l, --msns=MSNS         MSNs to listen on, semicolon-separated list or '*'\n"
+"  -l, --msns=MSNS         MSNs to listen on, semicolon-separated list or "
+"'*'\n"
 "                            default: *\n"
 "  -c, --call=NUMBER       Call specified number\n"
-"  -s, --sleep             Put ISDN thread to sleep (to be able to remove CAPI\n"
+"  -s, --sleep             Put ISDN thread to sleep (to be able to remove "
+"CAPI\n"
 "                            modules before suspending the computer).\n"
 "  -w, --wakeup            Restart ISDN thread after sleep.\n"
 "\n"
@@ -59,19 +63,23 @@ msgstr ""
 "  -v, --version           Imprime informação de versão\n"
 "  -r, --cleanup           Remove stale socket file (left by accident by\n"
 "                            previous run)\n"
-"  -d, --debug[=level]     Imprime dados adicionais de depuração na saída padrão\n"
+"  -d, --debug[=level]     Imprime dados adicionais de depuração na saída "
+"padrão\n"
 "                            nível = 1..4\n"
 "  -i, --soundin=DEVICE    Nome do dispositivo ALSA para entrada (gravação)\n"
 "                            escolha automática: \"default\"\n"
 "  -o, --soundout=DEVICE   Nome do dispositivo ALSA para saída (playback),\n"
 "                            escolha automática: \"default\"\n"
-"  -m, --msn=MSN           identifying MSN (for outgoing calls), 0 for master\n"
+"  -m, --msn=MSN           identifying MSN (for outgoing calls), 0 for "
+"master\n"
 "                          MSN of this termination/port\n"
 "                            default: 0\n"
-"  -l, --msns=MSNS         MSNs to listen on, semicolon-separated list or '*'\n"
+"  -l, --msns=MSNS         MSNs to listen on, semicolon-separated list or "
+"'*'\n"
 "                            default: *\n"
 "  -c, --call=NUMBER       Call specified number\n"
-"  -s, --sleep             Put ISDN thread to sleep (to be able to remove CAPI\n"
+"  -s, --sleep             Put ISDN thread to sleep (to be able to remove "
+"CAPI\n"
 "                            modules before suspending the computer).\n"
 "  -w, --wakeup            Restart ISDN thread after sleep.\n"
 "\n"
@@ -100,11 +108,12 @@ msgstr "Suspendendo thread ISDN... "
 msgid "Waking up ISDN thread... "
 msgstr "Acordando thread ISDN... "
 
-#: src/callerid.c:131
+#. TRANSLATORS: A separate Dialog with Cancel/OK option
+#: src/callerid.c:132
 msgid "Delete Entry"
 msgstr "Remover entrada"
 
-#: src/callerid.c:143
+#: src/callerid.c:144
 msgid ""
 "Are you sure you want to\n"
 "delete this entry?"
@@ -113,70 +122,71 @@ msgstr ""
 "remover essa entrada?"
 
 # TODO Verificar se recording nesse contexto é gravação
-#: src/callerid.c:148
+#. TRANSLATORS: A button label
+#: src/callerid.c:150
 msgid "Delete recording"
 msgstr "Removendo gravação"
 
-#: src/callerid.c:283
+#: src/callerid.c:285
 #, c-format
 msgid "Enter the base filename for %s file"
 msgstr "Entre com a nome do arquivo base para o arquivo %s"
 
-#: src/callerid.c:329
+#: src/callerid.c:331
 msgid "Do you really want to delete this recording?"
 msgstr "Tem realmente certeza que quer remover essa gravação?"
 
-#: src/callerid.c:353 src/callerid.c:381
+#: src/callerid.c:355 src/callerid.c:383
 msgid "/_Call"
 msgstr "/_Chamar"
 
 # FIXME Tradução para playback?
-#: src/callerid.c:354 src/callerid.c:385
+#: src/callerid.c:356 src/callerid.c:387
 #, fuzzy
 msgid "/_Playback"
 msgstr "/_Playback"
 
-#: src/callerid.c:355 src/callerid.c:389
+#: src/callerid.c:357 src/callerid.c:391
 msgid "/_Save as..."
 msgstr "/_Salvar como..."
 
-#: src/callerid.c:356 src/callerid.c:393
+#: src/callerid.c:358 src/callerid.c:395
 msgid "/Delete _Recording"
 msgstr "/Remover _Gravação"
 
-#: src/callerid.c:358 src/callerid.c:397
+#: src/callerid.c:360 src/callerid.c:399
 msgid "/_Delete Row"
 msgstr "/_Remover Linha"
 
-#: src/callerid.c:449 src/gtksettings.c:491
+#: src/callerid.c:451 src/gtksettings.c:491
 msgid "Caller ID"
 msgstr "ID de Chamada"
 
-#: src/callerid.c:452
+#: src/callerid.c:454
 msgid "Date/Time"
 msgstr "Data/Hora"
 
-#: src/callerid.c:453
+#: src/callerid.c:455
 msgid "Type"
 msgstr "Tipo"
 
-#: src/callerid.c:454
+#: src/callerid.c:456
 msgid "From"
 msgstr "De"
 
-#: src/callerid.c:455
+#: src/callerid.c:457
 msgid "To"
 msgstr "Para"
 
-#: src/callerid.c:456
+#: src/callerid.c:458
 msgid "Duration"
 msgstr "Duração"
 
-#: src/callerid.c:783
+#: src/callerid.c:785
 msgid "(UNKNOWN)"
 msgstr "(DESCONHECIDA)"
 
-#: src/callerid.c:852
+#: src/callerid.c:854
 #, c-format
 msgid "ANT: %d unanswered"
 msgstr "ANT: %d não atendida"
@@ -489,7 +499,8 @@ msgstr "Telefone ISDN Ant"
 
 #: src/gtksettings.c:258
 msgid "Bad isdn/sound device settings, please try again."
-msgstr "Configuração do dispositivo isdn/audio ruim, por favor tente novamente."
+msgstr ""
+"Configuração do dispositivo isdn/audio ruim, por favor tente novamente."
 
 #: src/gtksettings.c:329
 msgid "ANT Settings"
@@ -653,104 +664,107 @@ msgstr "Configurar"
 msgid "Playback"
 msgstr "Reprodução"
 
-#: src/session.c:76
+#. TRANSLATORS: A Stop button (like playback)
+#: src/session.c:78
 msgid "Stop"
 msgstr "Parar"
 
-#: src/session.c:551 src/session.c:552 src/session.c:1117
+#: src/session.c:553 src/session.c:554 src/session.c:1119
 msgid "(no caller ID)"
 msgstr "(sem ID de chamada)"
 
-#: src/session.c:556
+#: src/session.c:558
 #, c-format
 msgid "<b>Call from: %s</b>"
 msgstr "<b>Chamada de: %s</b>"
 
-#: src/session.c:636 src/session.c:1652
+#. TRANSLATORS: A status info about an aborted phone call
+#: src/session.c:638 src/session.c:1655
 msgid "(ABORTED)"
 msgstr "(ABORTADO)"
 
-#: src/session.c:717
+#: src/session.c:719
 #, c-format
 msgid "Preset %d"
 msgstr "Predefinido %d"
 
-#: src/session.c:985
+#: src/session.c:987
 msgid "ERROR"
 msgstr "ERRO"
 
-#: src/session.c:992
+#: src/session.c:994
 msgid "PROTOCOL ERROR"
 msgstr "ERRO DE PROTOCOLO"
 
-#: src/session.c:997
+#: src/session.c:999
 msgid "WRONG NUMBER"
 msgstr "NÚMERO ERRADO"
 
-#: src/session.c:1002
+#: src/session.c:1004
 msgid "NO ROUTE"
 msgstr "SEM ROTA"
 
-#: src/session.c:1012
+#: src/session.c:1014
 msgid "CHANNEL UNAVAILABLE"
 msgstr "CANAL INDISPONÍVEL"
 
-#: src/session.c:1016
+#: src/session.c:1018
 msgid "BUSY"
 msgstr "OCUPADO"
 
-#: src/session.c:1021
+#: src/session.c:1023
 msgid "NO ANSWER"
 msgstr "SEM RESPOSTA"
 
-#: src/session.c:1025
+#: src/session.c:1027
 msgid "REJECTED"
 msgstr "REJEITADO"
 
-#: src/session.c:1029
+#: src/session.c:1031
 msgid "NUMBER CHANGED"
 msgstr "NÚMERO MUDOU"
 
-#: src/session.c:1033
+#: src/session.c:1035
 msgid "DISCONNECT"
 msgstr "DISCONECTADO"
 
-#: src/session.c:1037
+#: src/session.c:1039
 msgid "REMOTE FAILURE"
 msgstr "FALHA REMOTA"
 
-#: src/session.c:1042
+#: src/session.c:1044
 msgid "NETWORK ERROR"
 msgstr "ERRO DE REDE"
 
-#: src/session.c:1048
+#: src/session.c:1050
 msgid "SERVICE UNAVAILABLE"
 msgstr "SERVIÇO INDISPONÍVEL"
 
-#: src/session.c:1053
+#: src/session.c:1055
 msgid "NOT SUBSCRIBED"
 msgstr "NÃO ESTÁ INSCRITO"
 
-#: src/session.c:1061
+#: src/session.c:1063
 msgid "NOT IMPLEMENTED"
 msgstr "NÃO ESTÁ IMPLEMENTADO"
 
-#: src/session.c:1065
+#: src/session.c:1067
 msgid "NOT COMPATIBLE"
 msgstr "NÃO É COMPATÍVEL"
 
-#: src/session.c:1094
+#: src/session.c:1096
 msgid "(MISSED)"
 msgstr "(PERDIDA)"
 
-#: src/session.c:1519
+#: src/session.c:1521
 msgid "Audio OFF"
 msgstr "Audio Desligado"
 
-#: src/session.c:1519
+#: src/session.c:1521
 msgid "Audio ON"
 msgstr "Audio Ligado"
 
-#: src/session.c:1657
+#. TRANSLATORS: A status info about an aborted phone call
+#: src/session.c:1661
 msgid "(REJECTED)"
 msgstr "(REJEITADO)"

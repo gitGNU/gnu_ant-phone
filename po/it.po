@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ant-phone-0.2.1\n"
 "Report-Msgid-Bugs-To: stigge@antcom.de\n"
-"POT-Creation-Date: 2008-02-03 20:51+0100\n"
+"POT-Creation-Date: 2012-02-13 14:56+0100\n"
 "PO-Revision-Date: 2010-10-25 07:15+0100\n"
 "Last-Translator: Vincenzo Campanella <vinz65@gmail.com>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -34,13 +35,16 @@ msgid ""
 "                            default: \"default\"\n"
 "  -o, --soundout=DEVICE   ALSA device name for output (playback),\n"
 "                            default: \"default\"\n"
-"  -m, --msn=MSN           identifying MSN (for outgoing calls), 0 for master\n"
+"  -m, --msn=MSN           identifying MSN (for outgoing calls), 0 for "
+"master\n"
 "                          MSN of this termination/port\n"
 "                            default: 0\n"
-"  -l, --msns=MSNS         MSNs to listen on, semicolon-separated list or '*'\n"
+"  -l, --msns=MSNS         MSNs to listen on, semicolon-separated list or "
+"'*'\n"
 "                            default: *\n"
 "  -c, --call=NUMBER       Call specified number\n"
-"  -s, --sleep             Put ISDN thread to sleep (to be able to remove CAPI\n"
+"  -s, --sleep             Put ISDN thread to sleep (to be able to remove "
+"CAPI\n"
 "                            modules before suspending the computer).\n"
 "  -w, --wakeup            Restart ISDN thread after sleep.\n"
 "\n"
@@ -52,25 +56,32 @@ msgstr ""
 "Opzioni:\n"
 "  -h, --help              Mostra questo messaggio di aiuto\n"
 "  -v, --version           Mostra le informazioni sulla versione\n"
-"  -r, --cleanup           Rimuove il vecchio file di socket (accidentalmente lasciato da\n"
+"  -r, --cleanup           Rimuove il vecchio file di socket (accidentalmente "
+"lasciato da\n"
 "                            esecuzioni precedenti)\n"
 "  -d, --debug[=LIVELLO]   Invia dati addizionali di debug sullo stdout\n"
 "                            LIVELLO = 1..4\n"
-"  -i, --soundin=PERIF     Nome della PERIFerica ALSA per i dati in ingresso (registrazione),\n"
+"  -i, --soundin=PERIF     Nome della PERIFerica ALSA per i dati in ingresso "
+"(registrazione),\n"
 "                            valore predefinito: «default»\n"
-"  -o, --soundout=PERIF    Nome della PERIFerica ALSA per i dati in uscita (ascolto),\n"
+"  -o, --soundout=PERIF    Nome della PERIFerica ALSA per i dati in uscita "
+"(ascolto),\n"
 "                            valore predefinito: «default»\n"
-"  -m, --msn=MSN           Identificazione MSN (per chiamate in uscita), 0 per il\n"
+"  -m, --msn=MSN           Identificazione MSN (per chiamate in uscita), 0 "
+"per il\n"
 "                            master MSN di questa terminazione/porta\n"
 "                            valore predefinito: 0\n"
-"  -l, --msns=MSNS         MSNS su cui mettersi in ascolto, «*» o elenco separato da «;»\n"
+"  -l, --msns=MSNS         MSNS su cui mettersi in ascolto, «*» o elenco "
+"separato da «;»\n"
 "                            valore predefinito: *\n"
 "  -c, --call=NUMERO       Chiama il NUMERO specificato\n"
-"  -s, --sleep             Mette in pausa il thread di ISDN (per poter rimuovere i moduli CAPI\n"
+"  -s, --sleep             Mette in pausa il thread di ISDN (per poter "
+"rimuovere i moduli CAPI\n"
 "                            prima di mettere il computer in sospensione).\n"
 "  -w, --wakeup            Riavvia il thread ISDN dopo la pausa.\n"
 "\n"
-"Nota: se gli argomenti «--soundin» e «--soundout» sono uguali, è necessaria una scheda audio\n"
+"Nota: se gli argomenti «--soundin» e «--soundout» sono uguali, è necessaria "
+"una scheda audio\n"
 "      full duplex\n"
 
 #: src/ant-phone.c:226
@@ -93,11 +104,12 @@ msgstr "Sospensione del thread ISDN in corso"
 msgid "Waking up ISDN thread... "
 msgstr "Riavvio del thread ISDN in corso"
 
-#: src/callerid.c:131
+#. TRANSLATORS: A separate Dialog with Cancel/OK option
+#: src/callerid.c:132
 msgid "Delete Entry"
 msgstr "Elimina la voce"
 
-#: src/callerid.c:143
+#: src/callerid.c:144
 msgid ""
 "Are you sure you want to\n"
 "delete this entry?"
@@ -105,68 +117,69 @@ msgstr ""
 "Eliminare\n"
 "questa voce?"
 
-#: src/callerid.c:148
+#. TRANSLATORS: A button label
+#: src/callerid.c:150
 msgid "Delete recording"
 msgstr "Elimina la registrazione"
 
-#: src/callerid.c:283
+#: src/callerid.c:285
 #, c-format
 msgid "Enter the base filename for %s file"
 msgstr "Inserire il nome di base del file %s"
 
-#: src/callerid.c:329
+#: src/callerid.c:331
 msgid "Do you really want to delete this recording?"
 msgstr "Eliminare questa registrazione?"
 
-#: src/callerid.c:353 src/callerid.c:381
+#: src/callerid.c:355 src/callerid.c:383
 msgid "/_Call"
 msgstr "/_Chiama"
 
-#: src/callerid.c:354 src/callerid.c:385
+#: src/callerid.c:356 src/callerid.c:387
 msgid "/_Playback"
 msgstr "/Ri_produci"
 
-#: src/callerid.c:355 src/callerid.c:389
+#: src/callerid.c:357 src/callerid.c:391
 msgid "/_Save as..."
 msgstr "/Sa_lva come..."
 
-#: src/callerid.c:356 src/callerid.c:393
+#: src/callerid.c:358 src/callerid.c:395
 msgid "/Delete _Recording"
 msgstr "/Elimina la _registrazione"
 
-#: src/callerid.c:358 src/callerid.c:397
+#: src/callerid.c:360 src/callerid.c:399
 msgid "/_Delete Row"
 msgstr "/Elimi_na la riga"
 
-#: src/callerid.c:449 src/gtksettings.c:491
+#: src/callerid.c:451 src/gtksettings.c:491
 msgid "Caller ID"
 msgstr "ID del chiamante"
 
-#: src/callerid.c:452
+#: src/callerid.c:454
 msgid "Date/Time"
 msgstr "Data/Ora"
 
-#: src/callerid.c:453
+#: src/callerid.c:455
 msgid "Type"
 msgstr "Tipo"
 
-#: src/callerid.c:454
+#: src/callerid.c:456
 msgid "From"
 msgstr "Da"
 
-#: src/callerid.c:455
+#: src/callerid.c:457
 msgid "To"
 msgstr "A"
 
-#: src/callerid.c:456
+#: src/callerid.c:458
 msgid "Duration"
 msgstr "Durata"
 
-#: src/callerid.c:783
+#: src/callerid.c:785
 msgid "(UNKNOWN)"
 msgstr "(SCONOSCIUTO)"
 
-#: src/callerid.c:852
+#: src/callerid.c:854
 #, c-format
 msgid "ANT: %d unanswered"
 msgstr "ANT: %d senza risposta"
@@ -380,17 +393,22 @@ msgstr ""
 "ANT (ANT is Not a Telephone)\n"
 "Copyright © 2002, 2003 Roland Stigge\n"
 "\n"
-"Questo programma è software libero; è possibile ridistribuirlo o modificarlo\n"
+"Questo programma è software libero; è possibile ridistribuirlo o "
+"modificarlo\n"
 "secondo i termini della licenza GNU General Public License, come pubblicata\n"
 "dalla Free Software Foundation, o la versione 2 della licenza, o (a scelta)\n"
 "qualsiasi versione successiva.\n"
 "\n"
-"Questo programma è distribuito nella speranza di essere utile, ma SENZA ALCUNA\n"
-"GARANZIA e senza nemmeno garanzia implicita di NEGOZIABILITÀ o di APPLICABILITÀ\n"
-"PER UN PARTICOLARE SCOPO. Per maggiori dettagli consultare la GNU General Public\n"
+"Questo programma è distribuito nella speranza di essere utile, ma SENZA "
+"ALCUNA\n"
+"GARANZIA e senza nemmeno garanzia implicita di NEGOZIABILITÀ o di "
+"APPLICABILITÀ\n"
+"PER UN PARTICOLARE SCOPO. Per maggiori dettagli consultare la GNU General "
+"Public\n"
 "License.\n"
 "\n"
-"Una copia della GNU General Public License dovrebbe essere stata ricevuta insieme\n"
+"Una copia della GNU General Public License dovrebbe essere stata ricevuta "
+"insieme\n"
 "a questo programma; in caso contrario, scrivere alla Free Software\n"
 "Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA."
 
@@ -632,104 +650,107 @@ msgstr "Impostazioni"
 msgid "Playback"
 msgstr "Riascolta"
 
-#: src/session.c:76
+#. TRANSLATORS: A Stop button (like playback)
+#: src/session.c:78
 msgid "Stop"
 msgstr "Ferma"
 
-#: src/session.c:551 src/session.c:552 src/session.c:1117
+#: src/session.c:553 src/session.c:554 src/session.c:1119
 msgid "(no caller ID)"
 msgstr "(ID del chiamante non disponibile)"
 
-#: src/session.c:556
+#: src/session.c:558
 #, c-format
 msgid "<b>Call from: %s</b>"
 msgstr "<b>Chiamata da: %s</b>"
 
-#: src/session.c:636 src/session.c:1652
+#. TRANSLATORS: A status info about an aborted phone call
+#: src/session.c:638 src/session.c:1655
 msgid "(ABORTED)"
 msgstr "(ANNULLATA)"
 
-#: src/session.c:717
+#: src/session.c:719
 #, c-format
 msgid "Preset %d"
 msgstr "Preselezione %d"
 
-#: src/session.c:985
+#: src/session.c:987
 msgid "ERROR"
 msgstr "ERRORE"
 
-#: src/session.c:992
+#: src/session.c:994
 msgid "PROTOCOL ERROR"
 msgstr "ERRORE DI PROTOCOLLO"
 
-#: src/session.c:997
+#: src/session.c:999
 msgid "WRONG NUMBER"
 msgstr "NUMERO ERRATO"
 
-#: src/session.c:1002
+#: src/session.c:1004
 msgid "NO ROUTE"
 msgstr "NON RAGGIUNGIBILE"
 
-#: src/session.c:1012
+#: src/session.c:1014
 msgid "CHANNEL UNAVAILABLE"
 msgstr "CANALE NON DISPONIBILE"
 
-#: src/session.c:1016
+#: src/session.c:1018
 msgid "BUSY"
 msgstr "OCCUPATO"
 
-#: src/session.c:1021
+#: src/session.c:1023
 msgid "NO ANSWER"
 msgstr "NESSUNA RISPOSTA"
 
-#: src/session.c:1025
+#: src/session.c:1027
 msgid "REJECTED"
 msgstr "RIFIUTATO"
 
-#: src/session.c:1029
+#: src/session.c:1031
 msgid "NUMBER CHANGED"
 msgstr "NUMERO MODIFICATO"
 
-#: src/session.c:1033
+#: src/session.c:1035
 msgid "DISCONNECT"
 msgstr "DISCONNETTI"
 
-#: src/session.c:1037
+#: src/session.c:1039
 msgid "REMOTE FAILURE"
 msgstr "ERRORE REMOTO"
 
-#: src/session.c:1042
+#: src/session.c:1044
 msgid "NETWORK ERROR"
 msgstr "ERRORE DI RETE"
 
-#: src/session.c:1048
+#: src/session.c:1050
 msgid "SERVICE UNAVAILABLE"
 msgstr "SERVIZIO NON DISPONIBILE"
 
-#: src/session.c:1053
+#: src/session.c:1055
 msgid "NOT SUBSCRIBED"
 msgstr "NON SOTTOSCRITTO"
 
-#: src/session.c:1061
+#: src/session.c:1063
 msgid "NOT IMPLEMENTED"
 msgstr "NON IMPLEMENTATO"
 
-#: src/session.c:1065
+#: src/session.c:1067
 msgid "NOT COMPATIBLE"
 msgstr "NON COMPATIBILE"
 
-#: src/session.c:1094
+#: src/session.c:1096
 msgid "(MISSED)"
 msgstr "(MANCATA/E)"
 
-#: src/session.c:1519
+#: src/session.c:1521
 msgid "Audio OFF"
 msgstr "Audio SPENTO"
 
-#: src/session.c:1519
+#: src/session.c:1521
 msgid "Audio ON"
 msgstr "Audio ACCESO"
 
-#: src/session.c:1657
+#. TRANSLATORS: A status info about an aborted phone call
+#: src/session.c:1661
 msgid "(REJECTED)"
 msgstr "(RIFIUTATO)"

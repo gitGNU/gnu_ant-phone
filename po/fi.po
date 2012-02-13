@@ -7,10 +7,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ant-phone 0.2.1\n"
 "Report-Msgid-Bugs-To: stigge@antcom.de\n"
-"POT-Creation-Date: 2008-02-03 20:51+0100\n"
+"POT-Creation-Date: 2012-02-13 14:56+0100\n"
 "PO-Revision-Date: 2010-08-27 17:00+0200\n"
 "Last-Translator: Jorma Karvonen <karvonen.jorma@gmail.com>\n"
 "Language-Team: Finnish <translation-team-fi@lists.sourceforge.net>\n"
+"Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -32,13 +33,16 @@ msgid ""
 "                            default: \"default\"\n"
 "  -o, --soundout=DEVICE   ALSA device name for output (playback),\n"
 "                            default: \"default\"\n"
-"  -m, --msn=MSN           identifying MSN (for outgoing calls), 0 for master\n"
+"  -m, --msn=MSN           identifying MSN (for outgoing calls), 0 for "
+"master\n"
 "                          MSN of this termination/port\n"
 "                            default: 0\n"
-"  -l, --msns=MSNS         MSNs to listen on, semicolon-separated list or '*'\n"
+"  -l, --msns=MSNS         MSNs to listen on, semicolon-separated list or "
+"'*'\n"
 "                            default: *\n"
 "  -c, --call=NUMBER       Call specified number\n"
-"  -s, --sleep             Put ISDN thread to sleep (to be able to remove CAPI\n"
+"  -s, --sleep             Put ISDN thread to sleep (to be able to remove "
+"CAPI\n"
 "                            modules before suspending the computer).\n"
 "  -w, --wakeup            Restart ISDN thread after sleep.\n"
 "\n"
@@ -50,18 +54,22 @@ msgstr ""
 "Valitsimet:\n"
 "  -h, --help              Näytä tämä opasteviesti\n"
 "  -v, --version           Tulosta versiotiedot\n"
-"  -r, --cleanup           Poista käytetty pistoketiedosto (edellisen suorituksen\n"
+"  -r, --cleanup           Poista käytetty pistoketiedosto (edellisen "
+"suorituksen\n"
 "                            vahingossa jättämä)\n"
-"  -d, --debug[=taso]     Tulosta lisäajoaikaista vianjäljitystietoa vakiotulosteeseen\n"
+"  -d, --debug[=taso]     Tulosta lisäajoaikaista vianjäljitystietoa "
+"vakiotulosteeseen\n"
 "                            taso = 1..4\n"
 "  -i, --soundin=LAITE     ALSA-laitenimi syötettä varten (äänitys),\n"
 "                            oletus: \"default\"\n"
 "  -o, --soundout=LAITE    ALSA-laitenimi tulostetta varten (toisto),\n"
 "                            oletus: \"default\"\n"
-"  -m, --msn=MSN           tunnistetaan MSN (lähteville puheluille), 0 tämän päätteen/\n"
+"  -m, --msn=MSN           tunnistetaan MSN (lähteville puheluille), 0 tämän "
+"päätteen/\n"
 "                          portin MSN\n"
 "                            oletus: 0\n"
-"  -l, --msns=MSNS         Kuunneltavat MSN-yhteydet, puolipisteellä eroteltu luettelo\n"
+"  -l, --msns=MSNS         Kuunneltavat MSN-yhteydet, puolipisteellä eroteltu "
+"luettelo\n"
 "                            tai '*'\n"
 "                            oletus: *\n"
 "  -c, --call=NUMERO       Kutsukohtainen numero\n"
@@ -69,7 +77,8 @@ msgstr ""
 "                            voidaan poistaa ennen tietokoneen keskeytystä).\n"
 "  -w, --wakeup            Käynnistä ISDN-säie uudelleen nukkumisen jälkeen.\n"
 "\n"
-"Huomaa: Jos valitsimen --soundin ja --soundout argumentit ovat samat, tarvitaan\n"
+"Huomaa: Jos valitsimen --soundin ja --soundout argumentit ovat samat, "
+"tarvitaan\n"
 "      kaksisuuntainen äänilaite.\n"
 
 #: src/ant-phone.c:226
@@ -92,11 +101,12 @@ msgstr "Keskeytetään ISDN-säie..."
 msgid "Waking up ISDN thread... "
 msgstr "Herätetään ISDN-säie..."
 
-#: src/callerid.c:131
+#. TRANSLATORS: A separate Dialog with Cancel/OK option
+#: src/callerid.c:132
 msgid "Delete Entry"
 msgstr "Poista käyttäjä"
 
-#: src/callerid.c:143
+#: src/callerid.c:144
 msgid ""
 "Are you sure you want to\n"
 "delete this entry?"
@@ -104,68 +114,69 @@ msgstr ""
 "Oletko varma, että haluat\n"
 "poistaa tämän käyttäjän?"
 
-#: src/callerid.c:148
+#. TRANSLATORS: A button label
+#: src/callerid.c:150
 msgid "Delete recording"
 msgstr "Poista äänitys"
 
-#: src/callerid.c:283
+#: src/callerid.c:285
 #, c-format
 msgid "Enter the base filename for %s file"
 msgstr "Kirjoita perustiedostonimi %s-tiedostolle"
 
-#: src/callerid.c:329
+#: src/callerid.c:331
 msgid "Do you really want to delete this recording?"
 msgstr "Haluatko todella poistaa tämän äänityksen?"
 
-#: src/callerid.c:353 src/callerid.c:381
+#: src/callerid.c:355 src/callerid.c:383
 msgid "/_Call"
 msgstr "/_Puhelu"
 
-#: src/callerid.c:354 src/callerid.c:385
+#: src/callerid.c:356 src/callerid.c:387
 msgid "/_Playback"
 msgstr "/_Toisto"
 
-#: src/callerid.c:355 src/callerid.c:389
+#: src/callerid.c:357 src/callerid.c:391
 msgid "/_Save as..."
 msgstr "/Tallenna _nimellä..."
 
-#: src/callerid.c:356 src/callerid.c:393
+#: src/callerid.c:358 src/callerid.c:395
 msgid "/Delete _Recording"
 msgstr "/Poist_a äänitys"
 
-#: src/callerid.c:358 src/callerid.c:397
+#: src/callerid.c:360 src/callerid.c:399
 msgid "/_Delete Row"
 msgstr "/P_oista rivi"
 
-#: src/callerid.c:449 src/gtksettings.c:491
+#: src/callerid.c:451 src/gtksettings.c:491
 msgid "Caller ID"
 msgstr "Soittajan puhelinnumero"
 
-#: src/callerid.c:452
+#: src/callerid.c:454
 msgid "Date/Time"
 msgstr "Päivämäärä/Aika"
 
-#: src/callerid.c:453
+#: src/callerid.c:455
 msgid "Type"
 msgstr "Tyyppi"
 
-#: src/callerid.c:454
+#: src/callerid.c:456
 msgid "From"
 msgstr "Numerosta"
 
-#: src/callerid.c:455
+#: src/callerid.c:457
 msgid "To"
 msgstr "Numeroon"
 
-#: src/callerid.c:456
+#: src/callerid.c:458
 msgid "Duration"
 msgstr "Kesto"
 
-#: src/callerid.c:783
+#: src/callerid.c:785
 msgid "(UNKNOWN)"
 msgstr "(TUNTEMATON)"
 
-#: src/callerid.c:852
+#: src/callerid.c:854
 #, c-format
 msgid "ANT: %d unanswered"
 msgstr "ANT: %d vastaamatonta"
@@ -632,104 +643,107 @@ msgstr "Asetukset"
 msgid "Playback"
 msgstr "Toisto"
 
-#: src/session.c:76
+#. TRANSLATORS: A Stop button (like playback)
+#: src/session.c:78
 msgid "Stop"
 msgstr "Pysäytä"
 
-#: src/session.c:551 src/session.c:552 src/session.c:1117
+#: src/session.c:553 src/session.c:554 src/session.c:1119
 msgid "(no caller ID)"
 msgstr "(ei soittajanumeroa)"
 
-#: src/session.c:556
+#: src/session.c:558
 #, c-format
 msgid "<b>Call from: %s</b>"
 msgstr "<b>Soitto numerosta: %s</b>"
 
-#: src/session.c:636 src/session.c:1652
+#. TRANSLATORS: A status info about an aborted phone call
+#: src/session.c:638 src/session.c:1655
 msgid "(ABORTED)"
 msgstr "(KESKEYTETTY)"
 
-#: src/session.c:717
+#: src/session.c:719
 #, c-format
 msgid "Preset %d"
 msgstr "Esiasetus %d"
 
-#: src/session.c:985
+#: src/session.c:987
 msgid "ERROR"
 msgstr "VIRHE"
 
-#: src/session.c:992
+#: src/session.c:994
 msgid "PROTOCOL ERROR"
 msgstr "YHTEYSKÄYTÄNTÖVIRHE"
 
-#: src/session.c:997
+#: src/session.c:999
 msgid "WRONG NUMBER"
 msgstr "VÄÄRÄ NUMERO"
 
-#: src/session.c:1002
+#: src/session.c:1004
 msgid "NO ROUTE"
 msgstr "EI REITTIÄ"
 
-#: src/session.c:1012
+#: src/session.c:1014
 msgid "CHANNEL UNAVAILABLE"
 msgstr "KANAVA EI OLE KÄYTETTÄVISSÄ"
 
-#: src/session.c:1016
+#: src/session.c:1018
 msgid "BUSY"
 msgstr "VARATTU"
 
-#: src/session.c:1021
+#: src/session.c:1023
 msgid "NO ANSWER"
 msgstr "EI VASTAUSTA"
 
-#: src/session.c:1025
+#: src/session.c:1027
 msgid "REJECTED"
 msgstr "HYLÄTTY"
 
-#: src/session.c:1029
+#: src/session.c:1031
 msgid "NUMBER CHANGED"
 msgstr "NUMERO ON MUUTTUNUT"
 
-#: src/session.c:1033
+#: src/session.c:1035
 msgid "DISCONNECT"
 msgstr "YHTEYS KATKAISTU"
 
-#: src/session.c:1037
+#: src/session.c:1039
 msgid "REMOTE FAILURE"
 msgstr "ETÄVIRHE"
 
-#: src/session.c:1042
+#: src/session.c:1044
 msgid "NETWORK ERROR"
 msgstr "VERKKOVIRHE"
 
-#: src/session.c:1048
+#: src/session.c:1050
 msgid "SERVICE UNAVAILABLE"
 msgstr "PALVELU EI OLE KÄYTETTÄVISSÄ"
 
-#: src/session.c:1053
+#: src/session.c:1055
 msgid "NOT SUBSCRIBED"
 msgstr "EI TILATTU"
 
-#: src/session.c:1061
+#: src/session.c:1063
 msgid "NOT IMPLEMENTED"
 msgstr "EI TOTEUTETTU"
 
-#: src/session.c:1065
+#: src/session.c:1067
 msgid "NOT COMPATIBLE"
 msgstr "EI YHTEENSOPIVA"
 
-#: src/session.c:1094
+#: src/session.c:1096
 msgid "(MISSED)"
 msgstr "(EPÄONNISTUI)"
 
-#: src/session.c:1519
+#: src/session.c:1521
 msgid "Audio OFF"
 msgstr "Ääni pois"
 
-#: src/session.c:1519
+#: src/session.c:1521
 msgid "Audio ON"
 msgstr "Ääni päällä"
 
-#: src/session.c:1657
+#. TRANSLATORS: A status info about an aborted phone call
+#: src/session.c:1661
 msgid "(REJECTED)"
 msgstr "(TORJUTTU)"
