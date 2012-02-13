@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: ant-phone 2.1.0\n"
+"Project-Id-Version: ant-phone 0.2.1\n"
 "Report-Msgid-Bugs-To: stigge@antcom.de\n"
-"POT-Creation-Date: 2012-02-09 11:38+0100\n"
+"POT-Creation-Date: 2012-02-13 14:56+0100\n"
 "PO-Revision-Date: 2012-02-13 14:11+0200\n"
 "Last-Translator: my name <email@address.org>\n"
 "Language-Team: Hebrew <he@li.org>\n"
@@ -32,13 +32,16 @@ msgid ""
 "                            default: \"default\"\n"
 "  -o, --soundout=DEVICE   ALSA device name for output (playback),\n"
 "                            default: \"default\"\n"
-"  -m, --msn=MSN           identifying MSN (for outgoing calls), 0 for master\n"
+"  -m, --msn=MSN           identifying MSN (for outgoing calls), 0 for "
+"master\n"
 "                          MSN of this termination/port\n"
 "                            default: 0\n"
-"  -l, --msns=MSNS         MSNs to listen on, semicolon-separated list or '*'\n"
+"  -l, --msns=MSNS         MSNs to listen on, semicolon-separated list or "
+"'*'\n"
 "                            default: *\n"
 "  -c, --call=NUMBER       Call specified number\n"
-"  -s, --sleep             Put ISDN thread to sleep (to be able to remove CAPI\n"
+"  -s, --sleep             Put ISDN thread to sleep (to be able to remove "
+"CAPI\n"
 "                            modules before suspending the computer).\n"
 "  -w, --wakeup            Restart ISDN thread after sleep.\n"
 "\n"
@@ -51,9 +54,7 @@ msgstr ""
 msgid "Calling %s... "
 msgstr "מתקשר %s... "
 
-#: src/ant-phone.c:230
-#: src/ant-phone.c:239
-#: src/ant-phone.c:248
+#: src/ant-phone.c:230 src/ant-phone.c:239 src/ant-phone.c:248
 #, c-format
 msgid "successful.\n"
 msgstr ""
@@ -95,33 +96,27 @@ msgstr ""
 msgid "Do you really want to delete this recording?"
 msgstr "האם באמת שברצונך למחוק את הקלטה זו?"
 
-#: src/callerid.c:355
-#: src/callerid.c:383
+#: src/callerid.c:355 src/callerid.c:383
 msgid "/_Call"
 msgstr "/_קריאה"
 
-#: src/callerid.c:356
-#: src/callerid.c:387
+#: src/callerid.c:356 src/callerid.c:387
 msgid "/_Playback"
 msgstr "_השמעת הקלטה"
 
-#: src/callerid.c:357
-#: src/callerid.c:391
+#: src/callerid.c:357 src/callerid.c:391
 msgid "/_Save as..."
 msgstr "/_שמירה בשם..."
 
-#: src/callerid.c:358
-#: src/callerid.c:395
+#: src/callerid.c:358 src/callerid.c:395
 msgid "/Delete _Recording"
 msgstr "/_מחיקת הקלטה"
 
-#: src/callerid.c:360
-#: src/callerid.c:399
+#: src/callerid.c:360 src/callerid.c:399
 msgid "/_Delete Row"
 msgstr "/_מחיקת שורה"
 
-#: src/callerid.c:451
-#: src/gtksettings.c:491
+#: src/callerid.c:451 src/gtksettings.c:491
 msgid "Caller ID"
 msgstr ""
 
@@ -168,23 +163,16 @@ msgstr ""
 msgid "Name:"
 msgstr "שם:"
 
-#: src/controlpad.c:125
-#: src/gtk.c:758
+#: src/controlpad.c:125 src/gtk.c:758
 msgid "Number:"
 msgstr "מספר:"
 
-#: src/controlpad.c:145
-#: src/gtk.c:388
-#: src/gtk.c:508
-#: src/gtk.c:592
-#: src/gtksettings.c:611
-#: src/llcheck.c:350
+#: src/controlpad.c:145 src/gtk.c:388 src/gtk.c:508 src/gtk.c:592
+#: src/gtksettings.c:611 src/llcheck.c:350
 msgid "OK"
 msgstr "אישור"
 
-#: src/controlpad.c:158
-#: src/gtksettings.c:656
-#: src/session.c:73
+#: src/controlpad.c:158 src/gtksettings.c:656 src/session.c:73
 msgid "Cancel"
 msgstr "ביטול"
 
@@ -228,8 +216,7 @@ msgstr "בקרה"
 msgid "Recording"
 msgstr "הקלטה"
 
-#: src/controlpad.c:435
-#: src/controlpad.c:446
+#: src/controlpad.c:435 src/controlpad.c:446
 msgid "Record to file"
 msgstr "הקלטה אל קובץ"
 
@@ -241,8 +228,7 @@ msgstr "הקלטת ערוץ מקומי"
 msgid "Record remote channel"
 msgstr "הקלטת ערוץ מרוחק"
 
-#: src/gtk.c:406
-#: src/gtksettings.c:257
+#: src/gtk.c:406 src/gtksettings.c:257
 msgid "ANT Note"
 msgstr ""
 
@@ -267,14 +253,8 @@ msgstr "מכשיר קלט שמע:"
 msgid "Input speed:"
 msgstr "מהירות קלט:"
 
-#: src/gtk.c:438
-#: src/gtk.c:441
-#: src/gtk.c:442
-#: src/gtk.c:444
-#: src/gtk.c:448
-#: src/gtk.c:451
-#: src/gtk.c:452
-#: src/gtk.c:454
+#: src/gtk.c:438 src/gtk.c:441 src/gtk.c:442 src/gtk.c:444 src/gtk.c:448
+#: src/gtk.c:451 src/gtk.c:452 src/gtk.c:454
 msgid "[inactive]"
 msgstr "[לא פעיל]"
 
@@ -282,8 +262,7 @@ msgstr "[לא פעיל]"
 msgid "Input sample size (bits):"
 msgstr "שיעור דגימת קלט (סיביות):"
 
-#: src/gtk.c:442
-#: src/gtk.c:452
+#: src/gtk.c:442 src/gtk.c:452
 msgid "Input fragment size (samples):"
 msgstr ""
 
@@ -407,8 +386,7 @@ msgstr "/_טלפון"
 msgid "/Phone/_Info Window"
 msgstr "/טלפון/חלון _מידע"
 
-#: src/gtk.c:637
-#: src/gtk.c:685
+#: src/gtk.c:637 src/gtk.c:685
 msgid "/Phone/_Line Level Check"
 msgstr ""
 
@@ -424,19 +402,16 @@ msgstr "/טלפון/_יציאה"
 msgid "/_View"
 msgstr "/_תצוגה"
 
-#: src/gtk.c:643
-#: src/gtk.c:673
+#: src/gtk.c:643 src/gtk.c:673
 msgid "/View/_Caller ID Monitor"
 msgstr ""
 
-#: src/gtk.c:645
-#: src/gtk.c:676
+#: src/gtk.c:645 src/gtk.c:676
 msgid "/View/_Line Level Meters"
 msgstr ""
 
 # Pad replaced with Panel
-#: src/gtk.c:647
-#: src/gtk.c:679
+#: src/gtk.c:647 src/gtk.c:679
 msgid "/View/Control _Pad"
 msgstr "/תצוגה/לוח _בקרה"
 
@@ -444,8 +419,7 @@ msgstr "/תצוגה/לוח _בקרה"
 msgid "/_Options"
 msgstr "/_אפשרויות"
 
-#: src/gtk.c:650
-#: src/gtk.c:682
+#: src/gtk.c:650 src/gtk.c:682
 msgid "/Options/_Settings"
 msgstr "/אפשרויות/_הגדרות"
 
@@ -461,28 +435,21 @@ msgstr "/עזרה/_אודות"
 msgid "/Help/_License"
 msgstr "/עזרה/_רשיון"
 
-#: src/gtk.c:730
-#: src/gtksettings.c:467
-#: src/session.c:73
+#: src/gtk.c:730 src/gtksettings.c:467 src/session.c:73
 msgid "Dialing"
 msgstr "חיוג"
 
-#: src/gtk.c:825
-#: src/session.c:71
-#: src/session.c:72
+#: src/gtk.c:825 src/session.c:71 src/session.c:72
 msgid "Answer"
 msgstr "לענות"
 
 # + Replaced with "To Reject"
 # - Replaced with Rejection
-#: src/gtk.c:875
-#: src/session.c:71
-#: src/session.c:72
+#: src/gtk.c:875 src/session.c:71 src/session.c:72
 msgid "Reject"
 msgstr "לדחות"
 
-#: src/gtk.c:1026
-#: src/gtk.c:1027
+#: src/gtk.c:1026 src/gtk.c:1027
 msgid "MUTED"
 msgstr "מושתק"
 
@@ -565,8 +532,7 @@ msgstr ""
 msgid "Maximum CID rows:"
 msgstr "מספר שורות CID מרבי:"
 
-#: src/gtksettings.c:511
-#: src/gtksettings.c:539
+#: src/gtksettings.c:511 src/gtksettings.c:539
 msgid "[no limit]"
 msgstr "[ללא הגבלה]"
 
@@ -629,22 +595,16 @@ msgstr "מוכן"
 msgid "Dial"
 msgstr "חיוג"
 
-#: src/session.c:70
-#: src/session.c:74
-#: src/session.c:75
+#: src/session.c:70 src/session.c:74 src/session.c:75
 msgid "Hang up"
 msgstr "סיום שיחה"
 
-#: src/session.c:71
-#: src/session.c:72
+#: src/session.c:71 src/session.c:72
 #, fuzzy
 msgid "RING"
 msgstr "צלצול"
 
-#: src/session.c:73
-#: src/session.c:74
-#: src/session.c:75
-#: src/session.c:76
+#: src/session.c:73 src/session.c:74 src/session.c:75 src/session.c:76
 msgid "Pick up"
 msgstr "לענות"
 
@@ -665,9 +625,7 @@ msgstr "השמעת הקלטה"
 msgid "Stop"
 msgstr "הפסקה"
 
-#: src/session.c:553
-#: src/session.c:554
-#: src/session.c:1119
+#: src/session.c:553 src/session.c:554 src/session.c:1119
 msgid "(no caller ID)"
 msgstr ""
 
@@ -677,8 +635,7 @@ msgid "<b>Call from: %s</b>"
 msgstr "<b>קריאה מאת: %s</b>"
 
 #. TRANSLATORS: A status info about an aborted phone call
-#: src/session.c:638
-#: src/session.c:1655
+#: src/session.c:638 src/session.c:1655
 msgid "(ABORTED)"
 msgstr "(הופסק)"
 
@@ -771,4 +728,3 @@ msgstr "שמע מופעל"
 #: src/session.c:1661
 msgid "(REJECTED)"
 msgstr "(נדחה)"
-
